@@ -634,7 +634,9 @@ do {
     check(jump2 <= natural * 1.6, "…and no step much larger than the sine's own (\(jump2))")
     let firstDiff = (0..<min(sine.count, l.count)).first { sine[$0] != l[$0] } ?? -1
     check(firstDiff >= 120 && firstDiff <= 360, "the change is in the packet's middle half (at \(firstDiff))")
-    let q = (120..<360).min { abs(sine[$0]) + abs(sine[$0 + 1]) < abs(sine[$1]) + abs(sine[$1 + 1]) } ?? 0
+    // 先算出每点的"安静度"再比较：写成一个闭包时 Xcode 26 的编译器类型推断超时。
+    func loudness(_ i: Int) -> Float { abs(sine[i]) + abs(sine[i + 1]) }
+    let q = (120..<360).min { loudness($0) < loudness($1) } ?? 0
     check(firstDiff == q + 1, "…at its quietest point (\(q))")
     var n0 = sine, n1 = sine
     AudioPlayout.change(&n0, &n1, by: 0)
