@@ -79,6 +79,9 @@ public struct WindowList: Codable {
     /// login window, or none), left out while its own screen is locked. A device words its cover by it:
     /// nothing typed reaches the Mac then (`LockedMac.Why`).
     public var offConsole: Bool?
+    /// 这台 Mac 现在能接语音输入（kind 100–102，Voice.swift）：1 表示找到了可用的 meeppo-voice；nil（老主机
+    /// 不发这个字段）时设备不显示语音悬浮球。在初始化之后设置，同 `keyRepeat`。
+    public var voice: Int?
 
     public init(macName: String, windows: [WindowInfo], active: StreamSource, launchID: String? = nil,
                 hostVersion: String? = nil, protocol: Int? = nil, gestures: Int? = nil, clipboard: Int? = nil) {

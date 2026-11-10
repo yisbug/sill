@@ -91,6 +91,12 @@ public enum StreamMessageKind: UInt8 {
                              // From the device once per interruption while its keyframe is due, again when it
                              // has not come in 4 s (or four round trips), 2 s apart at least (KeyframeRecovery);
                              // at most one a second per connection on the host
+    // 语音输入（Voice.swift，docs/voice-and-immersive-plan.md 第 2 节）：本 fork 的 100–102，避开上游已用或预留
+    // 到 45 的段。老版本读成 `.unknown` 并跳过；设备只向窗口列表 `voice` 为 1 的主机发 100 和 102。
+    case voiceClip = 100     // 设备 → Mac，二进制 VoiceClip：片段号、格式、音频（至多 4 MiB）。Mac 交给本机的
+                             // meeppo-voice 识别，把文字当作这台设备的文字输入打进串流的应用
+    case voiceResult = 101   // Mac → 设备，JSON VoiceResult：一个片段的结果，只回给发它的连接
+    case voiceCancel = 102   // 设备 → Mac，JSON VoiceCancel：取消还在处理的片段
     case unknown = 255       // never sent: what parseHeader yields for a kind this build does not know
 }
 
