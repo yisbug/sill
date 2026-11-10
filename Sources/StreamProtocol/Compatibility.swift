@@ -115,10 +115,44 @@ public struct Hello: Codable, Sendable, Equatable {
     /// ["aac-eld"]). Nil from a device that plays none, every device before 2026-09-27: a host sends
     /// it no kind 43 (Audio.swift).
     public var audio: [String]?
+    /// 设备首选语言；只发送前五项，旧设备不发送时沿用 Mac 的语言。
+    public var languages: [String]?
 
     public init(appVersion: String? = nil, build: String? = nil, protocol: Int? = nil, device: String? = nil,
-                audio: [String]? = nil) {
+                audio: [String]? = nil, languages: [String]? = nil) {
         self.appVersion = appVersion; self.build = build; self.protocol = `protocol`; self.device = device
         self.audio = audio
+        self.languages = languages
+    }
+}
+
+/// 为跨设备文案选择主机实际支持的语言；没有语言字段的旧设备沿用主机语言。
+public enum DeviceLanguage {
+    public static var hostLocale: Locale {
+        Locale(identifier: Bundle.main.preferredLocalizations.first ?? Locale.current.identifier)
+    }
+
+    /// locale 决定格式和复数；明确指定 lproj 才能使文字也遵循设备语言。
+    public static func bundle(for locale: Locale, in bundle: Bundle = .main) -> Bundle {
+        guard let path = bundle.path(forResource: locale.identifier, ofType: "lproj"),
+              let localized = Bundle(path: path) else { return bundle }
+        return localized
+    }
+
+    public static func locale(languages: [String]?, localizations: [String] = Bundle.main.localizations,
+                              current: Locale = hostLocale) -> Locale {
+        guard let languages else { return current }
+        let supported = localizations.filter { $0 != "Base" }
+        for language in languages.prefix(5) {
+            guard let candidate = Bundle.preferredLocalizations(from: supported, forPreferences: [language]).first else { continue }
+            let requested = Locale.Language(identifier: language)
+            let available = Locale.Language(identifier: candidate)
+            // Bundle 的默认回退不能抢在设备的下一个首选语言前面；中文也须区分字形。
+            guard requested.languageCode == available.languageCode,
+                  requested.maximalIdentifier.split(separator: "-").prefix(2) == available.maximalIdentifier.split(separator: "-").prefix(2)
+            else { continue }
+            return Locale(identifier: candidate)
+        }
+        return Locale(identifier: "en")
     }
 }

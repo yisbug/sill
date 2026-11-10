@@ -14,19 +14,26 @@ import Foundation
 ///
 /// Threads: every call on one queue (the pipeline's `sill.audio`); nothing here locks.
 final class AudioEncoder {
+    private static func localizedBundle(_ locale: Locale) -> Bundle {
+        guard let path = Bundle.main.path(forResource: locale.identifier, ofType: "lproj"),
+              let bundle = Bundle(path: path) else { return .main }
+        return bundle
+    }
+
     struct Failure: Error, CustomStringConvertible {
         let status: OSStatus
         let step: String
         var description: String { "\(step) failed (\(status)\(Self.fourCC(status)))" }
-        var localizedDescription: String {
+        var localizedDescription: String { localizedDescription(locale: Locale(identifier: Bundle.main.preferredLocalizations.first ?? Locale.current.identifier)) }
+        func localizedDescription(locale: Locale) -> String {
             let suffix = Self.fourCC(status)
             switch step {
-            case "AAC-ELD's format": return String(localized: "AAC-ELD's format failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
-            case "AudioConverterNew": return String(localized: "AudioConverterNew failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
-            case "the bitrate": return String(localized: "the bitrate failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
-            case "the output format": return String(localized: "the output format failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
-            case "the priming": return String(localized: "the priming failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
-            case "the magic cookie": return String(localized: "the magic cookie failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "AAC-ELD's format": return String(localized: "AAC-ELD's format failed (\(String(status))\(suffix))", bundle: AudioEncoder.localizedBundle(locale), locale: locale, comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "AudioConverterNew": return String(localized: "AudioConverterNew failed (\(String(status))\(suffix))", bundle: AudioEncoder.localizedBundle(locale), locale: locale, comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "the bitrate": return String(localized: "the bitrate failed (\(String(status))\(suffix))", bundle: AudioEncoder.localizedBundle(locale), locale: locale, comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "the output format": return String(localized: "the output format failed (\(String(status))\(suffix))", bundle: AudioEncoder.localizedBundle(locale), locale: locale, comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "the priming": return String(localized: "the priming failed (\(String(status))\(suffix))", bundle: AudioEncoder.localizedBundle(locale), locale: locale, comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "the magic cookie": return String(localized: "the magic cookie failed (\(String(status))\(suffix))", bundle: AudioEncoder.localizedBundle(locale), locale: locale, comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
             default: return description
             }
         }

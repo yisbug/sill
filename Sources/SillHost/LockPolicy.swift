@@ -572,7 +572,10 @@ enum LockPolicy {
     static let unlockedLine = "Unlocked: this Mac's screen is unlocked; devices see its windows again."
 
     /// The menus' note for a fetch or a choice refused while locked.
-    static let menuNote = String(localized: "The Mac is locked.", comment: "设备菜单：Mac 已锁定提示")
+    static var menuNote: String { menuNote(locale: DeviceLanguage.hostLocale) }
+    static func menuNote(locale: Locale) -> String {
+        String(localized: "The Mac is locked.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备菜单：Mac 已锁定提示")
+    }
 
     /// One kind's refusals of the last minute (RefusalSummary: the first at once).
     static func refusedLine(_ kind: Refusal, count: Int) -> String {

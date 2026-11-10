@@ -2058,7 +2058,7 @@ final class StreamClient: ObservableObject {
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String
         // The codecs of the Mac's sound it plays: a Mac sends kind 43 only to a device that lists one.
         return Wire.encode(Hello(appVersion: version, build: build, protocol: SillProtocol.current, device: ClientStatsReporter.deviceName,
-                                 audio: AudioCodec.devicePlays))
+                                 audio: AudioCodec.devicePlays, languages: Array(Locale.preferredLanguages.prefix(5))))
     }()
 
     /// The hello, the first thing on every session connection, written straight to `c` before
@@ -4637,12 +4637,16 @@ extension StreamClient {
             print("link: keeping up")
             return
         }
-        let quality = QualityPreset.name(forBitrate: new.bitrate)
+        let quality = QualityPreset.englishName(forBitrate: new.bitrate)
         guard new.isBehind else {
             print("link: \(new.state) (cannot carry \(quality); the Mac's alone: nothing shown)")
             return
         }
-        let suggesting = AwayCopy.suggestion(new).map { "suggesting \($0.title)" } ?? "nothing lower to suggest"
+        let suggesting = new.suggestedBitrate.map { bitrate in
+            let title = new.suggestedCaptureScale.map { QualityPreset.englishShortTitle(bitrate: bitrate, captureScale: $0) }
+                ?? QualityPreset.englishName(forBitrate: bitrate)
+            return "suggesting \(title)"
+        } ?? "nothing lower to suggest"
         print("link: behind (cannot carry \(quality); \(suggesting))")
     }
     #endif

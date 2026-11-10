@@ -753,13 +753,13 @@ struct HostSettingsPanel: View {
     /// own (see `header`). A no-break space before each "·" keeps it with the value before it, so a
     /// wrap at larger text never starts a line with one.
     static func readout(_ stream: RunningStream?, route: DiscoveryPolicy.Method? = nil) -> String {
-        let values = stream.map { ["\($0.width)×\($0.height)", String(localized: "\($0.fps)\u{00A0}fps", comment: "主机设置面板：参数及单位，插值为数值"), String(localized: "\($0.mbps)\u{00A0}Mbps", comment: "主机设置面板：参数及单位，插值为数值")] } ?? [String(localized: "Not streaming", comment: "主机设置面板：当前未串流的状态")]
+        let values = stream.map { ["\($0.width)×\($0.height)", String(localized: "\($0.fps.formatted(.number.grouping(.never)))\u{00A0}fps", comment: "主机设置面板：参数及单位，插值为数值"), String(localized: "\($0.mbps.formatted(.number.grouping(.never)))\u{00A0}Mbps", comment: "主机设置面板：参数及单位，插值为数值")] } ?? [String(localized: "Not streaming", comment: "主机设置面板：当前未串流的状态")]
         return (values + [route?.word].compactMap { $0 }).joined(separator: "\u{00A0}· ")
     }
 
     /// "48 ms", the last second's median round trip; "–" for a second without a pong.
     static func rttText(_ stats: StreamClient.LinkStats?) -> String {
-        stats?.rtt.map { String(localized: "\($0.median)\u{00A0}ms", comment: "主机设置面板：参数及单位，插值为数值") } ?? "–"
+        stats?.rtt.map { String(localized: "\($0.median.formatted(.number.grouping(.never)))\u{00A0}ms", comment: "主机设置面板：参数及单位，插值为数值") } ?? "–"
     }
 
     /// The readout as VoiceOver says it, ending in how this device reaches the Mac: its link, or
@@ -769,11 +769,11 @@ struct HostSettingsPanel: View {
                               rttMs: Int? = nil) -> String {
         var link = route.map { ", " + spoken($0) } ?? ""
         if let remote {
-            link = ", " + (rttMs.map { String(localized: "connected \(remote.phrase), \($0) millisecond round trip", comment: "主机设置面板：远程连接及延迟的无障碍从句，插值为连接方式和毫秒数") } ?? String(localized: "connected \(remote.phrase)", comment: "主机设置面板：远程连接的无障碍从句，插值为连接方式"))
+            link = ", " + (rttMs.map { String(localized: "connected \(remote.phrase), \($0.formatted(.number.grouping(.never))) millisecond round trip", comment: "主机设置面板：远程连接及延迟的无障碍从句，插值为连接方式和毫秒数") } ?? String(localized: "connected \(remote.phrase)", comment: "主机设置面板：远程连接的无障碍从句，插值为连接方式"))
         }
         guard let s = stream else { return String(localized: "Not streaming\(link)", comment: "主机设置面板：未串流的无障碍读出，插值为可选连接方式") }
-        return s.onVirtualDisplay ? String(localized: "Streaming \(s.width) by \(s.height), \(s.fps) frames per second, \(s.mbps) megabits per second, on the virtual display\(link)", comment: "主机设置面板：虚拟显示器串流的无障碍读出，插值为分辨率、帧率、码率和连接方式")
-            : String(localized: "Streaming \(s.width) by \(s.height), \(s.fps) frames per second, \(s.mbps) megabits per second\(link)", comment: "主机设置面板：串流的无障碍读出，插值为分辨率、帧率、码率和连接方式")
+        return s.onVirtualDisplay ? String(localized: "Streaming \(s.width) by \(s.height), \(s.fps.formatted(.number.grouping(.never))) frames per second, \(s.mbps.formatted(.number.grouping(.never))) megabits per second, on the virtual display\(link)", comment: "主机设置面板：虚拟显示器串流的无障碍读出，插值为分辨率、帧率、码率和连接方式")
+            : String(localized: "Streaming \(s.width) by \(s.height), \(s.fps.formatted(.number.grouping(.never))) frames per second, \(s.mbps.formatted(.number.grouping(.never))) megabits per second\(link)", comment: "主机设置面板：串流的无障碍读出，插值为分辨率、帧率、码率和连接方式")
     }
 
     /// The route as VoiceOver says it: a sentence's end rather than the bare word.
@@ -815,18 +815,22 @@ struct HostSettingsPanel: View {
     /// for 60 fps.
     private var streamFooter: String {
         _ = powerState
-        var text = String(localized: "Quality is per 60 fps; a 120 fps stream gets twice as much. \(QualityPreset.fastLinkNote)", comment: "主机设置面板：质量及连接要求说明，插值为质量策略说明")
+        let first = String(localized: "Quality is per 60 fps; a 120 fps stream gets twice as much.", comment: "主机设置面板：画质按 60 fps 计算的说明")
+        let second = QualityPreset.fastLinkNote
+        let text = String(localized: "\(first) \(second)", comment: "两句之间的连接；中文译为不带空格")
         let away = client.awayCapsFrameRate
         let wanted = StreamClient.wantedFPS(remote: away)
         guard wanted < 120 else { return text }
+        let limit: String
+        let frameRate = wanted.formatted(.number.grouping(.never))
         if away, StreamClient.wantedFPS() > wanted {
-            text += " " + String(localized: "Away from home, this \(device) asks for \(wanted) fps, which halves the data your Mac sends.", comment: "主机设置面板：帧率限制说明，插值为设备类型和帧率")
+            limit = String(localized: "Away from home, this \(device) asks for \(frameRate) fps, which halves the data your Mac sends.", comment: "主机设置面板：帧率限制说明，插值为设备类型和帧率")
         } else if ProcessInfo.processInfo.isLowPowerModeEnabled, StreamClient.screenMaximumFPS() >= 120 {
-            text += " " + String(localized: "Low Power Mode holds this \(device) to \(wanted) fps.", comment: "主机设置面板：帧率限制说明，插值为设备类型和帧率")
+            limit = String(localized: "Low Power Mode holds this \(device) to \(frameRate) fps.", comment: "主机设置面板：帧率限制说明，插值为设备类型和帧率")
         } else {
-            text += " " + String(localized: "This \(device) shows up to \(wanted) fps.", comment: "主机设置面板：帧率限制说明，插值为设备类型和帧率")
+            limit = String(localized: "This \(device) shows up to \(frameRate) fps.", comment: "主机设置面板：帧率限制说明，插值为设备类型和帧率")
         }
-        return text
+        return String(localized: "\(text) \(limit)", comment: "两句之间的连接；中文译为不带空格")
     }
 }
 

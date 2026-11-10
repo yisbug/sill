@@ -464,6 +464,7 @@ package final class StreamCoordinator {
         }
         catalog.isLocked = { gate.locked }
         clipboard.isLocked = { gate.locked }
+        menus.deviceLocale = { [weak self] connection in self?.deviceLocales[ObjectIdentifier(connection)] ?? DeviceLanguage.hostLocale }
         menus.isLocked = { gate.locked }
         injector.lockReading = { gate.reading }
         stage.mayWarp = { gate.reading != .offConsole }       // the cursor is the console's then, never moved from here
@@ -497,6 +498,7 @@ package final class StreamCoordinator {
         }
         voice.send = { [server] message, connection in server.send(message, to: connection) }
         voice.inject = { [weak self] text, connection in await self?.typeVoiceText(text, from: connection) ?? .nothingStreams }
+        voice.deviceLocale = { [weak self] connection in self?.deviceLocales[ObjectIdentifier(connection)] ?? DeviceLanguage.hostLocale }
         voice.deviceName = { [weak self] connection in self?.deviceName(connection) ?? "\(connection.endpoint)" }
         voice.onAvailabilityChanged = { [weak self] available, broadcast in
             guard let self else { return }
@@ -588,6 +590,7 @@ package final class StreamCoordinator {
                 self.connections[id] = nil
                 self.appsAndIconsSent.remove(id)
                 self.lastPublished[id] = nil
+                self.deviceLocales[id] = nil
                 self.linkReports[id] = nil
                 if self.flipWait == id { self.flipWait = nil }
                 self.menus.clientLeft(connection)
@@ -700,9 +703,12 @@ package final class StreamCoordinator {
         server.onClientHello = { [weak self] connection, hello in
             let id = ObjectIdentifier(connection)
             let name = SafeText.label(hello.device ?? "")
-            guard !name.isEmpty else { return }
             Task { @MainActor in
-                self?.status.update {
+                guard let self else { return }
+                self.deviceLocales[id] = DeviceLanguage.locale(languages: hello.languages)
+                self.publishSettings()
+                guard !name.isEmpty else { return }
+                self.status.update {
                     guard let i = $0.devices.firstIndex(where: { $0.id == id }), $0.devices[i].name == nil else { return }
                     $0.devices[i].name = name
                 }
@@ -869,7 +875,7 @@ package final class StreamCoordinator {
         }
         stageLosses = 0
         stage.disabledReason = apiProblem
-        stage.localizedDisabledReason = apiProblem == nil ? nil : VirtualDisplay.checkPrivateAPI(localized: true).joined(separator: "; ")
+        stage.disabledReasonText = apiProblem == nil ? nil : { locale in VirtualDisplay.checkPrivateAPI(localized: true, locale: locale).joined(separator: "; ") }
         status.update {
             $0.virtualDisplayProblem = stage.localizedDisabledReason
             $0.virtualDisplayAPIMissing = apiProblem != nil
@@ -1011,6 +1017,7 @@ package final class StreamCoordinator {
         catalog.preferMainDisplay = next.virtualDisplay   // the Desktop source must never capture the virtual display
         if old.virtualDisplay && !next.virtualDisplay {
             stage.release()        // idempotent: select has already sent a staged window home
+            lastStageFailureText = nil
             status.update { $0.lastStageFailure = nil }
         }
         if !old.virtualDisplay && next.virtualDisplay { enableVirtualDisplay() }
@@ -1600,9 +1607,9 @@ package final class StreamCoordinator {
         lockRefusals[why]?.count(why.rawValue)
         switch message.kind {
         case .fetchMenu:
-            if let r = Wire.decode(FetchMenu.self, from: message.payload) { menus.refuse(r, from: connection, note: LockPolicy.menuNote) }
+            if let r = Wire.decode(FetchMenu.self, from: message.payload) { menus.refuse(r, from: connection, note: LockPolicy.menuNote(locale: deviceLocales[ObjectIdentifier(connection)] ?? DeviceLanguage.hostLocale)) }
         case .pressMenuItem:
-            if let r = Wire.decode(PressMenuItem.self, from: message.payload) { menus.refuse(r, from: connection, note: LockPolicy.menuNote) }
+            if let r = Wire.decode(PressMenuItem.self, from: message.payload) { menus.refuse(r, from: connection, note: LockPolicy.menuNote(locale: deviceLocales[ObjectIdentifier(connection)] ?? DeviceLanguage.hostLocale)) }
         default:
             break
         }
@@ -1996,6 +2003,7 @@ package final class StreamCoordinator {
                     displayScale = CaptureScale.virtualDisplay
                     size = prepared.outputSize ?? prepared.sourceRect.size
                     describe = prepared.describe + (useSoftwareEncoder ? " (software encoder)" : "")
+                    lastStageFailureText = nil
                     status.update { $0.lastStageFailure = nil }
                 } catch {
                     // Locked while the window was being staged: no display was made (or it goes now), and
@@ -2007,10 +2015,14 @@ package final class StreamCoordinator {
                     stage.release()
                     // For the menu: why this window streams in place, and whether the stage gave up
                     // for the run (it does after repeated display creation failures).
-                    let why = (error as? VirtualStage.Failure).map { failure in
-                        if case .disabled = failure { return stage.localizedDisabledReason ?? failure.summary }
-                        return failure.summary
-                    } ?? "\(error)"
+                    let disabledText = stage.disabledReasonText
+                    lastStageFailureText = { locale in
+                        (error as? VirtualStage.Failure).map { failure in
+                            if case .disabled = failure { return disabledText?(locale) ?? failure.summary(locale: locale) }
+                            return failure.summary(locale: locale)
+                        } ?? "\(error)"
+                    }
+                    let why = lastStageFailureText?(DeviceLanguage.hostLocale)
                     status.update {
                         $0.lastStageFailure = why
                         if let off = stage.localizedDisabledReason { $0.virtualDisplayProblem = off }
@@ -2094,7 +2106,8 @@ package final class StreamCoordinator {
             if virtualDisplay, stage.isStaged, let w = picked {
                 // The display filter failed to start: send the window home and stream it there.
                 print("Capture on the virtual display failed: \(error); retrying with the real window.")
-                status.update { $0.lastStageFailure = String(localized: "capture on the display failed", comment: "虚拟显示器设置：显示器捕获失败") }
+                lastStageFailureText = { locale in String(localized: "capture on the display failed", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：显示器捕获失败") }
+                status.update { $0.lastStageFailure = lastStageFailureText?(DeviceLanguage.hostLocale) }
                 stage.release()
                 if comeForward, !shuttingDown { activateAndRaise(window: w) }   // regular mode now: a pick comes forward
                 let fallback = "\(w.owningApplication?.applicationName ?? "?") — \(w.title ?? "")\(useSoftwareEncoder ? " (software encoder)" : "")"
@@ -2825,7 +2838,7 @@ package final class StreamCoordinator {
     private func audioFollow() {
         let (key, reason) = audioKey()
         audio.follow(key, reason: reason) { [weak self] key in
-            await self?.makeAudioSource(key) ?? .localizedFailure("the host is shutting down", String(localized: "the host is shutting down", comment: "音频状态：主机正在关闭"))
+            await self?.makeAudioSource(key) ?? .localizedFailure("the host is shutting down", { locale in String(localized: "the host is shutting down", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：主机正在关闭") })
         }
     }
 
@@ -2835,11 +2848,11 @@ package final class StreamCoordinator {
     private func makeAudioSource(_ key: AudioKey) async -> AudioPipeline.Made {
         switch key {
         case .none:
-            return .localizedFailure("nothing to capture", String(localized: "nothing to capture", comment: "音频状态：没有可捕获的内容"))
+            return .localizedFailure("nothing to capture", { locale in String(localized: "nothing to capture", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：没有可捕获的内容") })
         case .test:
             return .source(SyntheticAudio(queue: audio.queue), line: "Audio: a test tone (440 Hz at -30 dBFS, a click at each second).")
         case .desktop:
-            guard let display = catalog.display else { return .localizedFailure("no display to capture from", String(localized: "no display to capture from", comment: "音频状态：没有可供捕获的显示器")) }
+            guard let display = catalog.display else { return .localizedFailure("no display to capture from", { locale in String(localized: "no display to capture from", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：没有可供捕获的显示器") }) }
             let filter: SCContentFilter
             if let own = catalog.ownApplication {
                 filter = SCContentFilter(display: display, excludingApplications: [own], exceptingWindows: [])
@@ -2848,10 +2861,10 @@ package final class StreamCoordinator {
             }
             return .source(AudioCapture(filter: filter, queue: audio.queue), line: "Audio: capturing the whole Mac's sound (every app but Sill).")
         case .app(let pid, let name):
-            guard let display = catalog.display else { return .localizedFailure("no display to capture from", String(localized: "no display to capture from", comment: "音频状态：没有可供捕获的显示器")) }
+            guard let display = catalog.display else { return .localizedFailure("no display to capture from", { locale in String(localized: "no display to capture from", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：没有可供捕获的显示器") }) }
             guard let app = await runningApplication(pid) else {
                 return .localizedFailure("\(name) is not among the apps ScreenCaptureKit lists",
-                                         String(localized: "\(name) is not among the apps ScreenCaptureKit lists", comment: "音频状态：系统未列出应用，插值为应用名称"))
+                                         { locale in String(localized: "\(name) is not among the apps ScreenCaptureKit lists", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：系统未列出应用，插值为应用名称") })
             }
             let filter = SCContentFilter(display: display, including: [app], exceptingWindows: [])
             return .source(AudioCapture(filter: filter, queue: audio.queue), line: "Audio: capturing \(name)'s sound (every window of it).")
@@ -2886,7 +2899,8 @@ package final class StreamCoordinator {
         print("The system removed the virtual display; the window is back on a real display.")
         if stageLosses > 2 {
             stage.disabledReason = "the system removed the virtual display \(stageLosses) times"
-            stage.localizedDisabledReason = String(localized: "the system removed the virtual display \(String(stageLosses)) times", comment: "虚拟显示器设置：被系统重复移除，插值为次数")
+            let count = stageLosses
+            stage.disabledReasonText = { locale in String(localized: "the system removed the virtual display \(String(count)) times", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：被系统重复移除，插值为次数") }
             status.update { $0.virtualDisplayProblem = stage.localizedDisabledReason }
         }
         if case .window = active { await select(active) }
@@ -3438,6 +3452,8 @@ package final class StreamCoordinator {
 
     /// The last state each connection was sent: at connect (`sendCatalog`) and by each publish.
     /// Answers never touch it.
+    private var deviceLocales: [ObjectIdentifier: Locale] = [:]
+    private var lastStageFailureText: ((Locale) -> String)?
     private var lastPublished: [ObjectIdentifier: HostSettingsState] = [:]
 
     /// Connection `id`'s state (docs/remote-bundle-plan.md §5.4): the pair its controls set (the
@@ -3453,6 +3469,7 @@ package final class StreamCoordinator {
     /// change, and none comes while nothing streams.
     private func settingsState(for id: ObjectIdentifier, answering: Int? = nil) -> HostSettingsState {
         let t = target, s = status.snapshot
+        let locale = deviceLocales[id] ?? DeviceLanguage.hostLocale
         let thisAway = routes[id]?.isAway ?? false
         // A report about the bitrate that runs while it is still the target's; one about a bitrate a
         // pick has just replaced is stale (the restart's reset clears it a moment later).
@@ -3465,13 +3482,13 @@ package final class StreamCoordinator {
         return HostSettingsState(settings: t.streamSettings(away: thisAway),
                                  persistent: onDeviceSettingsChange != nil,
                                  virtualDisplayAvailable: appKitLoop,
-                                 virtualDisplayNote: virtualDisplayNote(target: t, snapshot: s),
+                                 virtualDisplayNote: virtualDisplayNote(target: t, snapshot: s, locale: locale),
                                  softwareEncoder: s.softwareEncoder,
                                  stream: s.stream?.wire,
                                  answering: answering,
                                  away: away,
                                  link: link,
-                                 audioNote: t.sendAudio ? s.audio?.note : nil,
+                                 audioNote: t.sendAudio ? audio.note(locale: locale) : nil,
                                  sessionPaired: sessionPaired(id))
     }
 
@@ -3490,12 +3507,12 @@ package final class StreamCoordinator {
     /// The Mac's Virtual Display pane in its order (SettingsPanes.swift, `statusText`), without the
     /// permission lines: permissions are polled, not event-driven, and a missing one still reaches
     /// the device as the fallback reason on the next pick.
-    private func virtualDisplayNote(target t: HostConfig, snapshot s: HostStatusSnapshot) -> String? {
-        if !appKitLoop { return String(localized: "Start SillHost with --virtual-display to use it.", comment: "设备设置：启动主机时启用虚拟显示器") }
-        if s.virtualDisplayAPIMissing, let p = s.virtualDisplayProblem { return String(localized: "Not available on this version of macOS: \(p)", comment: "设备设置：系统不支持虚拟显示器，插值为错误说明") }
+    private func virtualDisplayNote(target t: HostConfig, snapshot s: HostStatusSnapshot, locale: Locale) -> String? {
+        if !appKitLoop { return String(localized: "Start SillHost with --virtual-display to use it.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备设置：启动主机时启用虚拟显示器") }
+        if s.virtualDisplayAPIMissing, let p = stage.disabledReasonText?(locale) { return String(localized: "Not available on this version of macOS: \(p)", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备设置：系统不支持虚拟显示器，插值为错误说明") }
         guard t.virtualDisplay else { return nil }
-        if let p = s.virtualDisplayProblem { return String(localized: "Off for this session: \(p). Turn it off and on to try again.", comment: "设备设置：本次虚拟显示器已停用，插值为错误说明") }
-        if let f = s.lastStageFailure { return String(localized: "The last window streamed where it is: \(f)", comment: "设备设置：上次窗口原位串流，插值为失败说明") }
+        if let p = stage.disabledReasonText?(locale) { return String(localized: "Off for this session: \(p). Turn it off and on to try again.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备设置：本次虚拟显示器已停用，插值为错误说明") }
+        if let f = lastStageFailureText?(locale) { return String(localized: "The last window streamed where it is: \(f)", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备设置：上次窗口原位串流，插值为失败说明") }
         return nil
     }
 

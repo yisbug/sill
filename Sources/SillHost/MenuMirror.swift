@@ -62,7 +62,7 @@ final class MenuMirror {
     /// The app did not answer a read within the timeout: presses are refused and fetches answered
     /// with `note`, until a read (each catalog poll) succeeds again.
     private var stale = false
-    private var note: String?
+    private var note: MenuRefusal?
     /// The top level was refused for Accessibility: read again at each catalog poll, so a grant
     /// shows the menus without a pick.
     private var untrusted = false
@@ -152,7 +152,7 @@ final class MenuMirror {
         let menu = r.id.flatMap(MenuPath.init)?.id
         guard allowed else {
             Stats.shared.bump("menu.refused")
-            send(MacMenu(version: version, answering: r.token, menu: menu, items: [], note: MenuRefusal.tooManyNote), to: c)
+            send(MacMenu(version: version, answering: r.token, menu: menu, items: [], note: MenuRefusal.tooManyNote(locale: deviceLocale(c))), to: c)
             return
         }
         guard let menuID = r.id else { subscribe(c, token: r.token); return }
@@ -160,7 +160,7 @@ final class MenuMirror {
         // and its target may be one nobody watches any more.
         guard subscribers[id] != nil else {
             Stats.shared.bump("menu.refused")
-            send(MacMenu(version: version, answering: r.token, menu: menu, items: [], note: MenuRefusal.changedNote), to: c)
+            send(MacMenu(version: version, answering: r.token, menu: menu, items: [], note: MenuRefusal.changedNote(locale: deviceLocale(c))), to: c)
             return
         }
         enqueue { await self.serveFetch(r, id: menuID, to: c, arrived: now) }
@@ -179,13 +179,13 @@ final class MenuMirror {
         rates[id] = rate
         guard allowed else {
             Stats.shared.bump("menu.refused")
-            send(MacMenu(version: version, answering: r.token, pressed: false, note: MenuRefusal.tooManyNote), to: c)
+            send(MacMenu(version: version, answering: r.token, pressed: false, note: MenuRefusal.tooManyNote(locale: deviceLocale(c))), to: c)
             return
         }
         guard subscribers[id] != nil else {
             Stats.shared.bump("menu.refused")
             print("Menu from \(who) refused: \(r.id.flatMap(MenuPath.init)?.id ?? SafeText.label(r.id ?? "no id", limit: 32)): \(MenuRefusal.changed.logReason(app: ""))")
-            send(MacMenu(version: version, answering: r.token, pressed: false, note: MenuRefusal.changedNote), to: c)
+            send(MacMenu(version: version, answering: r.token, pressed: false, note: MenuRefusal.changedNote(locale: deviceLocale(c))), to: c)
             return
         }
         enqueue { await self.servePress(r, to: c, who: who, arrived: now) }
@@ -195,6 +195,8 @@ final class MenuMirror {
     /// comes while it says locked reads, activates and presses nothing (it may have waited behind others
     /// since before the lock). Unset: never locked (the menu checks' harness).
     var isLocked: () -> Bool = { false }
+    /// Sill 自己的菜单提示使用连接设备的语言，应用原生菜单保持原文。
+    var deviceLocale: (NWConnection) -> Locale = { _ in DeviceLanguage.hostLocale }
 
     /// This Mac's screen is locked (the coordinator's LockPolicy, docs/locked-mac-plan.md): a kind 27
     /// with an id, or a kind 25, answered at once with `note` (a choice: not pressed), nothing read,
@@ -285,7 +287,7 @@ final class MenuMirror {
             // Read even when this version's top level is known: nobody may have watched it change.
             if self.target != nil { _ = await self.readTop(version: self.version) }
             guard self.subscribers[id] != nil else { return }
-            self.send(self.topMessage(answering: token), to: c)
+            self.send(self.topMessage(answering: token, locale: self.deviceLocale(c)), to: c)
             self.publishTop(except: id)
         }
     }
@@ -302,12 +304,12 @@ final class MenuMirror {
             answer(MacMenu(version: version, answering: r.token, menu: path?.id, items: [], note: note))
         }
         // A locked Mac reads no menu (LockPolicy): this fetch came before the lock and waited its turn.
-        if isLocked() { refuse(LockPolicy.menuNote); return }
+        if isLocked() { refuse(LockPolicy.menuNote(locale: deviceLocale(c))); return }
         // What the device showed for the menu: the item at the id must still have it (an id is a place).
         let shown = r.title ?? ""
-        guard r.version == version, let path, let t = target, !shown.isEmpty else { refuse(MenuRefusal.changedNote); return }
+        guard r.version == version, let path, let t = target, !shown.isEmpty else { refuse(MenuRefusal.changedNote(locale: deviceLocale(c))); return }
         if stale {
-            answer(MacMenu(version: version, answering: r.token, menu: path.id, items: [], stale: true, note: note))
+            answer(MacMenu(version: version, answering: r.token, menu: path.id, items: [], stale: true, note: note?.note(app: label(t.app), locale: deviceLocale(c))))
             return
         }
         func cached(_ e: MenuCache.Entry) {
@@ -318,12 +320,12 @@ final class MenuMirror {
         if let e = cache.fresh(path.id, title: shown, now: CFAbsoluteTimeGetCurrent(), frontmostNow: true) { cached(e); return }
         // Its device has stopped waiting (it waited behind other requests): nothing is activated or read.
         if RequestDeadline.expired(waited: CFAbsoluteTimeGetCurrent() - arrived, rttMs: roundTrips[cid]) {
-            refuse(MenuRefusal.tooManyNote)
+            refuse(MenuRefusal.tooManyNote(locale: deviceLocale(c)))
             return
         }
         let v = version
         let frontmost = await prepare()
-        guard v == version, target?.pid == t.pid else { refuse(MenuRefusal.changedNote); return }
+        guard v == version, target?.pid == t.pid else { refuse(MenuRefusal.changedNote(locale: deviceLocale(c))); return }
         // Still not frontmost: a read now would return the last validation, an inactive app's too.
         if !frontmost, let e = cache.fresh(path.id, title: shown, now: CFAbsoluteTimeGetCurrent(), frontmostNow: false) { cached(e); return }
         // Brought forward after a read made while it was not: AppKit validates the menu again only
@@ -331,13 +333,13 @@ final class MenuMirror {
         let wait = frontmost ? cache.wait(path.id, now: CFAbsoluteTimeGetCurrent()) : 0
         if wait > 0 {
             try? await Task.sleep(for: .seconds(wait))
-            guard v == version, target?.pid == t.pid else { refuse(MenuRefusal.changedNote); return }
+            guard v == version, target?.pid == t.pid else { refuse(MenuRefusal.changedNote(locale: deviceLocale(c))); return }
         }
         // The activation and the wait can take a second and a half: the same checks again, now.
         guard subscribers[cid] != nil, !cutOff.contains(cid) else { return }
-        if isLocked() { refuse(LockPolicy.menuNote); return }
+        if isLocked() { refuse(LockPolicy.menuNote(locale: deviceLocale(c))); return }
         if RequestDeadline.expired(waited: CFAbsoluteTimeGetCurrent() - arrived, rttMs: roundTrips[cid]) {
-            refuse(MenuRefusal.tooManyNote)
+            refuse(MenuRefusal.tooManyNote(locale: deviceLocale(c)))
             return
         }
         // The top level again, then the menu, in one hop: a top level that changed meanwhile moves
@@ -368,22 +370,22 @@ final class MenuMirror {
             }
             return (top, reader.items(pid: t.pid, of: opener, path: path, shown: shown, ancestors: ancestors, until: until))
         }
-        guard v == version, target?.pid == t.pid else { refuse(MenuRefusal.changedNote); return }
+        guard v == version, target?.pid == t.pid else { refuse(MenuRefusal.changedNote(locale: deviceLocale(c))); return }
         if let topResult { applyTop(topResult, target: t) }
         // What that read found goes to the subscribers first: a changed top level (a new version), the
         // app gone or not answering, or a top level read here for the first time in this version (its
         // first read failed; the polls stop retrying once it is read). An unchanged one sends nothing.
         publishTop()
         guard v == version, target?.pid == t.pid else {
-            refuse(target == nil ? MenuRefusal.goneNote(label(t.app)) : MenuRefusal.changedNote)
+            refuse(target == nil ? MenuRefusal.goneNote(label(t.app), locale: deviceLocale(c)) : MenuRefusal.changedNote(locale: deviceLocale(c)))
             return
         }
         if stale {
-            answer(MacMenu(version: version, answering: r.token, menu: path.id, items: [], stale: true, note: note))
+            answer(MacMenu(version: version, answering: r.token, menu: path.id, items: [], stale: true, note: note?.note(app: label(t.app), locale: deviceLocale(c))))
             return
         }
         guard let menuResult else {
-            if case .failure(.notTrusted)? = topResult { refuse(MenuRefusal.noAccessNote) } else { refuse(MenuRefusal.changedNote) }
+            if case .failure(.notTrusted)? = topResult { refuse(MenuRefusal.noAccessNote(locale: deviceLocale(c))) } else { refuse(MenuRefusal.changedNote(locale: deviceLocale(c))) }
             return
         }
         switch menuResult {
@@ -405,7 +407,7 @@ final class MenuMirror {
             // other items now.
             guard submenus.read(menu: path.id, found: found, examined: menu.total - menu.unread) else {
                 treeChanged()
-                refuse(MenuRefusal.changedNote)
+                refuse(MenuRefusal.changedNote(locale: deviceLocale(c)))
                 return
             }
             let more = menu.unread
@@ -421,26 +423,26 @@ final class MenuMirror {
             } else if let recorded = submenus.title(of: path.id), recorded != found {
                 treeChanged()
             }
-            refuse(MenuRefusal.changedNote)
+            refuse(MenuRefusal.changedNote(locale: deviceLocale(c)))
         case .failure(.moved):
             treeChanged()
-            refuse(MenuRefusal.changedNote)
+            refuse(MenuRefusal.changedNote(locale: deviceLocale(c)))
         case .failure(.late):
             // Its time ran out on the way (the top level read first took it): nothing was read.
-            refuse(MenuRefusal.tooManyNote)
+            refuse(MenuRefusal.tooManyNote(locale: deviceLocale(c)))
         case .failure(.notAnswering):
             Stats.shared.bump("menu.axTimeout")
             becomeStale(t)
             publishTop()
-            answer(MacMenu(version: version, answering: r.token, menu: path.id, items: [], stale: true, note: note))
+            answer(MacMenu(version: version, answering: r.token, menu: path.id, items: [], stale: true, note: note?.note(app: label(t.app), locale: deviceLocale(c))))
         case .failure(.gone):
             targetGone()
             publishTop()
-            refuse(MenuRefusal.goneNote(label(t.app)))
+            refuse(MenuRefusal.goneNote(label(t.app), locale: deviceLocale(c)))
         case .failure(.notTrusted):
-            refuse(MenuRefusal.noAccessNote)
+            refuse(MenuRefusal.noAccessNote(locale: deviceLocale(c)))
         case .failure(.noMenuBar), .failure(.failed):
-            refuse(MenuRefusal.changedNote)
+            refuse(MenuRefusal.changedNote(locale: deviceLocale(c)))
         }
     }
 
@@ -454,7 +456,7 @@ final class MenuMirror {
         func refuse(_ why: MenuRefusal, what: String) {
             Stats.shared.bump("menu.refused")
             print("Menu from \(who) refused: \(what): \(why.logReason(app: app))")
-            send(MacMenu(version: version, answering: r.token, pressed: false, note: why.note(app: app)), to: c)
+            send(MacMenu(version: version, answering: r.token, pressed: false, note: why.note(app: app, locale: deviceLocale(c))), to: c)
         }
         // The Mac no longer serves its device (`clientRevoked`): a choice it made before that is not
         // made after it, nor its app brought forward for it.
@@ -470,7 +472,7 @@ final class MenuMirror {
             guard isLocked() else { return false }
             Stats.shared.bump("menu.refused")
             print("Menu from \(who) refused: \(shownID): this Mac is locked")
-            send(MacMenu(version: version, answering: r.token, pressed: false, note: LockPolicy.menuNote), to: c)
+            send(MacMenu(version: version, answering: r.token, pressed: false, note: LockPolicy.menuNote(locale: deviceLocale(c))), to: c)
             return true
         }
         if cutOffNow() || lockedNow() { return }
@@ -560,7 +562,7 @@ final class MenuMirror {
         case .failure(.gone):
             targetGone()
         case .failure(.notTrusted):
-            setTop(TopLevel(titles: [], enabled: []), [], note: MenuRefusal.noAccessNote)
+            setTop(TopLevel(titles: [], enabled: []), [], note: .notTrusted)
             untrusted = true
         case .failure(.noMenuBar):
             setTop(TopLevel(titles: [], enabled: []), [], note: nil)
@@ -575,7 +577,7 @@ final class MenuMirror {
 
     /// A top level as read: when this version already had one and it differs (titles, count,
     /// enabled flags, or menus where there were none), the version moves first.
-    private func setTop(_ level: TopLevel, _ items: [MacMenuItem], note newNote: String?) {
+    private func setTop(_ level: TopLevel, _ items: [MacMenuItem], note newNote: MenuRefusal?) {
         if topRead, level != topLevel { newVersion() }
         stale = false
         note = newNote
@@ -592,7 +594,7 @@ final class MenuMirror {
     private func becomeStale(_ t: Target) {
         guard !stale else { return }
         stale = true
-        note = MenuRefusal.notRespondingNote(label(t.app))
+        note = .notAnswering
         print("Menus of \(label(t.app)) not answering (\(String(format: "%.1f", Double(MenuReader.timeout))) s); shown as unavailable until it answers.")
     }
 
@@ -627,10 +629,10 @@ final class MenuMirror {
         untrusted = false
     }
 
-    private func topMessage(answering: Int?) -> MacMenu {
+    private func topMessage(answering: Int?, locale: Locale = DeviceLanguage.hostLocale) -> MacMenu {
         guard let t = target else { return MacMenu(version: version, menus: [], answering: answering) }
         return MacMenu(version: version, app: label(t.app), bundleID: t.bundleID, menus: top, answering: answering,
-                       stale: stale ? true : nil, note: note)
+                       stale: stale ? true : nil, note: note?.note(app: label(t.app), locale: locale))
     }
 
     /// The top level to every subscriber (but `except`), when it differs from the last one sent:
@@ -641,7 +643,7 @@ final class MenuMirror {
         let m = topMessage(answering: nil)
         guard m != lastSent else { return }
         lastSent = m
-        for (id, c) in subscribers where id != except { send(m, to: c) }
+        for (id, c) in subscribers where id != except { send(topMessage(answering: nil, locale: deviceLocale(c)), to: c) }
     }
 
     // MARK: Helpers

@@ -40,7 +40,7 @@ enum AwayPolicy {
 
     /// "Low · Standard", from the host's knobs.
     static func title(_ bitrate: Int, _ captureScale: CGFloat) -> String {
-        QualityPreset.shortTitle(bitrate: bitrate, captureScale: Double(captureScale))
+        QualityPreset.englishShortTitle(bitrate: bitrate, captureScale: Double(captureScale))
     }
 
     /// The word `HostConfig.changes(to:)` uses for a capture scale.

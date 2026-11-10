@@ -74,24 +74,31 @@ final class VirtualDisplay {
             }
         }
 
-        var localizedDescription: String {
+        var localizedDescription: String { localizedDescription(locale: Locale(identifier: Bundle.main.preferredLocalizations.first ?? Locale.current.identifier)) }
+        func localizedDescription(locale: Locale) -> String {
             switch self {
             case .classMissing(let c):
-                return String(localized: "private class \(c) not found in CoreGraphics (API removed or renamed)", comment: "虚拟显示器设置：缺少系统类，插值为类名")
+                return String(localized: "private class \(c) not found in CoreGraphics (API removed or renamed)", bundle: VirtualDisplay.localizedBundle(locale), locale: locale, comment: "虚拟显示器设置：缺少系统类，插值为类名")
             case .selectorMissing(let c, let s):
-                return String(localized: "private class \(c) does not respond to \(s)", comment: "虚拟显示器设置：缺少系统方法，插值为类名和方法名")
+                return String(localized: "private class \(c) does not respond to \(s)", bundle: VirtualDisplay.localizedBundle(locale), locale: locale, comment: "虚拟显示器设置：缺少系统方法，插值为类名和方法名")
             case .signatureChanged(let c, let s, let e, let f):
-                return String(localized: "\(c) \(s) changed signature: expected \(e), found \(f)", comment: "虚拟显示器设置：系统方法签名变化，插值为类、方法及签名")
+                return String(localized: "\(c) \(s) changed signature: expected \(e), found \(f)", bundle: VirtualDisplay.localizedBundle(locale), locale: locale, comment: "虚拟显示器设置：系统方法签名变化，插值为类、方法及签名")
             case .initReturnedNil(let c):
-                return String(localized: "\(c) init returned nil", comment: "虚拟显示器设置：系统对象初始化失败，插值为类名")
+                return String(localized: "\(c) init returned nil", bundle: VirtualDisplay.localizedBundle(locale), locale: locale, comment: "虚拟显示器设置：系统对象初始化失败，插值为类名")
             case .applySettingsFailed:
-                return String(localized: "CGVirtualDisplay applySettings: returned NO (mode rejected)", comment: "虚拟显示器设置：显示模式被系统拒绝")
+                return String(localized: "CGVirtualDisplay applySettings: returned NO (mode rejected)", bundle: VirtualDisplay.localizedBundle(locale), locale: locale, comment: "虚拟显示器设置：显示模式被系统拒绝")
             case .noDisplayID:
-                return String(localized: "CGVirtualDisplay was created but reported displayID 0", comment: "虚拟显示器设置：系统没有分配显示器标识")
+                return String(localized: "CGVirtualDisplay was created but reported displayID 0", bundle: VirtualDisplay.localizedBundle(locale), locale: locale, comment: "虚拟显示器设置：系统没有分配显示器标识")
             case .invalidSize(let why):
-                return String(localized: "invalid size: \(why)", comment: "虚拟显示器设置：尺寸无效，插值为原因")
+                return String(localized: "invalid size: \(why)", bundle: VirtualDisplay.localizedBundle(locale), locale: locale, comment: "虚拟显示器设置：尺寸无效，插值为原因")
             }
         }
+    }
+
+    private static func localizedBundle(_ locale: Locale) -> Bundle {
+        guard let path = Bundle.main.path(forResource: locale.identifier, ofType: "lproj"),
+              let bundle = Bundle(path: path) else { return .main }
+        return bundle
     }
 
     let name: String
@@ -290,11 +297,11 @@ final class VirtualDisplay {
     /// Cheap enough to call at launch to decide between virtual display and window fallback.
     /// (The colour primaries setters are optional and not listed; `setDispatchQueue:` is
     /// accepted in place of `setQueue:`.)
-    static func checkPrivateAPI(localized: Bool = false) -> [String] {
+    static func checkPrivateAPI(localized: Bool = false, locale: Locale = Locale(identifier: Bundle.main.preferredLocalizations.first ?? Locale.current.identifier)) -> [String] {
         privateAPISurface.compactMap { entry -> String? in
-            let problem = methodProblem(cls: entry.cls, selector: entry.selector, encoding: entry.encoding, localized: localized)
+            let problem = methodProblem(cls: entry.cls, selector: entry.selector, encoding: entry.encoding, localized: localized, locale: locale)
             guard problem != nil, entry.selector == "setQueue:" else { return problem }
-            return methodProblem(cls: entry.cls, selector: "setDispatchQueue:", encoding: entry.encoding, localized: localized)
+            return methodProblem(cls: entry.cls, selector: "setDispatchQueue:", encoding: entry.encoding, localized: localized, locale: locale)
         }
     }
 
@@ -303,12 +310,12 @@ final class VirtualDisplay {
     /// `TypeEncoding.accepted(encoding)` takes; else the problem, as `checkPrivateAPI` lists it.
     /// Tests/checks/virtual-display-api asks it about classes it makes at run time, so the check
     /// runs this decision rather than a copy of it.
-    static func methodProblem(cls: String, selector: String, encoding: String, localized: Bool = false) -> String? {
+    static func methodProblem(cls: String, selector: String, encoding: String, localized: Bool = false, locale: Locale = Locale(identifier: Bundle.main.preferredLocalizations.first ?? Locale.current.identifier)) -> String? {
         do {
             _ = try Runtime.method(Runtime.cls(cls), selector, encoding)
             return nil
         } catch {
-            if localized, let failure = error as? Failure { return failure.localizedDescription }
+            if localized, let failure = error as? Failure { return failure.localizedDescription(locale: locale) }
             return "\(error)"
         }
     }

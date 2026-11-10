@@ -36,14 +36,24 @@ sync_mac() {
         -Xswiftc -emit-localized-strings -Xswiftc -emit-localized-strings-path -Xswiftc "$sd" \
         >"$work/mac-build.log" 2>&1 \
         || { grep -E 'error:' "$work/mac-build.log" | head -20; echo "Mac 编译失败，日志：$work/mac-build.log" >&2; exit 1; }
+    # 协议与菜单栏都有 HostSettings.swift，公共输出目录按文件名写入，会互相覆盖。
+    # 单独提取协议模块；外层目录只取主机与菜单栏，避免同一源码重复同步。
+    local protocol="$sd/protocol"
+    mkdir -p "$protocol"
+    xcrun swiftc -swift-version 5 -parse-as-library -module-name StreamProtocol \
+        -emit-module -emit-module-path "$protocol/StreamProtocol.swiftmodule" \
+        -emit-localized-strings -emit-localized-strings-path "$protocol" \
+        "$PWD"/Sources/StreamProtocol/*.swift >"$work/protocol-build.log" 2>&1 \
+        || { grep -E 'error:' "$work/protocol-build.log" | head -20; echo "协议字符串提取失败，日志：$work/protocol-build.log" >&2; exit 1; }
     # 探针程序（CaptureProbe、VirtualDisplayProbe）不进 Sill.app，它们的字符串不要。
     local files=()
     for f in "$sd"/*.stringsdata; do
         src="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1])).get("source",""))' "$f")"
         case "$src" in
-            */Sources/SillMenuBar/*|*/Sources/SillHost/*|*/Sources/StreamProtocol/*) files+=("$f") ;;
+            */Sources/SillMenuBar/*|*/Sources/SillHost/*) files+=("$f") ;;
         esac
     done
+    for f in "$protocol"/*.stringsdata; do files+=("$f"); done
     [ -f Packaging/Localizable.xcstrings ] || echo '{"sourceLanguage":"en","strings":{},"version":"1.0"}' > Packaging/Localizable.xcstrings
     xcrun xcstringstool sync Packaging/Localizable.xcstrings --stringsdata "${files[@]}"
     echo "Mac：${#files[@]} 个源文件已同步进 Packaging/Localizable.xcstrings"

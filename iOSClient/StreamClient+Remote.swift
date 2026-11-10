@@ -73,9 +73,7 @@ enum PairingProblem: Equatable {
         case .codeTypo: return String(localized: "That code has a typo. Check it against your Mac.", comment: "配对代码校验错误提示")
         case .wrongCode(let left):
             // A no-break space keeps the count with its word when the line wraps ("4 / tries left").
-            return left == 1
-                ? String(localized: "That code didn’t work. Check the code on your Mac. 1\u{00A0}try left.", comment: "配对代码错误提示，仅剩一次机会")
-                : String(localized: "That code didn’t work. Check the code on your Mac. \(left)\u{00A0}tries left.", comment: "配对代码错误提示，插值为剩余尝试次数")
+            return String(localized: "That code didn’t work. Check the code on your Mac. \(left)\u{00A0}tries left.", comment: "配对代码错误提示，插值为剩余尝试次数，使用复数变体")
         case .notPairing(let mac): return String(localized: "\(mac) isn’t pairing right now. On your Mac, choose Pair iPhone or iPad… first.", comment: "配对卡片错误提示，插值为 Mac 名称或地址称呼")
         case .stopped(let mac):
             return String(localized: "\(mac) stopped pairing after too many wrong codes. Choose Pair iPhone or iPad… on your Mac for a new code.", comment: "配对卡片错误提示，插值为 Mac 名称或地址称呼")

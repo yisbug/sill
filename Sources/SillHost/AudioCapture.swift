@@ -22,10 +22,17 @@ final class AudioCapture: NSObject, AudioSource, SCStreamOutput, SCStreamDelegat
     var onPCM: ((PCMChunk) -> Void)?
     var onStopped: ((String) -> Void)?
 
+    private static func localizedBundle(_ locale: Locale) -> Bundle {
+        guard let path = Bundle.main.path(forResource: locale.identifier, ofType: "lproj"),
+              let bundle = Bundle(path: path) else { return .main }
+        return bundle
+    }
+
     struct Failure: AudioSourceFailure {
         let description: String
-        var localizedReason: String? = nil
-        var localizedDescription: String { localizedReason ?? description }
+        var localizedReason: (@Sendable (Locale) -> String)? = nil
+        var localizedDescription: String { localizedDescription(locale: Locale(identifier: Bundle.main.preferredLocalizations.first ?? Locale.current.identifier)) }
+        func localizedDescription(locale: Locale) -> String { localizedReason?(locale) ?? description }
     }
 
     private let filter: SCContentFilter
@@ -107,9 +114,9 @@ final class AudioCapture: NSObject, AudioSource, SCStreamOutput, SCStreamDelegat
             }
             DispatchQueue.global().asyncAfter(deadline: .now() + seconds) {
                 if once.first() {
-                    let localizedReason = what == "start"
-                        ? String(localized: "the stream did not start within \(String(Int(seconds))) s", comment: "音频状态：捕获流启动超时，插值为秒数")
-                        : String(localized: "the stream did not stop within \(String(Int(seconds))) s", comment: "音频状态：捕获流停止超时，插值为秒数")
+                    let localizedReason: @Sendable (Locale) -> String = { locale in what == "start"
+                        ? String(localized: "the stream did not start within \(Int(seconds).formatted(.number.grouping(.never).locale(locale))) s", bundle: AudioCapture.localizedBundle(locale), locale: locale, comment: "音频状态：捕获流启动超时，插值为秒数")
+                        : String(localized: "the stream did not stop within \(Int(seconds).formatted(.number.grouping(.never).locale(locale))) s", bundle: AudioCapture.localizedBundle(locale), locale: locale, comment: "音频状态：捕获流停止超时，插值为秒数") }
                     c.resume(throwing: Failure(description: "the stream did not \(what) within \(Int(seconds)) s", localizedReason: localizedReason))
                 }
             }

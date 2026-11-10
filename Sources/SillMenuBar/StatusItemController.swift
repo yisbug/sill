@@ -87,7 +87,7 @@ enum MenuBuilder {
         menu.append(MenuEntry(kind: .item, title: String(localized: "Virtual Display", comment: "状态菜单虚拟显示器标题"), subtitle: p.virtualDisplayNote,
                               checked: config.virtualDisplay, action: .setVirtualDisplay(!config.virtualDisplay)))
         menu.append(MenuEntry(kind: .item, title: String(localized: "Frame Rate", comment: "状态菜单帧率标题"), children: [60, 120].map { fps in
-            MenuEntry(kind: .item, title: String(localized: "Up to \(String(fps)) fps", comment: "状态菜单帧率选项，插值为帧率上限"), checked: config.maxFPS == fps, action: .setMaxFPS(fps))
+            MenuEntry(kind: .item, title: String(localized: "Up to \(fps.formatted(.number.grouping(.never))) fps", comment: "状态菜单帧率选项，插值为帧率上限"), checked: config.maxFPS == fps, action: .setMaxFPS(fps))
         }))
         var quality = QualityPreset.allCases.map { preset in
             MenuEntry(kind: .item, title: MacQualityText.title(forBitrate: preset.rawValue), checked: config.bitrate == preset.rawValue, action: .setBitrate(preset.rawValue))

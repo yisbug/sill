@@ -124,6 +124,8 @@ final class StreamServer {
         var acceptedPeerToPeer = false
         /// A hello (kind 23) came on this connection: only the first counts.
         var helloSeen = false
+        /// 当前连接的设备语言，旧设备为 nil。
+        var languages: [String]?
         /// The Mac no longer serves it (`closeSessions`: its pairing removed, Remote Access or internet
         /// access off, Require pairing on), set as it is told goodbye: until its connection closes (at
         /// most `within`, 0.25 s), its receive loop hands on nothing but the up of a key or a button
@@ -1266,6 +1268,7 @@ final class StreamServer {
     /// `queue`.
     private func took(_ hello: Hello, from client: Client) {
         client.helloSeen = true
+        client.languages = hello.languages.map { Array($0.prefix(5)) }
         let c = client.connection
         let name = SafeText.label(hello.device ?? "")
         if client.device == nil, !name.isEmpty { client.device = name }

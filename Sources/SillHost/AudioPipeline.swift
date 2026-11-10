@@ -17,10 +17,12 @@ protocol AudioSource: AnyObject {
 /// and is shown with its domain and code.
 protocol AudioSourceFailure: Error, CustomStringConvertible {
     var localizedDescription: String { get }
+    func localizedDescription(locale: Locale) -> String
 }
 
 extension AudioSourceFailure {
     var localizedDescription: String { description }
+    func localizedDescription(locale: Locale) -> String { localizedDescription }
 }
 
 /// Seconds of the host clock: mach absolute time, the clock ScreenCaptureKit stamps its buffers with
@@ -83,7 +85,7 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
     enum Made {
         case source(AudioSource, line: String)
         case failed(String)
-        case localizedFailure(String, String)
+        case localizedFailure(String, @Sendable (Locale) -> String)
     }
 
     // Main actor.
@@ -101,6 +103,20 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
     private var worker: Task<Void, Never>?
     /// AAC-ELD could not be made (`encoderProblem`): no sound this run, and every source shows why.
     private var encoderGone: String?
+    private var encoderGoneText: (@Sendable (Locale) -> String)?
+    private var problemText: (@Sendable (Locale) -> String)?
+
+    /// 设备使用自己的语言；状态本身继续用 Mac 的语言显示。
+    @MainActor
+    func note(locale: Locale) -> String? {
+        guard let problem = status?.problem else { return nil }
+        let sentence = problemText?(locale) ?? problem
+        guard let first = sentence.first else { return nil }
+        let capitalized = String(first).uppercased(with: locale) + sentence.dropFirst()
+        return String(localized: "\(capitalized).", bundle: DeviceLanguage.bundle(for: locale), locale: locale,
+                      comment: "设备音频提示：完整错误句的句末标点")
+    }
+
     /// "Audio stopped" was said for the source that runs.
     private var stopSaid = false
 
@@ -204,6 +220,7 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
         phase = .starting
         stopSaid = false
         lastStartAt = HostClock.now()
+        problemText = encoderGoneText
         sourceStatus = Status(source: Self.shown(key), capturing: false, problem: encoderGone)
         generation += 1
         let g = generation
@@ -234,23 +251,27 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
             try await s.start()
         } catch {
             guard g == generation else { return }
-            failed(key, Self.describe(error), localizedWhy: (error as? AudioSourceFailure)?.localizedDescription)
+            failed(key, Self.describe(error), localizedWhy: { locale in
+                (error as? AudioSourceFailure)?.localizedDescription(locale: locale) ?? Self.describe(error)
+            })
             await stopSource()   // a new generation: what the source still delivers is inert
             return
         }
         guard g == generation else { return }   // it ended by itself meanwhile (`ended` has said so)
         phase = .running
         guard encoderGone == nil else { return }   // no sound this run: the status says why
+        problemText = nil
         sourceStatus = Status(source: Self.shown(key), capturing: true, problem: nil)
     }
 
     /// A source that could not start: one line, the problem shown, and the key kept (`.ended`), so the
     /// same source is tried again only after `AudioSourceRule.retryInterval`.
     @MainActor
-    private func failed(_ key: AudioKey, _ why: String, localizedWhy: String? = nil) {
+    private func failed(_ key: AudioKey, _ why: String, localizedWhy: (@Sendable (Locale) -> String)? = nil) {
         phase = .ended
         print("Audio: could not capture \(Self.said(key)): \(why). The picture is unaffected.")
-        sourceStatus = Status(source: Self.shown(key), capturing: false, problem: Self.captureProblem(key, why: localizedWhy ?? why))
+        problemText = { locale in Self.captureProblem(key, why: localizedWhy?(locale) ?? why, locale: locale) }
+        sourceStatus = Status(source: Self.shown(key), capturing: false, problem: problemText?(DeviceLanguage.hostLocale))
     }
 
     /// The source ended by itself (the permission revoked, the system stopping the stream).
@@ -260,7 +281,9 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
         phase = .ended
         source = nil
         print("Audio capture ended: \(why). The picture is unaffected.")
-        sourceStatus = Status(source: Self.shown(current), capturing: false, problem: Self.captureProblem(current, why: why))
+        let key = current
+        problemText = { locale in Self.captureProblem(key, why: why, locale: locale) }
+        sourceStatus = Status(source: Self.shown(current), capturing: false, problem: problemText?(DeviceLanguage.hostLocale))
         generation += 1
         let next = generation
         queue.async { self.live = next; self.packetizer = nil; self.encoder = nil }
@@ -295,12 +318,12 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
         }
     }
 
-    private static func captureProblem(_ key: AudioKey, why: String) -> String {
+    private static func captureProblem(_ key: AudioKey, why: String, locale: Locale) -> String {
         switch key {
-        case .app(_, let name): return String(localized: "couldn’t capture the sound of \(name): \(why)", comment: "音频状态：无法捕获应用声音，插值为应用名称和错误说明")
-        case .desktop: return String(localized: "couldn’t capture the sound of the whole Mac: \(why)", comment: "音频状态：无法捕获 Mac 声音，插值为错误说明")
-        case .test: return String(localized: "couldn’t capture the test tone: \(why)", comment: "音频状态：无法捕获测试音，插值为错误说明")
-        case .none: return String(localized: "couldn’t capture no sound: \(why)", comment: "音频状态：没有可捕获的声音，插值为错误说明")
+        case .app(_, let name): return String(localized: "couldn’t capture the sound of \(name): \(why)", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：无法捕获应用声音，插值为应用名称和错误说明")
+        case .desktop: return String(localized: "couldn’t capture the sound of the whole Mac: \(why)", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：无法捕获 Mac 声音，插值为错误说明")
+        case .test: return String(localized: "couldn’t capture the test tone: \(why)", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：无法捕获测试音，插值为错误说明")
+        case .none: return String(localized: "couldn’t capture no sound: \(why)", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：没有可捕获的声音，插值为错误说明")
         }
     }
 
@@ -348,9 +371,10 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
                 formatRefused = true
                 let why = "the capture delivered \(Int(chunk.sampleRate)) Hz with \(chunk.channels) channel\(chunk.channels == 1 ? "" : "s"), and Sill encodes 48 kHz stereo only"
                 print("Audio: \(why).")
-                let localizedWhy = chunk.channels == 1
-                    ? String(localized: "the capture delivered \(String(Int(chunk.sampleRate))) Hz with \(String(chunk.channels)) channel, and Sill encodes 48 kHz stereo only", comment: "音频状态：捕获格式不支持，插值为采样率和单声道数")
-                    : String(localized: "the capture delivered \(String(Int(chunk.sampleRate))) Hz with \(String(chunk.channels)) channels, and Sill encodes 48 kHz stereo only", comment: "音频状态：捕获格式不支持，插值为采样率和声道数")
+                let sampleRate = String(Int(chunk.sampleRate)), channels = chunk.channels
+                let localizedWhy: @Sendable (Locale) -> String = { locale in
+                    String(localized: "the capture delivered \(sampleRate) Hz with \(channels) channels, and Sill encodes 48 kHz stereo only", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：捕获格式不支持，插值为采样率和声道数")
+                }
                 Task { @MainActor in self.formatProblem(localizedWhy) }
             }
             return false
@@ -362,7 +386,7 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
         } catch {
             encoderUnavailable = true
             print("Audio encoder: AAC-ELD unavailable: \(error)")
-            Task { @MainActor in self.encoderProblem((error as? AudioEncoder.Failure)?.localizedDescription ?? "\(error)") }
+            Task { @MainActor in self.encoderProblem { locale in (error as? AudioEncoder.Failure)?.localizedDescription(locale: locale) ?? "\(error)" } }
             return false
         }
         epoch = (epoch + 1) & 0xFFFF
@@ -382,8 +406,14 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
     }
 
     @MainActor
-    private func encoderProblem(_ why: String) {
-        let problem = String(localized: "couldn’t encode the sound: AAC-ELD is unavailable (\(why))", comment: "音频状态：编码器不可用，插值为错误说明")
+    private func encoderProblem(_ whyText: @escaping @Sendable (Locale) -> String) {
+        let text: @Sendable (Locale) -> String = { locale in
+            let why = whyText(locale)
+            return String(localized: "couldn’t encode the sound: AAC-ELD is unavailable (\(why))", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：编码器不可用，插值为错误说明")
+        }
+        let problem = text(DeviceLanguage.hostLocale)
+        encoderGoneText = text
+        problemText = text
         encoderGone = problem
         guard var s = sourceStatus else { return }
         s.capturing = false
@@ -392,10 +422,14 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
     }
 
     @MainActor
-    private func formatProblem(_ why: String) {
+    private func formatProblem(_ whyText: @escaping @Sendable (Locale) -> String) {
         guard var s = sourceStatus else { return }
         s.capturing = false
-        s.problem = String(localized: "couldn’t use the sound: \(why)", comment: "音频状态：声音格式不可用，插值为错误说明")
+        problemText = { locale in
+            let why = whyText(locale)
+            return String(localized: "couldn’t use the sound: \(why)", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "音频状态：声音格式不可用，插值为错误说明")
+        }
+        s.problem = problemText?(DeviceLanguage.hostLocale)
         sourceStatus = s
     }
 }

@@ -18,7 +18,7 @@ enum AwayCopy {
 
     /// The same for VoiceOver: "Low, Standard", "12 megabits per second, Retina".
     static func spoken(_ bitrate: Int, _ captureScale: Double) -> String {
-        let name = QualityPreset(rawValue: bitrate)?.name ?? String(localized: "\(QualityPreset.mbps(bitrate)) megabits per second", comment: "画质设置或串流连接提示；插值为码率")
+        let name = QualityPreset(rawValue: bitrate)?.name ?? String(localized: "\(QualityPreset.localizedMbps(bitrate)) megabits per second", comment: "画质设置或串流连接提示；插值为码率")
         return captureScale >= 1.5
             ? String(localized: "\(name), Retina", comment: "画质的 VoiceOver 名称；插值为码率名称")
             : String(localized: "\(name), Standard", comment: "画质的 VoiceOver 名称；插值为码率名称")
@@ -74,7 +74,7 @@ enum AwayCopy {
             return (title(bitrate, scale), spoken(bitrate, scale), change)
         }
         let name = QualityPreset.name(forBitrate: bitrate)
-        return (name, QualityPreset(rawValue: bitrate)?.name ?? String(localized: "\(QualityPreset.mbps(bitrate)) megabits per second", comment: "画质设置或串流连接提示；插值为码率"), change)
+        return (name, QualityPreset(rawValue: bitrate)?.name ?? String(localized: "\(QualityPreset.localizedMbps(bitrate)) megabits per second", comment: "画质设置或串流连接提示；插值为码率"), change)
     }
 
     /// The callout while the link is behind, and its button. First match wins: away while a device at

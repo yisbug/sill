@@ -84,6 +84,9 @@ jobs:
           restore-keys: |
             spm-${{ runner.os }}-${{ runner.arch }}-${{ steps.xcode.outputs.toolchain }}-
 
+      - name: 检查各语言覆盖与格式符
+        run: Scripts/l10n-check.py
+
       - name: Build the Mac host, the CLI and the probes (swift build -c release)
         run: swift build -c release
 

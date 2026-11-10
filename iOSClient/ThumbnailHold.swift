@@ -87,18 +87,15 @@ enum ThumbnailHold {
     /// The row's value beside the title: "0.5 s", "1.0 s", "2.0 s", always a tenth's digit, so the
     /// value keeps its width as it steps.
     static func valueText(_ value: Double) -> String {
-        let number = String(format: "%.1f", seconds(value))
+        let number = seconds(value).formatted(.number.grouping(.never).precision(.fractionLength(1)))
         return String(localized: "\(number) s", comment: "设置面板长按时长；插值为保留一位小数的秒数")
     }
 
     /// The value as VoiceOver says it: "0.5 seconds", "1 second", "1.5 seconds", "2 seconds" (no
     /// spoken "point zero").
     static func spokenValue(_ value: Double) -> String {
-        let t = tenths(value)
-        let number = t % 10 == 0 ? String(t / 10) : String(format: "%.1f", seconds(tenths: t))
-        return t == 10
-            ? String(localized: "\(number) second", comment: "长按时长的 VoiceOver 单数读法；插值为秒数")
-            : String(localized: "\(number) seconds", comment: "长按时长的 VoiceOver 复数读法；插值为秒数")
+        let number = seconds(value)
+        return String(localized: "\(number, specifier: "%g") seconds", comment: "长按时长的 VoiceOver 读法；数值秒数决定目录的复数变体，整数不带小数")
     }
 
     /// Under the row: what the length is for. It agrees with the tour's words ("Touch and hold a window

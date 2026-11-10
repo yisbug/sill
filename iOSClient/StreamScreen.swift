@@ -2457,7 +2457,7 @@ struct AppDrawer: View {
                                 DrawerRow(height: 50,
                                           highlighted: app.bundleID == activeBundleID,
                                           title: app.name,
-                                          trailing: app.windows.count == 1 ? String(localized: "1 window", comment: "应用抽屉：单个窗口数量") : String(localized: "\(app.windows.count) windows", comment: "应用抽屉：窗口数量，插值为数量"),
+                                          trailing: String(localized: "\(app.windows.count) windows", comment: "应用抽屉：窗口数量，数值决定目录的复数变体"),
                                           action: { show(app) }) {
                                     AppIcon(image: client.icons[app.bundleID], name: app.name,
                                             size: 32, radius: 9, fontSize: 12)

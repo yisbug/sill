@@ -236,9 +236,7 @@ struct PairDeviceView: View {
                 }
                 countdown
                 if let wrongFrom {
-                    Label(triesLeft == 1
-                          ? String(localized: "A wrong code came from \(wrongFrom). 1 try left.", comment: "配对码错误警告；插值为错误请求来源，仅剩一次机会")
-                          : String(localized: "A wrong code came from \(wrongFrom). \(String(triesLeft)) tries left.", comment: "配对码错误警告；插值为错误请求来源及剩余次数"),
+                    Label(String(localized: "A wrong code came from \(wrongFrom). \(triesLeft) tries left.", comment: "配对码错误警告；插值为请求来源及剩余次数，使用复数变体"),
                           systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                 }
@@ -276,9 +274,7 @@ struct PairDeviceView: View {
                 }
                 countdown
                 if let wrongFrom {
-                    Label(triesLeft == 1
-                          ? String(localized: "A wrong code came from \(wrongFrom). 1 try left.", comment: "配对码错误警告；插值为错误请求来源，仅剩一次机会")
-                          : String(localized: "A wrong code came from \(wrongFrom). \(String(triesLeft)) tries left.", comment: "配对码错误警告；插值为错误请求来源及剩余次数"),
+                    Label(String(localized: "A wrong code came from \(wrongFrom). \(triesLeft) tries left.", comment: "配对码错误警告；插值为请求来源及剩余次数，使用复数变体"),
                           systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                 }
@@ -337,7 +333,8 @@ struct PairDeviceView: View {
 
     static func countdown(until end: Date, now: Date) -> String {
         let left = max(0, Int(end.timeIntervalSince(now).rounded(.up)))
-        return String(localized: "Works once, for the next \(String(left / 60)):\(String(format: "%02d", left % 60)).", comment: "配对码倒计时；插值依次为剩余分钟和两位秒数")
+        let remaining = Duration.seconds(left).formatted(.time(pattern: .minuteSecond(padMinuteToLength: 1)))
+        return String(localized: "Works once, for the next \(remaining).", comment: "配对码倒计时；插值为按区域格式化的分秒时长")
     }
 
     /// What to type on the device: Tailscale's name with its IPv4 under it, else a Tailscale IP,

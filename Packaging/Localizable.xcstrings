@@ -1,6 +1,17 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "%@ %@": {
+      "comment": "两句之间的连接；中文译为不带空格",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@%2$@"
+          }
+        }
+      }
+    },
     "%@ %@ asked to pair.": {
       "comment": "配对窗口首行；插值为设备名和其他来源说明",
       "localizations": {
@@ -58,7 +69,7 @@
       }
     },
     "%@ Mbps": {
-      "comment": "Mac 自定义画质名称，插值为码率",
+      "comment": "Mac 自定义画质名称，插值为码率\n自定义画质名称；插值为按区域格式化的码率",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -81,6 +92,7 @@
     },
     "%@ and %@ need the USB cable or very fast Wi‑Fi; if the picture lags, step down.": {
       "comment": "Mac 串流设置说明，插值为两种高码率画质名称",
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -322,7 +334,7 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ ms"
+            "value": "%@ 毫秒"
           }
         }
       }
@@ -389,7 +401,7 @@
       }
     },
     "%@ · Retina": {
-      "comment": "Mac 画质及分辨率摘要，插值为画质名称",
+      "comment": "Mac 画质及分辨率摘要，插值为画质名称\n画质及 Retina 分辨率摘要",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -400,7 +412,7 @@
       }
     },
     "%@ · Standard": {
-      "comment": "Mac 画质及分辨率摘要，插值为画质名称",
+      "comment": "Mac 画质及分辨率摘要，插值为画质名称\n画质及标准分辨率摘要",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -411,7 +423,7 @@
       }
     },
     "%@ — %@ Mbps": {
-      "comment": "Mac 画质菜单标题，插值为预设名称和码率",
+      "comment": "Mac 画质菜单标题，插值为预设名称和码率\n画质选项标题，插值为预设名称和每秒兆比特数",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -433,6 +445,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ — 未连接"
+          }
+        }
+      }
+    },
+    "%@, %@": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@、%2$@"
+          }
+        }
+      }
+    },
+    "%@.": {
+      "comment": "设备音频提示：完整错误句的句末标点",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@。"
           }
         }
       }
@@ -461,6 +495,111 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@×%@ · %@ · %@ Mbps"
+          }
+        }
+      }
+    },
+    "%g seconds": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%g second"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%g seconds"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%g 秒"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld windows": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld window"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld windows"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld 个窗口"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld windows, showing now": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld window, showing now"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld windows, showing now"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld 个窗口，当前正在显示"
+                }
+              }
+            }
           }
         }
       }
@@ -563,6 +702,7 @@
     },
     "A wrong code came from %@. %@ tries left.": {
       "comment": "配对码错误警告；插值为错误请求来源及剩余次数",
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -578,8 +718,44 @@
         }
       }
     },
+    "A wrong code came from %@. %lld tries left.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "A wrong code came from %1$@. %2$lld try left."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "A wrong code came from %1$@. %2$lld tries left."
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%1$@ 发来了错误的配对码。还可尝试 %2$lld 次。"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "A wrong code came from %@. 1 try left.": {
       "comment": "配对码错误警告；插值为错误请求来源，仅剩一次机会",
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -945,7 +1121,7 @@
       }
     },
     "Balanced": {
-      "comment": "Mac 画质预设名称",
+      "comment": "Mac 画质预设名称\n画质预设显示名称",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -1046,6 +1222,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "更改端口…"
+          }
+        }
+      }
+    },
+    "Changes apply at once: the current stream restarts for a moment.": {
+      "comment": "串流设置页脚：更改立即生效",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更改会立即生效，当前串流会短暂重启。"
           }
         }
       }
@@ -1152,6 +1339,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "配对码"
+          }
+        }
+      }
+    },
+    "Connected to meeppo-voice": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接 meeppo-voice"
           }
         }
       }
@@ -1332,7 +1529,7 @@
       }
     },
     "Custom — %@ Mbps": {
-      "comment": "Mac 自定义画质菜单标题，插值为码率",
+      "comment": "Mac 自定义画质菜单标题，插值为码率\n自定义画质选项标题，插值为每秒兆比特数",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -1504,8 +1701,20 @@
         }
       }
     },
+    "Each device asks for its own screen’s rate, up to this limit. Quality is per 60 fps; a 120 fps stream gets twice as much.": {
+      "comment": "串流设置页脚：设备帧率上限与画质码率",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每台设备会按自身屏幕的帧率请求串流，但不超过此上限。画质以 60 fps 为基准；120 fps 串流的码率为其两倍。"
+          }
+        }
+      }
+    },
     "Each device asks for its own screen’s rate, up to this limit. Quality is per 60 fps; a 120 fps stream gets twice as much. %@ Changes apply at once: the current stream restarts for a moment.": {
       "comment": "串流设置页脚；插值为高速网络质量提示",
+      "extractionState": "stale",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -1538,7 +1747,7 @@
       }
     },
     "Efficient": {
-      "comment": "Mac 画质预设名称",
+      "comment": "Mac 画质预设名称\n画质预设显示名称",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -1549,7 +1758,7 @@
       }
     },
     "Extreme": {
-      "comment": "Mac 画质预设名称",
+      "comment": "Mac 画质预设名称\n画质预设显示名称",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -1684,7 +1893,7 @@
       }
     },
     "High": {
-      "comment": "Mac 画质预设名称",
+      "comment": "Mac 画质预设名称\n画质预设显示名称",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -1906,7 +2115,7 @@
       }
     },
     "Low": {
-      "comment": "Mac 画质预设名称",
+      "comment": "Mac 画质预设名称\n画质预设显示名称",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -2143,6 +2352,28 @@
         }
       }
     },
+    "Nothing is streaming, so the text had nowhere to go.": {
+      "comment": "语音输入结果：没有正在串流的内容",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前没有正在串流的内容，因此无法输入文字。"
+          }
+        }
+      }
+    },
+    "Nothing was recognized. Try speaking again.": {
+      "comment": "语音输入结果：没有识别出文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未识别出文字，请再说一次。"
+          }
+        }
+      }
+    },
     "Nothing you copy goes between this %@ and %@ while this is off.": {
       "comment": "设置中共享剪贴板关闭时的说明，插值为设备类型和 Mac 名称",
       "localizations": {
@@ -2356,6 +2587,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "打开系统设置…"
+          }
+        }
+      }
+    },
+    "Open meeppo-voice on this Mac to dictate from your iPhone or iPad.": {
+      "comment": "通用设置：未找到语音识别服务时的说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在此 Mac 上打开 meeppo-voice，即可从 iPhone 或 iPad 进行语音输入。"
           }
         }
       }
@@ -2817,7 +3059,7 @@
       }
     },
     "Pro": {
-      "comment": "Mac 画质预设名称",
+      "comment": "Mac 画质预设名称\n画质预设显示名称",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -2834,6 +3076,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "画质"
+          }
+        }
+      }
+    },
+    "Quality is per 60 fps; a 120 fps stream gets twice as much.": {
+      "extractionState": "stale",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画质按 60 fps 计算；120 fps 串流会获得两倍码率。"
           }
         }
       }
@@ -3725,6 +3978,41 @@
         }
       }
     },
+    "That code didn’t work. Check the code on your Mac. %lld tries left.": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "That code didn’t work. Check the code on your Mac. %lld try left."
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "That code didn’t work. Check the code on your Mac. %lld tries left."
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "配对码不正确。请核对 Mac 上的配对码。还可尝试 %lld 次。"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "That doesn’t look like an address. Try home.example.net, or home.example.net:17455.": {
       "comment": "远程访问地址名校验错误",
       "localizations": {
@@ -3743,6 +4031,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Mac 已锁定"
+          }
+        }
+      }
+    },
+    "The Mac is locked, so the text wasn’t typed.": {
+      "comment": "语音输入结果：Mac 已锁屏",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 已锁屏，因此未输入文字。"
           }
         }
       }
@@ -3809,6 +4108,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "硬件编码器已卡住，串流改用软件编码器：标准分辨率下最高为 60 fps。重新启动 Mac 即可解决。"
+          }
+        }
+      }
+    },
+    "The last recording is still being recognized.": {
+      "comment": "语音输入结果：上一段还在识别",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "上一段录音仍在识别中。"
           }
         }
       }
@@ -3961,6 +4271,28 @@
         }
       }
     },
+    "The recording is too long to send.": {
+      "comment": "语音输入结果：录音超过大小上限",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录音太长，无法发送。"
+          }
+        }
+      }
+    },
+    "The recording was empty.": {
+      "comment": "语音输入结果：录音为空",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "录音为空。"
+          }
+        }
+      }
+    },
     "The streamed window is on the virtual display": {
       "comment": "虚拟显示器菜单副标题，窗口已移至虚拟显示器",
       "localizations": {
@@ -4000,6 +4332,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "这台 Mac 睡眠时无法连接。有设备从外部连接时，Sill 会阻止它自动进入睡眠。"
+          }
+        }
+      }
+    },
+    "This Mac doesn’t know that audio format. Update Sill on it.": {
+      "comment": "语音输入结果：Mac 不认识设备发来的音频格式",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 Mac 不支持该音频格式，请更新 Mac 上的 Sill。"
           }
         }
       }
@@ -4126,12 +4469,23 @@
       }
     },
     "Ultra": {
-      "comment": "Mac 画质预设名称",
+      "comment": "Mac 画质预设名称\n画质预设显示名称",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "超高"
+          }
+        }
+      }
+    },
+    "Ultra and Extreme need the USB cable or very fast Wi‑Fi; if the picture lags, step down.": {
+      "comment": "画质设置页的高速连接提示；Ultra 与 Extreme 为画质预设名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "超高和极致需要 USB 连接线或速度很快的 Wi‑Fi；如果画面卡顿，请降低画质。"
           }
         }
       }
@@ -4296,6 +4650,16 @@
         }
       }
     },
+    "Voice input": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "语音输入"
+          }
+        }
+      }
+    },
     "Waiting for a Device": {
       "comment": "状态卡标题，等待设备",
       "localizations": {
@@ -4394,8 +4758,20 @@
         }
       }
     },
+    "Works once, for the next %@.": {
+      "comment": "配对码倒计时；插值为按区域格式化的分秒时长",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅可使用一次，有效时间还剩 %@。"
+          }
+        }
+      }
+    },
     "Works once, for the next %@:%@.": {
       "comment": "配对码倒计时；插值依次为剩余分钟和两位秒数",
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -4450,6 +4826,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "你的设备会在配对时获取这些地址，并在每次连接时更新。"
+          }
+        }
+      }
+    },
+    "Your iPhone and iPad can dictate into what streams: what they record is recognized by meeppo-voice on this Mac.": {
+      "comment": "通用设置：语音输入已连接时的说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你可以在 iPhone 和 iPad 上录音，由此 Mac 上的 meeppo-voice 识别，并将文字输入正在串流的应用。"
           }
         }
       }
@@ -4715,6 +5102,82 @@
         }
       }
     },
+    "meeppo-voice answered with an error (HTTP %lld).": {
+      "comment": "语音输入结果：识别服务返回错误，插值为 HTTP 状态码",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "meeppo-voice 返回错误（HTTP %lld）。"
+          }
+        }
+      }
+    },
+    "meeppo-voice couldn’t recognize the recording.": {
+      "comment": "语音输入结果：识别服务出错",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "meeppo-voice 无法识别录音。"
+          }
+        }
+      }
+    },
+    "meeppo-voice didn’t answer in time.": {
+      "comment": "语音输入结果：识别超时",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "meeppo-voice 响应超时。"
+          }
+        }
+      }
+    },
+    "meeppo-voice isn’t running on this Mac. Open it, then try again.": {
+      "comment": "语音输入结果：没有找到识别服务",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此 Mac 上未运行 meeppo-voice。请先打开它，然后重试。"
+          }
+        }
+      }
+    },
+    "meeppo-voice not found": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未找到 meeppo-voice"
+          }
+        }
+      }
+    },
+    "meeppo-voice: %@": {
+      "comment": "语音输入结果：识别服务返回的错误说明，插值为服务给出的原文",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "meeppo-voice：%@"
+          }
+        }
+      }
+    },
+    "meeppo-voice’s answer couldn’t be read.": {
+      "comment": "语音输入结果：识别服务的回答无法解析",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法解析 meeppo-voice 的响应。"
+          }
+        }
+      }
+    },
     "needs Accessibility": {
       "comment": "虚拟显示器设置：窗口原位串流的原因",
       "localizations": {
@@ -4959,6 +5422,7 @@
     },
     "the capture delivered %@ Hz with %@ channel, and Sill encodes 48 kHz stereo only": {
       "comment": "音频状态：捕获格式不支持，插值为采样率和单声道数",
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -4976,6 +5440,7 @@
     },
     "the capture delivered %@ Hz with %@ channels, and Sill encodes 48 kHz stereo only": {
       "comment": "音频状态：捕获格式不支持，插值为采样率和声道数",
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -4987,6 +5452,41 @@
           "stringUnit": {
             "state": "translated",
             "value": "捕获的声音为 %@ Hz、%@ 声道，而 Sill 仅支持编码 48 kHz 立体声"
+          }
+        }
+      }
+    },
+    "the capture delivered %@ Hz with %lld channels, and Sill encodes 48 kHz stereo only": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "the capture delivered %1$@ Hz with %2$lld channel, and Sill encodes 48 kHz stereo only"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "the capture delivered %1$@ Hz with %2$lld channels, and Sill encodes 48 kHz stereo only"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "采集到的音频为 %1$@ Hz、%2$lld 个声道，而 Sill 仅编码 48 kHz 立体声"
+                }
+              }
+            }
           }
         }
       }
@@ -5296,7 +5796,15 @@
       }
     },
     "“%@”": {
-      "comment": "通用设置中的网络名称；插值为本机名称"
+      "comment": "通用设置中的网络名称；插值为本机名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

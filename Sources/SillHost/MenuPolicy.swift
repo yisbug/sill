@@ -199,22 +199,26 @@ package enum MenuRefusal: Equatable {
     /// Any other Accessibility error, by its name.
     case failed(String)
 
-    package static let changedNote = String(localized: "The menus changed. Open the menu again.", comment: "设备菜单：菜单变化提示")
-    package static let unavailableNote = String(localized: "It isn’t available right now.", comment: "设备菜单：暂时不可用提示")
-    package static let tooManyNote = String(localized: "Too many requests. Open the menu again.", comment: "设备菜单：请求过多提示")
-    package static let noAccessNote = String(localized: "Allow Accessibility for Sill on the Mac (System Settings › Privacy & Security › Accessibility).", comment: "设备菜单：Mac 辅助功能权限提示")
-    package static func notRespondingNote(_ app: String) -> String { String(localized: "\(app) isn’t responding.", comment: "设备菜单：应用未响应，插值为应用名称") }
-    package static func goneNote(_ app: String) -> String { String(localized: "\(app) is no longer open.", comment: "设备菜单：应用已关闭，插值为应用名称") }
+    package static var changedNote: String { changedNote(locale: DeviceLanguage.hostLocale) }
+    package static func changedNote(locale: Locale) -> String { String(localized: "The menus changed. Open the menu again.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备菜单：菜单变化提示") }
+    package static var unavailableNote: String { unavailableNote(locale: DeviceLanguage.hostLocale) }
+    package static func unavailableNote(locale: Locale) -> String { String(localized: "It isn’t available right now.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备菜单：暂时不可用提示") }
+    package static var tooManyNote: String { tooManyNote(locale: DeviceLanguage.hostLocale) }
+    package static func tooManyNote(locale: Locale) -> String { String(localized: "Too many requests. Open the menu again.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备菜单：请求过多提示") }
+    package static var noAccessNote: String { noAccessNote(locale: DeviceLanguage.hostLocale) }
+    package static func noAccessNote(locale: Locale) -> String { String(localized: "Allow Accessibility for Sill on the Mac (System Settings › Privacy & Security › Accessibility).", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备菜单：Mac 辅助功能权限提示") }
+    package static func notRespondingNote(_ app: String, locale: Locale = DeviceLanguage.hostLocale) -> String { String(localized: "\(app) isn’t responding.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备菜单：应用未响应，插值为应用名称") }
+    package static func goneNote(_ app: String, locale: Locale = DeviceLanguage.hostLocale) -> String { String(localized: "\(app) is no longer open.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备菜单：应用已关闭，插值为应用名称") }
 
     /// What the device shows as it is.
-    package func note(app: String) -> String {
+    package func note(app: String, locale: Locale = DeviceLanguage.hostLocale) -> String {
         switch self {
-        case .disabled, .failed: Self.unavailableNote
-        case .changed: Self.changedNote
-        case .gone: Self.goneNote(app)
-        case .notAnswering: Self.notRespondingNote(app)
-        case .notTrusted: Self.noAccessNote
-        case .tooMany, .late: Self.tooManyNote
+        case .disabled, .failed: Self.unavailableNote(locale: locale)
+        case .changed: Self.changedNote(locale: locale)
+        case .gone: Self.goneNote(app, locale: locale)
+        case .notAnswering: Self.notRespondingNote(app, locale: locale)
+        case .notTrusted: Self.noAccessNote(locale: locale)
+        case .tooMany, .late: Self.tooManyNote(locale: locale)
         }
     }
 

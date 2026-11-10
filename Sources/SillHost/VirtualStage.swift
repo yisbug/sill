@@ -73,19 +73,20 @@ final class VirtualStage {
         }
 
         /// A few words for the app's menu, after "real window (virtual display: …)".
-        var summary: String {
+        var summary: String { summary(locale: DeviceLanguage.hostLocale) }
+        func summary(locale: Locale) -> String {
             switch self {
             case .disabled(let why): return why
-            case .accessibilityOff: return String(localized: "needs Accessibility", comment: "虚拟显示器设置：窗口原位串流的原因")
-            case .screenRecordingOff: return String(localized: "needs Screen Recording", comment: "虚拟显示器设置：窗口原位串流的原因")
-            case .axWindowNotFound: return String(localized: "the window wasn’t found through Accessibility", comment: "虚拟显示器设置：窗口原位串流的原因")
-            case .displayCreate: return String(localized: "the display couldn’t be created", comment: "虚拟显示器设置：窗口原位串流的原因")
-            case .neverOnline: return String(localized: "the display never came up", comment: "虚拟显示器设置：窗口原位串流的原因")
-            case .notListedBySCK: return String(localized: "ScreenCaptureKit didn’t list the display", comment: "虚拟显示器设置：窗口原位串流的原因")
-            case .moveRefused: return String(localized: "the app refused the move", comment: "虚拟显示器设置：窗口原位串流的原因")
-            case .notOnDisplay: return String(localized: "the window didn’t move", comment: "虚拟显示器设置：窗口原位串流的原因")
-            case .windowMissing: return String(localized: "the window went away", comment: "虚拟显示器设置：窗口原位串流的原因")
-            case .locked: return String(localized: "this Mac is locked", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .accessibilityOff: return String(localized: "needs Accessibility", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .screenRecordingOff: return String(localized: "needs Screen Recording", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .axWindowNotFound: return String(localized: "the window wasn’t found through Accessibility", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .displayCreate: return String(localized: "the display couldn’t be created", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .neverOnline: return String(localized: "the display never came up", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .notListedBySCK: return String(localized: "ScreenCaptureKit didn’t list the display", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .moveRefused: return String(localized: "the app refused the move", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .notOnDisplay: return String(localized: "the window didn’t move", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .windowMissing: return String(localized: "the window went away", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .locked: return String(localized: "this Mac is locked", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：窗口原位串流的原因")
             }
         }
     }
@@ -129,7 +130,8 @@ final class VirtualStage {
     private var insetMeasured = false
     /// Set when staging must not be attempted again this run (API missing, repeated failures).
     var disabledReason: String?
-    var localizedDisabledReason: String?
+    var disabledReasonText: ((Locale) -> String)?
+    var localizedDisabledReason: String? { disabledReasonText?(DeviceLanguage.hostLocale) }
     private var creationFailures = 0
     /// Bumped per display created, so a late termination callback for an old display is ignored.
     private var generation = 0
@@ -538,8 +540,11 @@ final class VirtualStage {
             creationFailures += 1
             if creationFailures >= 2 {
                 disabledReason = "creating the display failed \(creationFailures) times (\(error))"
-                let why = (error as? VirtualDisplay.Failure)?.localizedDescription ?? "\(error)"
-                localizedDisabledReason = String(localized: "creating the display failed \(String(creationFailures)) times (\(why))", comment: "虚拟显示器设置：重复创建失败，插值为次数和错误说明")
+                let count = creationFailures
+                disabledReasonText = { locale in
+                    let why = (error as? VirtualDisplay.Failure)?.localizedDescription(locale: locale) ?? "\(error)"
+                    return String(localized: "creating the display failed \(String(count)) times (\(why))", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：重复创建失败，插值为次数和错误说明")
+                }
             }
             throw Failure.displayCreate(error)
         }

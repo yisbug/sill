@@ -275,7 +275,7 @@ enum StatusText {
                 } else if count == 1 {
                     header = String(localized: "Streaming to a Device", comment: "状态卡串流标题，设备名称未知")
                 } else {
-                    header = String(localized: "Streaming to \(String(count)) Devices", comment: "状态卡串流标题，插值为设备数量")
+                    header = String(localized: "Streaming to \(count.formatted(.number.grouping(.never))) Devices", comment: "状态卡串流标题，插值为设备数量")
                 }
                 return (header, nil)
             }
@@ -284,7 +284,7 @@ enum StatusText {
             } else if count == 1 {
                 header = String(localized: "Device Connected", comment: "状态卡连接标题，设备名称未知")
             } else {
-                header = String(localized: "\(String(count)) Devices Connected", comment: "状态卡连接标题，插值为设备数量")
+                header = String(localized: "\(count.formatted(.number.grouping(.never))) Devices Connected", comment: "状态卡连接标题，插值为设备数量")
             }
             return (header, String(localized: "Pick a window on the device to start streaming.", comment: "状态卡已连接设备说明"))
         }
@@ -323,8 +323,8 @@ enum StatusText {
         // changing, unless the count's own digits tip it: the open menu resizes the card on every
         // change, and "nothing changing" with the route word made it jump a line each time a
         // window stopped or started changing.
-        let rate = s.encodedFPS > 0 ? String(localized: "\(String(min(s.encodedFPS, stream.fps))) of \(String(stream.fps)) fps", comment: "状态卡帧率，插值为当前帧率和上限") : String(localized: "\(String(stream.fps)) fps, still", comment: "状态卡静止画面帧率，插值为帧率上限")
-        var details = [String(localized: "\(String(stream.width))×\(String(stream.height)) · \(rate) · \(String(stream.mbps)) Mbps", comment: "状态卡串流参数，插值为尺寸、帧率和码率")]
+        let rate = s.encodedFPS > 0 ? String(localized: "\((min(s.encodedFPS, stream.fps)).formatted(.number.grouping(.never))) of \((stream.fps).formatted(.number.grouping(.never))) fps", comment: "状态卡帧率，插值为当前帧率和上限") : String(localized: "\((stream.fps).formatted(.number.grouping(.never))) fps, still", comment: "状态卡静止画面帧率，插值为帧率上限")
+        var details = [String(localized: "\(String(stream.width))×\(String(stream.height)) · \(rate) · \((stream.mbps).formatted(.number.grouping(.never))) Mbps", comment: "状态卡串流参数，插值为尺寸、帧率和码率")]
         if s.devices.count == 1, let route = routeWord(s.devices[0]) { details.append(route) }
         if stream.onVirtualDisplay {
             details.append(String(localized: "virtual display", comment: "状态卡串流参数中的虚拟显示器状态项目"))
@@ -353,7 +353,7 @@ enum StatusText {
         if let link = d.link {
             parts.append(linkWords(link, fps: d.fps, rttMs: d.rttMs))
         } else if let fps = d.fps, let age = d.frameAgeMs, let rtt = d.rttMs {
-            parts.append(String(localized: "\(String(fps)) fps · frame age \(ms(age)) · RTT \(ms(rtt))", comment: "状态卡设备统计，插值为帧率、画面延迟和往返延迟"))
+            parts.append(String(localized: "\((fps).formatted(.number.grouping(.never))) fps · frame age \(ms(age)) · RTT \(ms(rtt))", comment: "状态卡设备统计，插值为帧率、画面延迟和往返延迟"))
         }
         if let route = routeWord(d) { parts.append(route) }
         return StatusPresentation.Row(id: String(describing: d.id), symbol: symbol, title: name,
@@ -370,10 +370,10 @@ enum StatusText {
         case .behind:
             let quality = MacQualityText.name(forBitrate: link.bitrate).replacingOccurrences(of: " ", with: "\u{00A0}")
             if let fps, let rtt = rttMs {
-                return String(localized: "\(String(fps)) fps, the link can’t carry \(quality) · RTT \(ms(rtt))", comment: "状态卡连接跟不上，插值为帧率、画质和往返延迟")
+                return String(localized: "\((fps).formatted(.number.grouping(.never))) fps, the link can’t carry \(quality) · RTT \(ms(rtt))", comment: "状态卡连接跟不上，插值为帧率、画质和往返延迟")
             }
             if let fps {
-                return String(localized: "\(String(fps)) fps, the link can’t carry \(quality)", comment: "状态卡连接跟不上，插值为帧率和画质")
+                return String(localized: "\((fps).formatted(.number.grouping(.never))) fps, the link can’t carry \(quality)", comment: "状态卡连接跟不上，插值为帧率和画质")
             }
             if let rtt = rttMs {
                 return String(localized: "The link can’t carry \(quality) · RTT \(ms(rtt))", comment: "状态卡连接跟不上，插值为画质和往返延迟")
@@ -407,7 +407,7 @@ enum StatusText {
 
     /// One of a device's reported times. Negative is the client's "no sample this second" (-1),
     /// never a time.
-    private static func ms(_ v: Int) -> String { v < 0 ? "–" : String(localized: "\(String(v)) ms", comment: "状态卡时间，插值为毫秒数") }
+    private static func ms(_ v: Int) -> String { v < 0 ? "–" : String(localized: "\((v).formatted(.number.grouping(.never))) ms", comment: "状态卡时间，插值为毫秒数") }
 
     private static func virtualDisplayNote(_ s: HostStatusSnapshot) -> String {
         if let problem = s.virtualDisplayProblem { return String(localized: "Unavailable: \(problem)", comment: "虚拟显示器菜单副标题，插值为不可用原因") }
@@ -433,15 +433,15 @@ enum MacQualityText {
         case .pro: return String(localized: "Pro", comment: "Mac 画质预设名称")
         case .ultra: return String(localized: "Ultra", comment: "Mac 画质预设名称")
         case .extreme: return String(localized: "Extreme", comment: "Mac 画质预设名称")
-        case nil: return String(localized: "\(QualityPreset.mbps(bitrate)) Mbps", comment: "Mac 自定义画质名称，插值为码率")
+        case nil: return String(localized: "\(QualityPreset.localizedMbps(bitrate)) Mbps", comment: "Mac 自定义画质名称，插值为码率")
         }
     }
 
     static func title(forBitrate bitrate: Int) -> String {
         if QualityPreset(rawValue: bitrate) != nil {
-            return String(localized: "\(name(forBitrate: bitrate)) — \(String(bitrate / 1_000_000)) Mbps", comment: "Mac 画质菜单标题，插值为预设名称和码率")
+            return String(localized: "\(name(forBitrate: bitrate)) — \((bitrate / 1_000_000).formatted(.number.grouping(.never))) Mbps", comment: "Mac 画质菜单标题，插值为预设名称和码率")
         }
-        return String(localized: "Custom — \(QualityPreset.mbps(bitrate)) Mbps", comment: "Mac 自定义画质菜单标题，插值为码率")
+        return String(localized: "Custom — \(QualityPreset.localizedMbps(bitrate)) Mbps", comment: "Mac 自定义画质菜单标题，插值为码率")
     }
 
     static func shortTitle(bitrate: Int, captureScale: Double) -> String {
@@ -452,7 +452,7 @@ enum MacQualityText {
     }
 
     static var fastLinkNote: String {
-        String(localized: "\(name(forBitrate: QualityPreset.ultra.rawValue)) and \(name(forBitrate: QualityPreset.extreme.rawValue)) need the USB cable or very fast Wi\u{2011}Fi; if the picture lags, step down.", comment: "Mac 串流设置说明，插值为两种高码率画质名称")
+        QualityPreset.fastLinkNote
     }
 }
 

@@ -99,18 +99,18 @@ enum VoicePolicy {
         case malformed
     }
 
-    static func clip(_ payload: Data) -> Clip {
+    static func clip(_ payload: Data, locale: Locale = DeviceLanguage.hostLocale) -> Clip {
         guard let (clip, format, audio) = VoiceClip.parse(payload) else { return .malformed }
         guard audio.count <= VoiceClip.maxAudioBytes else {
-            return .refuse(clip: clip, reason: .tooLarge, message: message(.tooLarge))
+            return .refuse(clip: clip, reason: .tooLarge, message: message(.tooLarge, locale: locale))
         }
         guard format == VoiceClip.formatM4A else {
             return .refuse(clip: clip, reason: .serviceError,
-                           message: String(localized: "This Mac doesn’t know that audio format. Update Sill on it.", comment: "语音输入结果：Mac 不认识设备发来的音频格式"))
+                           message: String(localized: "This Mac doesn’t know that audio format. Update Sill on it.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：Mac 不认识设备发来的音频格式"))
         }
         guard !audio.isEmpty else {
             return .refuse(clip: clip, reason: .serviceError,
-                           message: String(localized: "The recording was empty.", comment: "语音输入结果：录音为空"))
+                           message: String(localized: "The recording was empty.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：录音为空"))
         }
         return .audio(clip: clip, audio: audio)
     }
@@ -140,24 +140,24 @@ enum VoicePolicy {
 
     /// HTTP 状态码与响应体判成文字或失败：200 时取 `polishedText`，去掉首尾空白后为空则取 `recognizedText`，
     /// 两者都空回 `serviceError`（没识别出文字）；非 200 或读不懂回 `serviceError`，说明优先用响应里的 `error`。
-    static func answer(status: Int, body: Data) -> Answer {
+    static func answer(status: Int, body: Data, locale: Locale = DeviceLanguage.hostLocale) -> Answer {
         let json = (try? JSONSerialization.jsonObject(with: body)) as? [String: Any]
         guard status == 200 else {
             let error = (json?["error"] as? String).map { SafeText.label($0, limit: 200) } ?? ""
             let text = error.isEmpty
-                ? String(localized: "meeppo-voice answered with an error (HTTP \(status)).", comment: "语音输入结果：识别服务返回错误，插值为 HTTP 状态码")
-                : String(localized: "meeppo-voice: \(error)", comment: "语音输入结果：识别服务返回的错误说明，插值为服务给出的原文")
+                ? String(localized: "meeppo-voice answered with an error (HTTP \(status)).", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：识别服务返回错误，插值为 HTTP 状态码")
+                : String(localized: "meeppo-voice: \(error)", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：识别服务返回的错误说明，插值为服务给出的原文")
             return .failed(.serviceError, message: text)
         }
         guard let json else {
-            return .failed(.serviceError, message: String(localized: "meeppo-voice’s answer couldn’t be read.", comment: "语音输入结果：识别服务的回答无法解析"))
+            return .failed(.serviceError, message: String(localized: "meeppo-voice’s answer couldn’t be read.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：识别服务的回答无法解析"))
         }
         for key in ["polishedText", "recognizedText"] {
             if let text = json[key] as? String, !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 return .text(text.trimmingCharacters(in: .whitespacesAndNewlines))
             }
         }
-        return .failed(.serviceError, message: String(localized: "Nothing was recognized. Try speaking again.", comment: "语音输入结果：没有识别出文字"))
+        return .failed(.serviceError, message: String(localized: "Nothing was recognized. Try speaking again.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：没有识别出文字"))
     }
 
     /// 请求没拿到回答时（URLError 的代码）的原因：超时回 `timeout`，连不上（服务刚退出）回 `noService`，
@@ -185,16 +185,16 @@ enum VoicePolicy {
     }
 
     /// 文字识别出来了但没能打进去，或者别的失败。
-    static func failed(clip: UInt32, _ reason: VoiceReason, message: String? = nil) -> VoiceResult {
-        VoiceResult(clip: clip, ok: false, reason: reason.rawValue, message: message ?? self.message(reason))
+    static func failed(clip: UInt32, _ reason: VoiceReason, message: String? = nil, locale: Locale = DeviceLanguage.hostLocale) -> VoiceResult {
+        VoiceResult(clip: clip, ok: false, reason: reason.rawValue, message: message ?? self.message(reason, locale: locale))
     }
 
     /// 落点对应的结果。
-    static func result(clip: UInt32, text: String, landing: Landing) -> VoiceResult {
+    static func result(clip: UInt32, text: String, landing: Landing, locale: Locale = DeviceLanguage.hostLocale) -> VoiceResult {
         switch landing {
         case .typed: return typed(clip: clip, text: text)
-        case .locked: return failed(clip: clip, .locked)
-        case .nothingStreams: return failed(clip: clip, .nothingStreams)
+        case .locked: return failed(clip: clip, .locked, locale: locale)
+        case .nothingStreams: return failed(clip: clip, .nothingStreams, locale: locale)
         }
     }
 
@@ -205,23 +205,23 @@ enum VoicePolicy {
         return String(text.prefix(limit - 1)) + "…"
     }
 
-    /// 每个原因的默认说明（Mac 的语言）。
-    static func message(_ reason: VoiceReason) -> String {
+    /// 每个原因的默认说明（按连接设备的语言）。
+    static func message(_ reason: VoiceReason, locale: Locale = DeviceLanguage.hostLocale) -> String {
         switch reason {
         case .noService:
-            return String(localized: "meeppo-voice isn’t running on this Mac. Open it, then try again.", comment: "语音输入结果：没有找到识别服务")
+            return String(localized: "meeppo-voice isn’t running on this Mac. Open it, then try again.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：没有找到识别服务")
         case .timeout:
-            return String(localized: "meeppo-voice didn’t answer in time.", comment: "语音输入结果：识别超时")
+            return String(localized: "meeppo-voice didn’t answer in time.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：识别超时")
         case .serviceError:
-            return String(localized: "meeppo-voice couldn’t recognize the recording.", comment: "语音输入结果：识别服务出错")
+            return String(localized: "meeppo-voice couldn’t recognize the recording.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：识别服务出错")
         case .locked:
-            return String(localized: "The Mac is locked, so the text wasn’t typed.", comment: "语音输入结果：Mac 已锁屏")
+            return String(localized: "The Mac is locked, so the text wasn’t typed.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：Mac 已锁屏")
         case .nothingStreams:
-            return String(localized: "Nothing is streaming, so the text had nowhere to go.", comment: "语音输入结果：没有正在串流的内容")
+            return String(localized: "Nothing is streaming, so the text had nowhere to go.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：没有正在串流的内容")
         case .tooLarge:
-            return String(localized: "The recording is too long to send.", comment: "语音输入结果：录音超过大小上限")
+            return String(localized: "The recording is too long to send.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：录音超过大小上限")
         case .busy:
-            return String(localized: "The last recording is still being recognized.", comment: "语音输入结果：上一段还在识别")
+            return String(localized: "The last recording is still being recognized.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "语音输入结果：上一段还在识别")
         }
     }
 

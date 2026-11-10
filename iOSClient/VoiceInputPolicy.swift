@@ -214,7 +214,7 @@ enum VoiceInputPolicy {
     /// 录音时长 "0:07"、"12:03"：分与秒。
     static func elapsedText(_ seconds: Double) -> String {
         let s = max(0, Int(seconds.isFinite ? seconds : 0))
-        return String(format: "%d:%02d", s / 60, s % 60)
+        return Duration.seconds(s).formatted(.time(pattern: .minuteSecond(padMinuteToLength: 1)))
     }
 
     /// AVAudioRecorder 的平均功率（dBFS，-160…0）换成 0…1 的音量：-50 dB 以下为 0。

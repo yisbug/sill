@@ -188,7 +188,7 @@ struct LinkJudge {
                            suggestion: (bitrate: Int, captureScale: Double?)?) -> String {
         let carried = carriedKbps.map { "; the link carried about \(mbps(kbps: $0)) Mbps" } ?? ""
         let suggesting = suggestion.map { "suggesting \(title($0))" } ?? "nothing lower to suggest"
-        return "Link to \(device): cannot carry \(QualityPreset.name(forBitrate: bitrate)) "
+        return "Link to \(device): cannot carry \(QualityPreset.englishName(forBitrate: bitrate)) "
             + "(withheld \(withheld) of \(offered) frames in the last second\(carried)); \(suggesting)."
     }
 
@@ -204,7 +204,7 @@ struct LinkJudge {
     /// A suggestion as the lines and the device name it: "Low · Standard" when it names a
     /// resolution, else the preset's name alone ("Ultra").
     static func title(_ s: (bitrate: Int, captureScale: Double?)) -> String {
-        s.captureScale.map { QualityPreset.shortTitle(bitrate: s.bitrate, captureScale: $0) } ?? QualityPreset.name(forBitrate: s.bitrate)
+        s.captureScale.map { QualityPreset.englishShortTitle(bitrate: s.bitrate, captureScale: $0) } ?? QualityPreset.englishName(forBitrate: s.bitrate)
     }
 
     /// 6400 → "6.4", 12000 → "12", 800 → "0.8".

@@ -326,7 +326,7 @@ public enum QualityPreset: Int, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    private var englishName: String {
+    public var englishName: String {
         switch self {
         case .low: "Low"
         case .efficient: "Efficient"
@@ -339,30 +339,50 @@ public enum QualityPreset: Int, CaseIterable, Identifiable, Sendable {
     }
 
     /// "Balanced — 15 Mbps".
-    public var title: String { String(localized: "\(name) — \(rawValue / 1_000_000) Mbps", comment: "画质选项标题，插值为预设名称和每秒兆比特数") }
+    public var title: String { String(localized: "\(name) — \((rawValue / 1_000_000).formatted(.number.grouping(.never))) Mbps", comment: "画质选项标题，插值为预设名称和每秒兆比特数") }
 
     /// The one sentence, in the Mac's Settings › Streaming footer and the device's Quality footer,
     /// on what the top presets need.
     public static var fastLinkNote: String {
-        String(localized: "\(ultra.name) and \(extreme.name) need the USB cable or very fast Wi\u{2011}Fi; if the picture lags, step down.", comment: "画质设置页的高速连接提示，插值为两个最高画质预设名称")
+        String(localized: "Ultra and Extreme need the USB cable or very fast Wi\u{2011}Fi; if the picture lags, step down.", comment: "画质设置页的高速连接提示；Ultra 与 Extreme 为画质预设名称")
     }
 
     /// The label for any stored bitrate: a preset's title, or "Custom — 12 Mbps" for one set by
     /// hand (`defaults write`, a launch argument).
     public static func title(forBitrate bitrate: Int) -> String {
-        QualityPreset(rawValue: bitrate)?.title ?? String(localized: "Custom — \(mbps(bitrate)) Mbps", comment: "自定义画质选项标题，插值为每秒兆比特数")
+        QualityPreset(rawValue: bitrate)?.title ?? String(localized: "Custom — \(localizedMbps(bitrate)) Mbps", comment: "自定义画质选项标题，插值为每秒兆比特数")
     }
 
     /// A quality in a sentence: a preset's name ("Pro"), or "12 Mbps" for a bitrate set by hand
     /// (docs/remote-bundle-plan.md §4.1: the host's log, the Mac's card and the device's callouts).
     public static func name(forBitrate bitrate: Int) -> String {
-        QualityPreset(rawValue: bitrate)?.englishName ?? "\(mbps(bitrate)) Mbps"
+        QualityPreset(rawValue: bitrate)?.name ?? String(localized: "\(localizedMbps(bitrate)) Mbps", comment: "自定义画质名称；插值为按区域格式化的码率")
     }
 
     /// A quality with its resolution: "Low · Standard", "Pro · Retina", "12 Mbps · Retina". Plain
     /// spaces: a view that must keep it whole on one line spells them no-break itself.
     public static func shortTitle(bitrate: Int, captureScale: Double) -> String {
-        "\(name(forBitrate: bitrate)) · \(captureScale >= 1.5 ? "Retina" : "Standard")"
+        captureScale >= 1.5
+            ? String(localized: "\(name(forBitrate: bitrate)) · Retina", comment: "画质及 Retina 分辨率摘要")
+            : String(localized: "\(name(forBitrate: bitrate)) · Standard", comment: "画质及标准分辨率摘要")
+    }
+
+    /// 日志名称保持英文，不读取界面译文。
+    public static func englishName(forBitrate bitrate: Int) -> String {
+        QualityPreset(rawValue: bitrate)?.englishName ?? "\(mbps(bitrate)) Mbps"
+    }
+
+    /// 日志中的画质与分辨率摘要。
+    public static func englishShortTitle(bitrate: Int, captureScale: Double) -> String {
+        "\(englishName(forBitrate: bitrate)) · \(captureScale >= 1.5 ? "Retina" : "Standard")"
+    }
+
+    /// 界面码率按区域格式化，不添加分组符，保留既有小数精度。
+    public static func localizedMbps(_ bitsPerSecond: Int) -> String {
+        if bitsPerSecond % 1_000_000 == 0 {
+            return (bitsPerSecond / 1_000_000).formatted(.number.grouping(.never))
+        }
+        return (Double(bitsPerSecond) / 1_000_000).formatted(.number.grouping(.never).precision(.fractionLength(1)))
     }
 
     /// "15", or "8.5" for a bitrate that is not whole megabits. The same text as `HostConfig.mbps`

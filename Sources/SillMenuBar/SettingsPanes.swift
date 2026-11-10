@@ -349,7 +349,11 @@ private struct StreamingPane: View {
                     Text("Standard").tag(CGFloat(1))
                 }
             } footer: {
-                Footnote(String(localized: "Each device asks for its own screen’s rate, up to this limit. Quality is per 60 fps; a 120 fps stream gets twice as much. \(MacQualityText.fastLinkNote) Changes apply at once: the current stream restarts for a moment.", comment: "串流设置页脚；插值为高速网络质量提示"))
+                let first = String(localized: "Each device asks for its own screen’s rate, up to this limit. Quality is per 60 fps; a 120 fps stream gets twice as much.", comment: "串流设置页脚：设备帧率上限与画质码率")
+                let second = MacQualityText.fastLinkNote
+                let joined = String(localized: "\(first) \(second)", comment: "两句之间的连接；中文译为不带空格")
+                let last = String(localized: "Changes apply at once: the current stream restarts for a moment.", comment: "串流设置页脚：更改立即生效")
+                Footnote(String(localized: "\(joined) \(last)", comment: "两句之间的连接；中文译为不带空格"))
             }
             // Away from home (docs/remote-bundle-plan.md §5): its own quality, which a device away
             // sets too; the menu's Quality and Resolution stay the home ones.

@@ -23,6 +23,8 @@ final class VoiceBridge {
     /// 把文字当作这条连接的设备打的字输入，回落点。
     var inject: (String, NWConnection) async -> VoicePolicy.Landing = { _, _ in .nothingStreams }
     /// 设备的名字（日志用）。
+    /// 生成发给设备的说明时使用该连接的语言。
+    var deviceLocale: (NWConnection) -> Locale = { _ in .current }
     var deviceName: (NWConnection) -> String = { "\($0.endpoint)" }
     /// 可用与否变了（第二个参数：是否要重发窗口列表；发列表途中看的那次不重发）。
     var onAvailabilityChanged: ((Bool, Bool) -> Void)?
@@ -109,7 +111,7 @@ final class VoiceBridge {
     func clip(_ payload: Data, from connection: NWConnection) {
         let id = ObjectIdentifier(connection)
         let device = deviceName(connection)
-        switch VoicePolicy.clip(payload) {
+        switch VoicePolicy.clip(payload, locale: deviceLocale(connection)) {
         case .malformed:
             print("Voice clip from \(device): \(payload.count) bytes, malformed (dropped)")
         case .refuse(let clip, let reason, let message):
@@ -120,13 +122,13 @@ final class VoiceBridge {
             if inFlight[id] != nil {
                 print(VoicePolicy.logLine(clip: clip, device: device, bytes: audio.count, seconds: nil, characters: nil,
                                           reason: VoiceReason.busy.rawValue))
-                reply(VoicePolicy.failed(clip: clip, .busy), to: connection)
+                reply(VoicePolicy.failed(clip: clip, .busy, locale: deviceLocale(connection)), to: connection)
                 return
             }
             guard let service = refresh(), let url = VoicePolicy.processURL(port: service.port) else {
                 print(VoicePolicy.logLine(clip: clip, device: device, bytes: audio.count, seconds: nil, characters: nil,
                                           reason: VoiceReason.noService.rawValue))
-                reply(VoicePolicy.failed(clip: clip, .noService), to: connection)
+                reply(VoicePolicy.failed(clip: clip, .noService, locale: deviceLocale(connection)), to: connection)
                 return
             }
             var request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: VoicePolicy.timeout)
@@ -180,9 +182,9 @@ final class VoiceBridge {
         let answer: VoicePolicy.Answer
         if failed || status == nil {
             let reason = VoicePolicy.failure(urlErrorCode: errorCode ?? NSURLErrorUnknown)
-            answer = .failed(reason, message: VoicePolicy.message(reason))
+            answer = .failed(reason, message: VoicePolicy.message(reason, locale: deviceLocale(connection)))
         } else {
-            answer = VoicePolicy.answer(status: status ?? 0, body: body ?? Data())
+            answer = VoicePolicy.answer(status: status ?? 0, body: body ?? Data(), locale: deviceLocale(connection))
         }
         let result: VoiceResult
         var characters: Int?
@@ -193,7 +195,7 @@ final class VoiceBridge {
             characters = text.count
             // 文字打进去之前这条连接仍算忙：打字途中再来的片段回 busy。
             let landing = await inject(text, connection)
-            result = VoicePolicy.result(clip: clip, text: text, landing: landing)
+            result = VoicePolicy.result(clip: clip, text: text, landing: landing, locale: deviceLocale(connection))
         }
         inFlight[id] = nil
         print(VoicePolicy.logLine(clip: clip, device: device, bytes: flight.bytes, seconds: seconds, characters: characters,

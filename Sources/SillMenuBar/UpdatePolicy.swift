@@ -279,7 +279,7 @@ enum UpdatePolicy {
         case .notARelease: return (String(localized: "Couldn’t check: GitHub’s answer wasn’t a release Sill understands.", comment: "设置更新检查错误：无法识别发布信息"), true)
         case .noConnection(let code, let description):
             return (tlsCodes.contains(code) ? String(localized: "Couldn’t check: \(description)", comment: "设置更新检查连接错误：插值为系统错误说明") : String(localized: "Couldn’t check: this Mac isn’t connected to the internet.", comment: "设置更新检查连接错误：网络不可用"), true)
-        case .timeout: return (String(localized: "Couldn’t check: GitHub didn’t answer within \(String(Int(requestTimeout))) seconds.", comment: "设置更新检查超时：插值为等待秒数"), true)
+        case .timeout: return (String(localized: "Couldn’t check: GitHub didn’t answer within \(Int(requestTimeout).formatted(.number.grouping(.never))) seconds.", comment: "设置更新检查超时：插值为等待秒数"), true)
         case .failed(_, let description): return (String(localized: "Couldn’t check: \(description)", comment: "设置更新检查失败：插值为错误说明"), true)
         }
     }

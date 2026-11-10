@@ -337,5 +337,18 @@ if let out {
     ]
     try! JSONSerialization.data(withJSONObject: payloads, options: [.sortedKeys, .prettyPrinted]).write(to: URL(fileURLWithPath: out))
 }
+// 设备语言只增不改：顺序保留、旧设备缺省 nil、旧主机跳过新字段。
+let multilingualHello = Hello(appVersion: "0.6", build: "7", protocol: 1, device: "iPad (iPad14,1)", languages: ["zh-Hans-CN", "en-US"])
+check(json(multilingualHello).contains(#""languages":["zh-Hans-CN","en-US"]"#), "设备语言按首选顺序编码")
+check(Wire.decode(Hello.self, from: Wire.encode(multilingualHello)) == multilingualHello, "设备语言编码后可以解码")
+check(Wire.decode(Hello.self, from: Data("{}".utf8))?.languages == nil, "旧设备缺省语言为 nil")
+check(Wire.decode(OldHello.self, from: Wire.encode(multilingualHello)) == OldHello(appVersion: "0.6", build: "7", protocol: 1, device: "iPad (iPad14,1)"), "旧主机跳过设备语言")
+check(DeviceLanguage.locale(languages: nil, localizations: ["en", "zh-Hans"], current: Locale(identifier: "fr" )).identifier == "fr", "旧设备沿用主机语言")
+check(DeviceLanguage.locale(languages: ["fr", "zh-CN", "en"], localizations: ["en", "zh-Hans"]).identifier == "zh-Hans", "跳过不支持语言并匹配区域中文")
+check(DeviceLanguage.locale(languages: ["zh-Hant", "en-US"], localizations: ["en", "zh-Hans"]).identifier == "en", "不以简体中文匹配繁体中文")
+check(DeviceLanguage.locale(languages: ["fr"], localizations: ["en", "zh-Hans"]).identifier == "en", "不支持设备语言时回退英文")
+check(DeviceLanguage.locale(languages: ["fr", "de", "ja", "ko", "it", "zh-Hans"], localizations: ["en", "zh-Hans"]).identifier == "en", "只检查前五个设备语言")
+
+
 print("\(checks) checks, \(failures) failed")
 exit(failures == 0 ? 0 : 1)
