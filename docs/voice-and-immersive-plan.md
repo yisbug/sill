@@ -16,13 +16,13 @@
 ```
 iPad 悬浮球（点按开始，再点提交）
   → AVAudioEngine 录音，单声道 16 kHz，AAC 压缩（约 32 kbps）
-  → kind 45 voiceClip（设备 → Mac，新增，只增不改）
+  → kind 100 voiceClip（设备 → Mac，新增，只增不改）
   → Sill 主机（SillHostCore 新模块 VoiceBridge）
   → POST http://127.0.0.1:<port>/api/process（meeppo-voice 本机接口，带令牌）
   → { recognizedText, polishedText }
   → 取 polishedText（为空时取 recognizedText）
   → 主机用现有的 InputInjector 文字输入打进当前串流应用（与设备打字同一路径：先激活应用，锁屏时被 LockGate 拦下）
-  → kind 46 voiceResult（Mac → 设备：成功、失败原因、文字预览）
+  → kind 101 voiceResult（Mac → 设备：成功、失败原因、文字预览）
 ```
 
 为什么在 Mac 端识别：
@@ -42,12 +42,14 @@ Sill 侧读取 `local-api.json`，校验 pid 还活着、端口在 127.0.0.1，�
 
 ### 2.3 协议（只增不改）
 
+种类号用 100–102：上游已占用或预留到 44，并已把 45 预留给 Pencil（#81），本 fork 避开这一段，以免日后合并上游时撞号。
+
 | 种类 | 方向 | 载荷 |
 |---|---|---|
 | `WindowList.voice` | Mac → 设备 | 可选 Int：1 表示这台 Mac 能接语音（已找到 meeppo-voice 且接口可用）；nil 或缺失时设备不显示悬浮球 |
-| kind 45 `voiceClip` | 设备 → Mac | 二进制：4 字节片段号 + 1 字节格式（1 = AAC-LC ADTS）+ 音频；单条上限 4 MiB（约 15 分钟），超出由设备分段提交 |
-| kind 46 `voiceResult` | Mac → 设备 | JSON：`clip`、`ok`、`text`（预览，最多 200 字）、`reason`（`noService` / `timeout` / `serviceError` / `locked` / `nothingStreams`）、`message`（人读的说明，按 Mac 语言） |
-| kind 47 `voiceCancel` | 设备 → Mac | JSON：`clip`；Mac 中断对应请求（meeppo-voice 支持连接关闭即取消） |
+| kind 100 `voiceClip` | 设备 → Mac | 二进制：4 字节片段号 + 1 字节格式（1 = AAC-LC ADTS）+ 音频；单条上限 4 MiB（约 15 分钟），超出由设备分段提交 |
+| kind 101 `voiceResult` | Mac → 设备 | JSON：`clip`、`ok`、`text`（预览，最多 200 字）、`reason`（`noService` / `timeout` / `serviceError` / `locked` / `nothingStreams`）、`message`（人读的说明，按 Mac 语言） |
+| kind 102 `voiceCancel` | 设备 → Mac | JSON：`clip`；Mac 中断对应请求（meeppo-voice 支持连接关闭即取消） |
 
 ### 2.4 iPad 端
 
