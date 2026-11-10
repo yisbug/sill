@@ -270,18 +270,24 @@ final class VirtualStage {
     private static func ms(since t: Date) -> Int { Int(Date().timeIntervalSince(t) * 1000) }
 
     /// 第一次移动后窗口的大小原封未动（`refused`）：用另一种顺序再改一次（WindowSizer.resizeFirst），
-    /// 最多等 0.6 秒看窗口列表里的大小有没有变，返回列表里的新位置；还是没变就照旧返回 `refused`，
+    /// 等它缩到位（最多 1.5 秒；0.6 秒还没动就算拒绝），返回列表里的新位置；没变就照旧返回 `refused`，
     /// 交给后面的流程（大于可用区域时加大虚拟显示器，否则按窗口自己的大小截取）。每次重试记一行日志。
     private func resizeAgain(_ p: WindowSizer.Placement, to dest: CGRect, refused: CGRect) async -> CGRect {
         let t0 = Date()
         let err = sizer.resizeFirst(p, to: dest)
+        // 等到大小到位，或开始变化后连续 3 次读数不再变（ChatGPT 是分几步缩过去的：第一次变化时
+        // 只到 2309×986，1.8 秒后才到要的 1392×906）；最多 1.5 秒。
         var now = refused
-        let deadline = Date().addingTimeInterval(0.6)
+        var same = 0
+        let deadline = Date().addingTimeInterval(1.5)
         while Date() < deadline {
             try? await Task.sleep(for: .milliseconds(30))
             guard let f = WindowSizer.liveBounds(of: p.windowID) else { continue }
+            same = Self.sameSize(f.size, now.size, within: 0.5) ? same + 1 : 0
             now = f
-            if !Self.sameSize(f.size, refused.size) { break }
+            if Self.sameSize(f.size, dest.size) { break }
+            if !Self.sameSize(f.size, refused.size), same >= 3 { break }
+            if Self.sameSize(f.size, refused.size), Date() > deadline.addingTimeInterval(-0.9) { break }   // 0.6 秒还没动：拒绝
         }
         let took = !Self.sameSize(now.size, refused.size)
         print("\(p.appName) — \(p.title) kept its size at \(Self.fmt(refused)); asked again, size first (\(WindowSizer.axErrorName(err))): "
