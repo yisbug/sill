@@ -199,12 +199,12 @@ package enum MenuRefusal: Equatable {
     /// Any other Accessibility error, by its name.
     case failed(String)
 
-    package static let changedNote = "The menus changed. Open the menu again."
-    package static let unavailableNote = "It isn’t available right now."
-    package static let tooManyNote = "Too many requests. Open the menu again."
-    package static let noAccessNote = "Allow Accessibility for Sill on the Mac (System Settings › Privacy & Security › Accessibility)."
-    package static func notRespondingNote(_ app: String) -> String { "\(app) isn’t responding." }
-    package static func goneNote(_ app: String) -> String { "\(app) is no longer open." }
+    package static let changedNote = String(localized: "The menus changed. Open the menu again.", comment: "设备菜单：菜单变化提示")
+    package static let unavailableNote = String(localized: "It isn’t available right now.", comment: "设备菜单：暂时不可用提示")
+    package static let tooManyNote = String(localized: "Too many requests. Open the menu again.", comment: "设备菜单：请求过多提示")
+    package static let noAccessNote = String(localized: "Allow Accessibility for Sill on the Mac (System Settings › Privacy & Security › Accessibility).", comment: "设备菜单：Mac 辅助功能权限提示")
+    package static func notRespondingNote(_ app: String) -> String { String(localized: "\(app) isn’t responding.", comment: "设备菜单：应用未响应，插值为应用名称") }
+    package static func goneNote(_ app: String) -> String { String(localized: "\(app) is no longer open.", comment: "设备菜单：应用已关闭，插值为应用名称") }
 
     /// What the device shows as it is.
     package func note(app: String) -> String {

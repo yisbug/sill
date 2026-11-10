@@ -17,6 +17,17 @@ enum SettingsTab: String, CaseIterable {
         }
     }
 
+    var localizedTitle: String {
+        switch self {
+        case .general: String(localized: "General", comment: "设置窗口：通用标签页")
+        case .devices: String(localized: "Devices", comment: "设置窗口：设备标签页")
+        case .streaming: String(localized: "Streaming", comment: "设置窗口：串流标签页")
+        case .virtualDisplay: String(localized: "Virtual Display", comment: "设置窗口：虚拟显示器标签页")
+        case .permissions: String(localized: "Permissions", comment: "设置窗口：权限标签页")
+        case .remoteAccess: String(localized: "Remote Access", comment: "设置窗口：远程访问标签页")
+        }
+    }
+
     var symbol: String {
         switch self {
         case .general: "gearshape"
@@ -251,10 +262,10 @@ final class SettingsTabController: NSTabViewController {
         for tab in SettingsTab.allCases {
             let host = NSHostingController(rootView: SettingsPane(tab: tab, model: model))
             host.sizingOptions = [.preferredContentSize]
-            host.title = tab.title
+            host.title = tab.localizedTitle
             let item = NSTabViewItem(viewController: host)
-            item.label = tab.title
-            item.image = NSImage(systemSymbolName: tab.symbol, accessibilityDescription: tab.title)
+            item.label = tab.localizedTitle
+            item.image = NSImage(systemSymbolName: tab.symbol, accessibilityDescription: tab.localizedTitle)
             item.identifier = tab.rawValue
             addTabViewItem(item)
         }

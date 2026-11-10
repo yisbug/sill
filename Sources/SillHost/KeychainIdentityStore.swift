@@ -107,7 +107,11 @@ package final class KeychainIdentityStore: IdentityStore {
         if status == errSecSuccess, let item, CFGetTypeID(item) == SecKeyGetTypeID() {
             return item as! SecKey      // the type was just checked
         }
-        guard status == errSecItemNotFound else { throw Self.error("the key couldn’t be read", status) }
+        guard status == errSecItemNotFound else {
+            throw Self.error("the key couldn’t be read", status) {
+                String(localized: "the key couldn’t be read: \($0)", comment: "设备设置密钥读取错误：插值为系统错误说明")
+            }
+        }
         // No key here: make a fresh one. In data-protection mode this store never reads the login
         // keychain (no migration: it could not tell Sill's own legacy key from a planted one — see
         // the type), so a Mac with only a legacy key gets a fresh Mac ID and re-pairs; that is why
@@ -134,15 +138,22 @@ package final class KeychainIdentityStore: IdentityStore {
         }
         var error: Unmanaged<CFError>?
         guard let key = SecKeyCreateRandomKey(attributes as CFDictionary, &error) else {
-            let reason = error.map { "\($0.takeRetainedValue())" } ?? "no reason given"
-            throw IdentityStoreError("no key could be made in the keychain (\(reason))")
+            let reason = error.map { "\($0.takeRetainedValue())" }
+            let localized = reason.map {
+                String(localized: "no key could be made in the keychain (\($0))", comment: "设备设置密钥创建错误：插值为系统错误说明")
+            } ?? String(localized: "no key could be made in the keychain (no reason given)", comment: "设备设置密钥创建错误：系统未给出原因")
+            throw IdentityStoreError("no key could be made in the keychain (\(reason ?? "no reason given"))",
+                                     localizedDescription: localized)
         }
         return key
     }
 
     package func loadOrCreateRecognitionKey() throws -> Data {
         if let data = try read(Self.recognitionAccount) {
-            guard data.count == 32 else { throw IdentityStoreError("the recognition key in the keychain is damaged") }
+            guard data.count == 32 else {
+                throw IdentityStoreError("the recognition key in the keychain is damaged",
+                                         localizedDescription: String(localized: "the recognition key in the keychain is damaged", comment: "设备设置错误：钥匙串中的识别密钥损坏"))
+            }
             return data
         }
         let data = try MemoryIdentityStore.randomBytes(32)
@@ -158,7 +169,8 @@ package final class KeychainIdentityStore: IdentityStore {
             return []
         }
         guard let list = try? JSONDecoder().decode([PairedDevice].self, from: data) else {
-            throw IdentityStoreError("the paired devices in the keychain are damaged")
+            throw IdentityStoreError("the paired devices in the keychain are damaged",
+                                     localizedDescription: String(localized: "the paired devices in the keychain are damaged", comment: "设备设置错误：钥匙串中的已配对设备损坏"))
         }
         return list
     }
@@ -194,7 +206,11 @@ package final class KeychainIdentityStore: IdentityStore {
         var item: CFTypeRef?
         let status = SecItemCopyMatching(query as CFDictionary, &item)
         if status == errSecItemNotFound { return nil }
-        guard status == errSecSuccess, let data = item as? Data else { throw Self.error("\(account) couldn’t be read", status) }
+        guard status == errSecSuccess, let data = item as? Data else {
+            throw Self.error("\(account) couldn’t be read", status) {
+                String(localized: "\(account) couldn’t be read: \($0)", comment: "设备设置钥匙串读取错误：插值为条目标识和系统错误说明")
+            }
+        }
         return data
     }
 
@@ -209,17 +225,27 @@ package final class KeychainIdentityStore: IdentityStore {
         query.merge(scope()) { _, new in new }
         let updated = SecItemUpdate(query as CFDictionary, [kSecValueData as String: data] as CFDictionary)
         if updated == errSecSuccess { return }
-        guard updated == errSecItemNotFound else { throw Self.error("\(account) couldn’t be saved", updated) }
+        guard updated == errSecItemNotFound else {
+            throw Self.error("\(account) couldn’t be saved", updated) {
+                String(localized: "\(account) couldn’t be saved: \($0)", comment: "设备设置钥匙串保存错误：插值为条目标识和系统错误说明")
+            }
+        }
         var add = query
         add[kSecValueData as String] = data
         add[kSecAttrLabel as String] = label
         if let accessible { add[kSecAttrAccessible as String] = accessible }
         let added = SecItemAdd(add as CFDictionary, nil)
-        guard added == errSecSuccess else { throw Self.error("\(account) couldn’t be saved", added) }
+        guard added == errSecSuccess else {
+            throw Self.error("\(account) couldn’t be saved", added) {
+                String(localized: "\(account) couldn’t be saved: \($0)", comment: "设备设置钥匙串保存错误：插值为条目标识和系统错误说明")
+            }
+        }
     }
 
-    private static func error(_ what: String, _ status: OSStatus) -> IdentityStoreError {
-        let message = SecCopyErrorMessageString(status, nil).map { $0 as String } ?? "error \(status)"
-        return IdentityStoreError("\(what): \(message)")
+    private static func error(_ what: String, _ status: OSStatus, localized: (String) -> String) -> IdentityStoreError {
+        let systemMessage = SecCopyErrorMessageString(status, nil).map { $0 as String }
+        let message = systemMessage ?? "error \(status)"
+        let localizedMessage = systemMessage ?? String(localized: "error \(String(status))", comment: "钥匙串错误的系统诊断：插值为系统状态码")
+        return IdentityStoreError("\(what): \(message)", localizedDescription: localized(localizedMessage))
     }
 }

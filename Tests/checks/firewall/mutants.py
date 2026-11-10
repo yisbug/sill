@@ -88,7 +88,7 @@ MUTANTS = {
                                '"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/._-+,:@% "'),
     "W11 a tilde left plain": ('"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/._-+,:@%"',
                                '"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/._-+,:@%~"'),
-    "W12 the menu silent about block all": ('case .blocksAll: return "The macOS firewall blocks all incoming connections."',
+    "W12 the menu silent about block all": ('case .blocksAll: return String(localized: "The macOS firewall blocks all incoming connections.", comment: "状态菜单：防火墙阻止全部传入连接")',
                                             'case .blocksAll: return nil'),
     "W13 no continuation between the lines": ('i < lines.count - 1 ? line + " \\\\" : line', 'line'),
     "W14 a continuation after the last line too": ('i < lines.count - 1 ? line + " \\\\" : line', 'line + " \\\\"'),

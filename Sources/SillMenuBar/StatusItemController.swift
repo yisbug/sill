@@ -84,72 +84,72 @@ enum MenuBuilder {
         }
         menu.append(.separator)
 
-        menu.append(MenuEntry(kind: .item, title: "Virtual Display", subtitle: p.virtualDisplayNote,
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Virtual Display", comment: "状态菜单虚拟显示器标题"), subtitle: p.virtualDisplayNote,
                               checked: config.virtualDisplay, action: .setVirtualDisplay(!config.virtualDisplay)))
-        menu.append(MenuEntry(kind: .item, title: "Frame Rate", children: [60, 120].map { fps in
-            MenuEntry(kind: .item, title: "Up to \(fps) fps", checked: config.maxFPS == fps, action: .setMaxFPS(fps))
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Frame Rate", comment: "状态菜单帧率标题"), children: [60, 120].map { fps in
+            MenuEntry(kind: .item, title: String(localized: "Up to \(String(fps)) fps", comment: "状态菜单帧率选项，插值为帧率上限"), checked: config.maxFPS == fps, action: .setMaxFPS(fps))
         }))
         var quality = QualityPreset.allCases.map { preset in
-            MenuEntry(kind: .item, title: preset.title, checked: config.bitrate == preset.rawValue, action: .setBitrate(preset.rawValue))
+            MenuEntry(kind: .item, title: MacQualityText.title(forBitrate: preset.rawValue), checked: config.bitrate == preset.rawValue, action: .setBitrate(preset.rawValue))
         }
         if QualityPreset(rawValue: config.bitrate) == nil {
-            quality.append(MenuEntry(kind: .item, title: QualityPreset.title(forBitrate: config.bitrate), checked: true, enabled: false))
+            quality.append(MenuEntry(kind: .item, title: MacQualityText.title(forBitrate: config.bitrate), checked: true, enabled: false))
         }
         // The home quality, as ever; while every connected device is away, the subtitle says which
         // quality runs instead (the away one is set in Settings › Streaming, never here).
         let qualityNote = p.away
-            ? "Away from home now: \(QualityPreset.shortTitle(bitrate: config.awayBitrate, captureScale: Double(config.awayCaptureScale)))"
-            : "Per 60 fps; a 120 fps stream gets twice as much"
-        menu.append(MenuEntry(kind: .item, title: "Quality", subtitle: qualityNote, children: quality))
+            ? String(localized: "Away from home now: \(MacQualityText.shortTitle(bitrate: config.awayBitrate, captureScale: Double(config.awayCaptureScale)))", comment: "状态菜单画质副标题，插值为外出画质及分辨率")
+            : String(localized: "Per 60 fps; a 120 fps stream gets twice as much", comment: "状态菜单画质副标题")
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Quality", comment: "状态菜单画质标题"), subtitle: qualityNote, children: quality))
         // Standard is one pixel a point: a quarter of a Retina display's pixels, and on a 1x display
         // the same capture as Retina (CaptureScale holds the knob to the display's own scale).
-        menu.append(MenuEntry(kind: .item, title: "Resolution", children: [
-            MenuEntry(kind: .item, title: "Retina", checked: config.captureScale >= 1.5, action: .setCaptureScale(2)),
-            MenuEntry(kind: .item, title: "Standard", subtitle: "On a Retina display, a quarter of the pixels to encode",
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Resolution", comment: "状态菜单分辨率标题"), children: [
+            MenuEntry(kind: .item, title: String(localized: "Retina", comment: "状态菜单分辨率选项"), checked: config.captureScale >= 1.5, action: .setCaptureScale(2)),
+            MenuEntry(kind: .item, title: String(localized: "Standard", comment: "状态菜单分辨率选项"), subtitle: String(localized: "On a Retina display, a quarter of the pixels to encode", comment: "状态菜单标准分辨率说明"),
                       checked: config.captureScale < 1.5, action: .setCaptureScale(1)),
         ]))
         // The last of what streams: the sound of it (docs/audio-plan.md §6), a beta, which its title
         // says (in the title, so menu.txt and VoiceOver have it too). Absolute, like Virtual Display:
         // it sets the value it showed.
-        menu.append(MenuEntry(kind: .item, title: "Send Audio (Beta)", subtitle: "The Mac keeps playing it too",
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Send Audio (Beta)", comment: "状态菜单发送声音标题"), subtitle: String(localized: "The Mac keeps playing it too", comment: "状态菜单发送声音说明"),
                               checked: config.sendAudio, action: .setSendAudio(!config.sendAudio)))
         menu.append(.separator)
 
         // How Sill runs on this Mac, not the picture: devices reach it over peer-to-peer Wi-Fi too.
         // Here as well as in Settings because it is situational (on in a café, off at home).
-        menu.append(MenuEntry(kind: .item, title: "Direct Wireless Connection",
-                              subtitle: "No shared network needed; Wi\u{2011}Fi streams can stutter",
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Direct Wireless Connection", comment: "状态菜单直接无线连接标题"),
+                              subtitle: String(localized: "No shared network needed; Wi\u{2011}Fi streams can stutter", comment: "状态菜单直接无线连接说明"),
                               checked: config.directWireless, action: .setDirectWireless(!config.directWireless)))
         // Opens the pane rather than toggling: turning it on is worth reading what it does, and the
         // internet switch stays one deliberate step deeper, never in the menu.
         if let note = p.remoteAccessNote {
-            menu.append(MenuEntry(kind: .item, title: "Remote Access…", subtitle: note, action: .showSettingsTab(.remoteAccess)))
+            menu.append(MenuEntry(kind: .item, title: String(localized: "Remote Access…", comment: "状态菜单远程访问标题"), subtitle: note, action: .showSettingsTab(.remoteAccess)))
         }
         var loginNote: String?
-        if !login.available { loginNote = "Available when Sill runs from its app bundle" }
+        if !login.available { loginNote = String(localized: "Available when Sill runs from its app bundle", comment: "状态菜单登录启动不可用说明") }
         else if let error = login.error { loginNote = error }
-        else if login.needsApproval { loginNote = "Approve Sill in System Settings › Login Items" }
-        menu.append(MenuEntry(kind: .item, title: "Launch at Login", subtitle: loginNote, checked: login.on,
+        else if login.needsApproval { loginNote = String(localized: "Approve Sill in System Settings › Login Items", comment: "状态菜单登录启动待批准说明") }
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Launch at Login", comment: "状态菜单登录启动标题"), subtitle: loginNote, checked: login.on,
                               enabled: login.available, action: .toggleLaunchAtLogin))
-        menu.append(MenuEntry(kind: .item, title: "Permissions", children: [
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Permissions", comment: "状态菜单权限子菜单标题"), children: [
             permissions.screenRecording
-                ? MenuEntry(kind: .item, title: "Screen Recording: Allowed", enabled: false)
-                : MenuEntry(kind: .item, title: "Screen Recording: Not Allowed…", action: .allowScreenRecording),
+                ? MenuEntry(kind: .item, title: String(localized: "Screen Recording: Allowed", comment: "状态菜单屏幕录制已允许"), enabled: false)
+                : MenuEntry(kind: .item, title: String(localized: "Screen Recording: Not Allowed…", comment: "状态菜单屏幕录制未允许"), action: .allowScreenRecording),
             permissions.accessibility
-                ? MenuEntry(kind: .item, title: "Accessibility: Allowed", enabled: false)
-                : MenuEntry(kind: .item, title: "Accessibility: Not Allowed…", action: .allowAccessibility),
+                ? MenuEntry(kind: .item, title: String(localized: "Accessibility: Allowed", comment: "状态菜单辅助功能已允许"), enabled: false)
+                : MenuEntry(kind: .item, title: String(localized: "Accessibility: Not Allowed…", comment: "状态菜单辅助功能未允许"), action: .allowAccessibility),
             .separator,
-            MenuEntry(kind: .item, title: "Open Privacy & Security…", action: .openPrivacy),
+            MenuEntry(kind: .item, title: String(localized: "Open Privacy & Security…", comment: "状态菜单打开隐私与安全设置"), action: .openPrivacy),
         ]))
         menu.append(.separator)
 
         if p.remoteAccessNote != nil {
-            menu.append(MenuEntry(kind: .item, title: "Pair iPhone or iPad…", enabled: p.canPair, action: .showPairing))
+            menu.append(MenuEntry(kind: .item, title: String(localized: "Pair iPhone or iPad…", comment: "状态菜单打开设备配对"), enabled: p.canPair, action: .showPairing))
         }
-        menu.append(MenuEntry(kind: .item, title: "Show Log…", action: .showLog))
-        menu.append(MenuEntry(kind: .item, title: "Settings…", key: ",", action: .showSettings))
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Show Log…", comment: "状态菜单显示日志窗口"), action: .showLog))
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Settings…", comment: "状态菜单打开设置"), key: ",", action: .showSettings))
         menu.append(.separator)
-        menu.append(MenuEntry(kind: .item, title: "Quit Sill", key: "q", action: .quit))
+        menu.append(MenuEntry(kind: .item, title: String(localized: "Quit Sill", comment: "状态菜单退出应用"), key: "q", action: .quit))
         return menu
     }
 
@@ -212,7 +212,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
 
     private static let attentionImage: NSImage? = {
         let config = NSImage.SymbolConfiguration(paletteColors: [.systemOrange])
-        let image = NSImage(systemSymbolName: "exclamationmark.triangle.fill", accessibilityDescription: "Needs attention")?
+        let image = NSImage(systemSymbolName: "exclamationmark.triangle.fill", accessibilityDescription: String(localized: "Needs attention", comment: "状态菜单警告图标的辅助功能说明"))?
             .withSymbolConfiguration(config)
         image?.isTemplate = false
         return image

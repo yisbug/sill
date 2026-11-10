@@ -100,7 +100,7 @@ private struct GeneralPane: View {
                 Toggle("Launch at login", isOn: Binding(get: { model.loginItem.isOn }, set: { model.loginItem.set($0) }))
                     .disabled(!model.loginItem.available)
                 if !model.loginItem.available {
-                    Footnote("Available when Sill runs from its app bundle.")
+                    Footnote(String(localized: "Available when Sill runs from its app bundle.", comment: "通用设置中登录启动不可用的说明"))
                 } else if model.loginItem.needsApproval {
                     LabeledContent("Waiting for your approval") {
                         Button("Approve in System Settings…") { model.loginItem.openSystemSettings() }
@@ -151,7 +151,7 @@ private struct GeneralPane: View {
             Section {
                 Toggle("Direct wireless connection", isOn: $settings.config.directWireless)
             } footer: {
-                Footnote("Lets your iPhone and iPad connect when they’re near this Mac, even without a shared Wi\u{2011}Fi network, the way AirDrop does. While it’s on, this Mac’s Wi\u{2011}Fi keeps stepping away from your network, so streaming over Wi\u{2011}Fi can stutter. Anyone nearby with Sill can find this Mac; only devices you paired can connect, unless Require pairing is off.")
+                Footnote(String(localized: "Lets your iPhone and iPad connect when they’re near this Mac, even without a shared Wi\u{2011}Fi network, the way AirDrop does. While it’s on, this Mac’s Wi\u{2011}Fi keeps stepping away from your network, so streaming over Wi\u{2011}Fi can stutter. Anyone nearby with Sill can find this Mac; only devices you paired can connect, unless Require pairing is off.", comment: "通用设置中直接无线连接的说明"))
             }
             // The clipboard both ways (HostClipboard): at once, no restart. Each device has its own
             // switch too. macOS's answer is read with the permissions (once a second while this pane
@@ -179,7 +179,7 @@ private struct GeneralPane: View {
                 // A way out when the status item is hidden (a crowded menu bar, the notch).
                 Button("Quit Sill") { NSApp.terminate(nil) }
             } footer: {
-                Footnote("Sill \(AppModel.version) (\(AppModel.build)). Free and open source.")
+                Footnote(String(localized: "Sill \(AppModel.version) (\(AppModel.build)). Free and open source.", comment: "通用设置页脚；插值依次为 Sill 版本号和构建号"))
             }
         }
     }
@@ -187,11 +187,11 @@ private struct GeneralPane: View {
     private var networkName: String {
         let snapshot = model.coordinator?.status.snapshot ?? HostStatusSnapshot()
         switch snapshot.network {
-        case .advertising(let name): return "“\(name)”"
-        case .notAdvertised: return "Not advertised (test pattern mode)"
-        case .failed: return "Not visible (the listener failed)"
-        case .waiting: return "Not yet (waiting for the network)"
-        case .starting, .registering: return "Registering…"
+        case .advertising(let name): return String(localized: "“\(name)”", comment: "通用设置中的网络名称；插值为本机名称")
+        case .notAdvertised: return String(localized: "Not advertised (test pattern mode)", comment: "通用设置中的网络状态：测试图案模式未广播")
+        case .failed: return String(localized: "Not visible (the listener failed)", comment: "通用设置中的网络状态：监听失败")
+        case .waiting: return String(localized: "Not yet (waiting for the network)", comment: "通用设置中的网络状态：等待网络")
+        case .starting, .registering: return String(localized: "Registering…", comment: "通用设置中的网络状态：正在注册")
         }
     }
 }
@@ -216,7 +216,7 @@ struct FirewallSection: View {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .foregroundStyle(.orange)
                         if let command {
-                            Button(copied ? "Copied" : "Copy") { copy(command) }
+                            Button(copied ? String(localized: "Copied", comment: "防火墙命令复制按钮；已复制") : String(localized: "Copy", comment: "防火墙命令复制按钮")) { copy(command) }
                                 .help("Copies the command, to paste into Terminal")
                         }
                     }
@@ -241,7 +241,7 @@ struct FirewallSection: View {
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(command, forType: .string)
         copied = true
-        AccessibilityNotification.Announcement("Copied").post()
+        AccessibilityNotification.Announcement(String(localized: "Copied", comment: "防火墙命令复制后的 VoiceOver 提示")).post()
         Task { @MainActor in
             try? await Task.sleep(for: .seconds(2))
             copied = false
@@ -337,9 +337,9 @@ private struct StreamingPane: View {
                 }
                 .pickerStyle(.segmented)
                 Picker("Quality", selection: $settings.config.bitrate) {
-                    ForEach(QualityPreset.allCases) { Text($0.title).tag($0.rawValue) }
+                    ForEach(QualityPreset.allCases) { Text(MacQualityText.title(forBitrate: $0.rawValue)).tag($0.rawValue) }
                     if QualityPreset(rawValue: settings.config.bitrate) == nil {
-                        Text(QualityPreset.title(forBitrate: settings.config.bitrate)).tag(settings.config.bitrate)
+                        Text(MacQualityText.title(forBitrate: settings.config.bitrate)).tag(settings.config.bitrate)
                     }
                 }
                 Picker("Resolution", selection: $settings.config.captureScale) {
@@ -347,15 +347,15 @@ private struct StreamingPane: View {
                     Text("Standard").tag(CGFloat(1))
                 }
             } footer: {
-                Footnote("Each device asks for its own screen’s rate, up to this limit. Quality is per 60 fps; a 120 fps stream gets twice as much. \(QualityPreset.fastLinkNote) Changes apply at once: the current stream restarts for a moment.")
+                Footnote(String(localized: "Each device asks for its own screen’s rate, up to this limit. Quality is per 60 fps; a 120 fps stream gets twice as much. \(MacQualityText.fastLinkNote) Changes apply at once: the current stream restarts for a moment.", comment: "串流设置页脚；插值为高速网络质量提示"))
             }
             // Away from home (docs/remote-bundle-plan.md §5): its own quality, which a device away
             // sets too; the menu's Quality and Resolution stay the home ones.
             Section {
                 Picker("Quality", selection: $settings.config.awayBitrate) {
-                    ForEach(QualityPreset.allCases) { Text($0.title).tag($0.rawValue) }
+                    ForEach(QualityPreset.allCases) { Text(MacQualityText.title(forBitrate: $0.rawValue)).tag($0.rawValue) }
                     if QualityPreset(rawValue: settings.config.awayBitrate) == nil {
-                        Text(QualityPreset.title(forBitrate: settings.config.awayBitrate)).tag(settings.config.awayBitrate)
+                        Text(MacQualityText.title(forBitrate: settings.config.awayBitrate)).tag(settings.config.awayBitrate)
                     }
                 }
                 Picker("Resolution", selection: $settings.config.awayCaptureScale) {
@@ -365,13 +365,14 @@ private struct StreamingPane: View {
             } header: {
                 Text("Away from home")
             } footer: {
-                Footnote("Sill streams at these while every connected device is away from home, through a VPN or over the internet, so a slow connection never starts at your home quality. A device away from home changes these, and never your Quality and Resolution above."
-                         + (model.coordinator?.status.snapshot.away == true ? " Streaming at these now." : ""))
+                Footnote(model.coordinator?.status.snapshot.away == true
+                         ? String(localized: "Sill streams at these while every connected device is away from home, through a VPN or over the internet, so a slow connection never starts at your home quality. A device away from home changes these, and never your Quality and Resolution above. Streaming at these now.", comment: "异地串流质量说明；当前正在使用此质量")
+                         : String(localized: "Sill streams at these while every connected device is away from home, through a VPN or over the internet, so a slow connection never starts at your home quality. A device away from home changes these, and never your Quality and Resolution above.", comment: "异地串流质量说明；当前未使用此质量"))
             }
             Section {
                 Toggle("Prioritize encoding speed", isOn: $settings.config.prioritizeSpeed)
             } footer: {
-                Footnote("Lower latency when the Mac is busy, at a softer picture.")
+                Footnote(String(localized: "Lower latency when the Mac is busy, at a softer picture.", comment: "串流设置中优先编码速度的说明"))
             }
             // The Mac's sound (docs/audio-plan.md §6), a beta: its switch and its footnote say so. A device's
             // Settings panel turns it on and off too, for every device, and mutes it for that device alone
@@ -379,16 +380,16 @@ private struct StreamingPane: View {
             Section {
                 Toggle("Send audio (beta)", isOn: $settings.config.sendAudio)
                 if settings.config.sendAudio, let problem = model.coordinator?.status.snapshot.audio?.problem {
-                    Warning("Sill \(problem). The picture is unaffected.")
+                    Warning(String(localized: "Sill \(problem). The picture is unaffected.", comment: "串流设置中的音频警告；插值为音频故障说明"))
                 }
             } footer: {
-                Footnote("Beta. Devices play the sound of what you stream: all of the streamed window’s app, or every app for the Desktop. The Mac keeps playing it too. A connected iPhone or iPad can also turn this on or off from Sill’s settings there, and mute it for itself alone. Nothing is recorded.")
+                Footnote(String(localized: "Beta. Devices play the sound of what you stream: all of the streamed window’s app, or every app for the Desktop. The Mac keeps playing it too. A connected iPhone or iPad can also turn this on or off from Sill’s settings there, and mute it for itself alone. Nothing is recorded.", comment: "串流设置中的测试版音频说明"))
             }
             if let snapshot = model.coordinator?.status.snapshot, snapshot.softwareEncoder {
                 Section {
                     Label(snapshot.hardwareEncoderStuck
-                          ? "The hardware encoder is stuck, so streams use the software encoder: up to 60 fps at Standard resolution. Restarting the Mac fixes this."
-                          : "The hardware encoder is busy or not answering, so streams use the software encoder: up to 60 fps at Standard resolution. Sill switches back by itself once it keeps up again.",
+                          ? String(localized: "The hardware encoder is stuck, so streams use the software encoder: up to 60 fps at Standard resolution. Restarting the Mac fixes this.", comment: "串流面板硬件编码器卡住的提示")
+                          : String(localized: "The hardware encoder is busy or not answering, so streams use the software encoder: up to 60 fps at Standard resolution. Sill switches back by itself once it keeps up again.", comment: "串流面板硬件编码器暂不可用的提示"),
                           systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                 }
@@ -410,7 +411,7 @@ private struct VirtualDisplayPane: View {
             Section {
                 Toggle("Stream from a virtual display", isOn: $settings.config.virtualDisplay)
             } footer: {
-                Footnote("Sill moves the window you pick onto an invisible display made for your device, so it keeps updating when other windows cover it and text is drawn at your device’s scale. The window leaves this screen while it streams and comes back when you stop streaming or quit Sill.")
+                Footnote(String(localized: "Sill moves the window you pick onto an invisible display made for your device, so it keeps updating when other windows cover it and text is drawn at your device’s scale. The window leaves this screen while it streams and comes back when you stop streaming or quit Sill.", comment: "虚拟显示设置中窗口移动行为的说明"))
             }
             Section {
                 LabeledContent("Status") {
@@ -435,7 +436,7 @@ private struct VirtualDisplayPane: View {
                     }
                 }
             } footer: {
-                Footnote("Uses a private macOS interface (CGVirtualDisplay). If a macOS update breaks it, Sill streams the window where it is.")
+                Footnote(String(localized: "Uses a private macOS interface (CGVirtualDisplay). If a macOS update breaks it, Sill streams the window where it is.", comment: "虚拟显示设置中私有接口兼容性的说明"))
             }
         }
     }
@@ -443,13 +444,13 @@ private struct VirtualDisplayPane: View {
     private func statusText(_ s: HostStatusSnapshot) -> String {
         let sr = model.permissions.screenRecording, ax = model.permissions.accessibility
         if s.virtualDisplayAPIMissing, let problem = s.virtualDisplayProblem {
-            return "Not available on this version of macOS: \(problem)"
+            return String(localized: "Not available on this version of macOS: \(problem)", comment: "虚拟显示设置中的不可用原因；插值为系统故障说明")
         }
-        if !sr && !ax { return "Needs Screen Recording and Accessibility" }
-        if !ax { return "Needs Accessibility" }
-        if !sr { return "Needs Screen Recording" }
-        if let problem = s.virtualDisplayProblem { return "Off for this session: \(problem)" }
-        return "Available"
+        if !sr && !ax { return String(localized: "Needs Screen Recording and Accessibility", comment: "虚拟显示设置中的状态：缺少屏幕录制和辅助功能权限") }
+        if !ax { return String(localized: "Needs Accessibility", comment: "虚拟显示设置中的状态：缺少辅助功能权限") }
+        if !sr { return String(localized: "Needs Screen Recording", comment: "虚拟显示设置中的状态：缺少屏幕录制权限") }
+        if let problem = s.virtualDisplayProblem { return String(localized: "Off for this session: \(problem)", comment: "虚拟显示设置中的停用状态；插值为停用原因") }
+        return String(localized: "Available", comment: "虚拟显示设置中的可用状态")
     }
 
     /// A run-level disable (the system removed the display too often) can be retried; a missing
@@ -469,24 +470,24 @@ private struct PermissionsPane: View {
         let network = model.coordinator?.status.snapshot.network
         Form {
             Section {
-                PermissionRow(title: "Screen Recording", allowed: permissions.screenRecording,
+                PermissionRow(title: String(localized: "Screen Recording", comment: "权限行标题：屏幕录制"), allowed: permissions.screenRecording,
                               // Not "on this network": a device connected over Direct Wireless shares none.
-                              explanation: "Lets Sill capture the windows you pick on your iPhone or iPad, and their sound when Send Audio is on. Nothing is recorded or saved; frames and sound go straight to your devices.",
-                              button: model.settings.askedScreenRecording ? "Open System Settings…" : "Allow…") {
+                              explanation: String(localized: "Lets Sill capture the windows you pick on your iPhone or iPad, and their sound when Send Audio is on. Nothing is recorded or saved; frames and sound go straight to your devices.", comment: "屏幕录制权限说明"),
+                              button: model.settings.askedScreenRecording ? String(localized: "Open System Settings…", comment: "权限按钮：打开系统设置") : String(localized: "Allow…", comment: "权限按钮：允许")) {
                     permissions.requestScreenRecording()
                 }
-                PermissionRow(title: "Accessibility", allowed: permissions.accessibility,
-                              explanation: "Lets your iPhone or iPad click, scroll and type on this Mac, and lets Sill move and size the window it streams.",
-                              button: model.settings.askedAccessibility ? "Open System Settings…" : "Allow…") {
+                PermissionRow(title: String(localized: "Accessibility", comment: "权限行标题：辅助功能"), allowed: permissions.accessibility,
+                              explanation: String(localized: "Lets your iPhone or iPad click, scroll and type on this Mac, and lets Sill move and size the window it streams.", comment: "辅助功能权限说明"),
+                              button: model.settings.askedAccessibility ? String(localized: "Open System Settings…", comment: "权限按钮：打开系统设置") : String(localized: "Allow…", comment: "权限按钮：允许")) {
                     permissions.requestAccessibility()
                 }
             } footer: {
-                Footnote("Access belongs to Sill itself. Access you gave Terminal for the SillHost command-line tool doesn’t carry over.")
+                Footnote(String(localized: "Access belongs to Sill itself. Access you gave Terminal for the SillHost command-line tool doesn’t carry over.", comment: "权限设置页脚：授权仅属于当前 Sill 应用"))
             }
             if permissions.relaunchSuggested, !permissions.screenRecording {
                 Section {
                     LabeledContent("Screen Recording starts working once Sill opens again.") {
-                        Button(permissions.canRelaunch ? "Relaunch Sill" : "Quit Sill") { permissions.relaunch() }
+                        Button(permissions.canRelaunch ? String(localized: "Relaunch Sill", comment: "权限生效按钮：重新启动 Sill") : String(localized: "Quit Sill", comment: "权限生效按钮：退出 Sill")) { permissions.relaunch() }
                     }
                 }
             }

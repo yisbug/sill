@@ -76,16 +76,16 @@ final class VirtualStage {
         var summary: String {
             switch self {
             case .disabled(let why): return why
-            case .accessibilityOff: return "needs Accessibility"
-            case .screenRecordingOff: return "needs Screen Recording"
-            case .axWindowNotFound: return "the window wasn’t found through Accessibility"
-            case .displayCreate: return "the display couldn’t be created"
-            case .neverOnline: return "the display never came up"
-            case .notListedBySCK: return "ScreenCaptureKit didn’t list the display"
-            case .moveRefused: return "the app refused the move"
-            case .notOnDisplay: return "the window didn’t move"
-            case .windowMissing: return "the window went away"
-            case .locked: return "this Mac is locked"
+            case .accessibilityOff: return String(localized: "needs Accessibility", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .screenRecordingOff: return String(localized: "needs Screen Recording", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .axWindowNotFound: return String(localized: "the window wasn’t found through Accessibility", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .displayCreate: return String(localized: "the display couldn’t be created", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .neverOnline: return String(localized: "the display never came up", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .notListedBySCK: return String(localized: "ScreenCaptureKit didn’t list the display", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .moveRefused: return String(localized: "the app refused the move", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .notOnDisplay: return String(localized: "the window didn’t move", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .windowMissing: return String(localized: "the window went away", comment: "虚拟显示器设置：窗口原位串流的原因")
+            case .locked: return String(localized: "this Mac is locked", comment: "虚拟显示器设置：窗口原位串流的原因")
             }
         }
     }
@@ -129,6 +129,7 @@ final class VirtualStage {
     private var insetMeasured = false
     /// Set when staging must not be attempted again this run (API missing, repeated failures).
     var disabledReason: String?
+    var localizedDisabledReason: String?
     private var creationFailures = 0
     /// Bumped per display created, so a late termination callback for an old display is ignored.
     private var generation = 0
@@ -535,7 +536,11 @@ final class VirtualStage {
                                    refreshHz: Double(refreshHz), vendorID: Self.vendorID, productID: Self.productID, serialNum: Self.serialNum)
         } catch {
             creationFailures += 1
-            if creationFailures >= 2 { disabledReason = "creating the display failed \(creationFailures) times (\(error))" }
+            if creationFailures >= 2 {
+                disabledReason = "creating the display failed \(creationFailures) times (\(error))"
+                let why = (error as? VirtualDisplay.Failure)?.localizedDescription ?? "\(error)"
+                localizedDisabledReason = String(localized: "creating the display failed \(String(creationFailures)) times (\(why))", comment: "虚拟显示器设置：重复创建失败，插值为次数和错误说明")
+            }
             throw Failure.displayCreate(error)
         }
         creationFailures = 0

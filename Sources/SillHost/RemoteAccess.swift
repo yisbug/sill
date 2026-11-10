@@ -65,6 +65,8 @@ package final class RemoteAccess {
     /// Why there is no identity (the keychain failed); remote access, and a TLS home door, are
     /// then unavailable.
     package let identityProblem: String?
+    package let identityLogProblem: String?
+    private let localizedIdentityProblem: String?
     /// Where the key lives, as the home door's unavailable line names it: "in the keychain" (the
     /// app), "in memory", "in the test directory …".
     package let keyPlace: String
@@ -164,20 +166,25 @@ package final class RemoteAccess {
     package init(store: IdentityStore) {
         var identity: HostIdentity?
         var problem: String?
+        var localizedProblem: String?
         var paired: [PairedDevice] = []
         do {
             let key = try store.loadOrCreateKey()
             let recognition = try store.loadOrCreateRecognitionKey()
             guard let id = HostIdentity(privateKey: key, recognitionKey: recognition) else {
-                throw IdentityStoreError("the key could not make a TLS identity")
+                throw IdentityStoreError("the key could not make a TLS identity",
+                                         localizedDescription: String(localized: "the key could not make a TLS identity", comment: "设备设置：密钥无法创建 TLS 身份"))
             }
             paired = try store.loadPaired()
             identity = id
         } catch {
             problem = "\(error)"
+            localizedProblem = (error as? IdentityStoreError)?.localizedDescription ?? "\(error)"
         }
         self.identity = identity
+        identityLogProblem = problem
         identityProblem = problem
+        localizedIdentityProblem = localizedProblem
         keyPlace = store is KeychainIdentityStore ? "in the keychain" : store.summary
         self.store = identity == nil ? nil : store
         self.paired = paired
@@ -307,14 +314,14 @@ package final class RemoteAccess {
     /// Saves Require pairing with the trust list, off signed by this Mac's key. Nil when saved;
     /// otherwise why not, and the caller keeps it as it was.
     package func saveRequirePairing(_ on: Bool) -> String? {
-        guard let store, let identity else { return identityProblem ?? "no identity" }
+        guard let store, let identity else { return localizedIdentityProblem ?? String(localized: "no identity", comment: "设备设置：没有可用的主机身份") }
         guard let record = RequirePairingValue.encode(on, macID: identity.macID, sign: { identity.signRecord($0) }) else {
             print("Require pairing: couldn’t sign it with this Mac’s key \(keyPlace).")
-            return "this Mac’s key couldn’t sign it"
+            return String(localized: "this Mac’s key couldn’t sign it", comment: "设备设置：Mac 密钥无法签署设置")
         }
         do { try store.saveRequirePairing(record); return nil } catch {
             print("Require pairing: couldn’t save it \(keyPlace) (\(error)).")
-            return "\(error)"
+            return (error as? IdentityStoreError)?.localizedDescription ?? "\(error)"
         }
     }
 
@@ -468,7 +475,7 @@ package final class RemoteAccess {
         let device = rest.remove(at: i)
         do { try store?.savePaired(rest) } catch {
             print("Remote access: \(device.displayName) is still paired: the paired devices could not be saved (\(error)).")
-            return "\(error)"
+            return (error as? IdentityStoreError)?.localizedDescription ?? "\(error)"
         }
         paired = rest
         if let fp = device.fingerprintData { lastSeen[RemoteIdentity.shortName(fp)] = nil }
@@ -585,7 +592,7 @@ package final class RemoteAccess {
             publishTrust()
             print("Paired \(device.displayName) (key \(RemoteIdentity.shortName(attempt.deviceFingerprint))…) from \(attempt.display), "
                   + "with \(attempt.request.method == PairRequest.qr ? "the QR code" : "the code").")
-            pairingState = .paired(device.displayName)
+            pairingState = .paired(device.localizedDisplayName)
             requestAnswered(by: attempt.deviceFingerprint)
             windowClosed(.used, reopen: true)
             return PairResult(ok: true, proof: Base64URL.encode(proofM), macID: identity.macID, name: macName,
@@ -714,7 +721,7 @@ package final class RemoteAccess {
         publish()
         print("Paired \(device.displayName) (key \(RemoteIdentity.shortName(a.deviceFingerprint))…) over the USB cable (\(a.display)).")
         pairedNow()
-        onCablePaired?(device.displayName, fingerprint)
+        onCablePaired?(device.localizedDisplayName, fingerprint)
         return ok
     }
 
@@ -974,7 +981,7 @@ package final class RemoteAccess {
             let prefix = d.fingerprintData.map(RemoteIdentity.shortName) ?? "?"
             let seen = lastSeen[prefix]
             return PairedDeviceSummary(id: d.fingerprint, keyPrefix: prefix,
-                                       name: d.displayName, model: d.model, pairedAt: Date(timeIntervalSince1970: d.pairedAt),
+                                       name: d.localizedDisplayName, model: d.model, pairedAt: Date(timeIntervalSince1970: d.pairedAt),
                                        method: d.method, lastSeen: seen?.at, lastRoute: seen?.route)
         }
         let input = reach.map(Reachability.input)
@@ -985,7 +992,7 @@ package final class RemoteAccess {
                                   vpnDown: reach.map { AddressList.vpnDown(setupVPNs: $0.setupVPNs, services: $0.services) } ?? [],
                                   lanAddress: input.flatMap(AddressList.lanAddress), router: routerState,
                                   addressName: addressNameText, pairing: pairingState, paired: summaries,
-                                  identityProblem: identityProblem, homeDoor: homeDoor, pairingRequest: pairingRequest,
+                                  identityProblem: localizedIdentityProblem, homeDoor: homeDoor, pairingRequest: pairingRequest,
                                   olderDeviceAt: olderDeviceAt)
         status.update { $0.remote = remote }
     }

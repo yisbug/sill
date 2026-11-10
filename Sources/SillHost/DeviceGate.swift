@@ -61,7 +61,11 @@ package enum DeviceGate {
     /// "Update Sill on your iPad to keep using Mac mini. It needs version 1.2 or later." The Mac by
     /// its name: on the device's connect screen "this Mac" would read as the device itself.
     package static func message(_ hello: Hello?, floor: SillVersion, macName: String) -> String {
-        "Update Sill on your \(deviceWord(hello)) to keep using \(macName). It needs version \(floor) or later."
+        switch deviceWord(hello) {
+        case "iPhone": return String(localized: "Update Sill on your iPhone to keep using \(macName). It needs version \(floor.description) or later.", comment: "设备连接页：iPhone 需更新，插值为 Mac 名称和最低版本")
+        case "iPad": return String(localized: "Update Sill on your iPad to keep using \(macName). It needs version \(floor.description) or later.", comment: "设备连接页：iPad 需更新，插值为 Mac 名称和最低版本")
+        default: return String(localized: "Update Sill on your device to keep using \(macName). It needs version \(floor.description) or later.", comment: "设备连接页：设备需更新，插值为 Mac 名称和最低版本")
+        }
     }
 
     /// "iPhone" or "iPad" from the start of the hello's cleaned name, else "device".

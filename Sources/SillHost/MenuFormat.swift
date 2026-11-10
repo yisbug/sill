@@ -124,14 +124,14 @@ package enum MenuFormat {
 
     /// AXMenuItemCmdChar's special characters.
     package static let characters: [String: String] = [
-        "\u{8}": "⌫", "\u{7f}": "⌫", "\u{1b}": "⎋", "\r": "↩", "\u{3}": "⌤", "\t": "⇥", " ": "Space",
+        "\u{8}": "⌫", "\u{7f}": "⌫", "\u{1b}": "⎋", "\r": "↩", "\u{3}": "⌤", "\t": "⇥", " ": String(localized: "Space", comment: "设备菜单快捷键：空格键名称"),
         "\u{F700}": "↑", "\u{F701}": "↓", "\u{F702}": "←", "\u{F703}": "→", "\u{F728}": "⌦",
         "\u{F729}": "↖", "\u{F72B}": "↘", "\u{F72C}": "⇞", "\u{F72D}": "⇟",
     ]
 
     /// AXMenuItemCmdGlyph: Carbon's Menus.h glyph codes.
     package static let glyphs: [Int: String] = {
-        var g: [Int: String] = [2: "⇥", 4: "⌤", 9: "Space", 10: "⌦", 11: "↩", 23: "⌫", 27: "⎋", 28: "⌧", 98: "⇞",
+        var g: [Int: String] = [2: "⇥", 4: "⌤", 9: String(localized: "Space", comment: "设备菜单快捷键：空格键名称"), 10: "⌦", 11: "↩", 23: "⌫", 27: "⎋", 28: "⌧", 98: "⇞",
                                 100: "←", 101: "→", 102: "↖", 104: "↑", 105: "↘", 106: "↓", 107: "⇟"]
         for n in 1...12 { g[110 + n] = "F\(n)" }           // 111–122: F1–F12
         for n in 13...15 { g[122 + n] = "F\(n)" }          // 135–137: F13–F15
@@ -140,7 +140,7 @@ package enum MenuFormat {
 
     /// AXMenuItemCmdVirtualKey: Events.h key codes.
     package static let virtualKeys: [Int: String] = [
-        36: "↩", 48: "⇥", 49: "Space", 51: "⌫", 53: "⎋", 76: "⌤", 115: "↖", 116: "⇞", 117: "⌦", 119: "↘", 121: "⇟",
+        36: "↩", 48: "⇥", 49: String(localized: "Space", comment: "设备菜单快捷键：空格键名称"), 51: "⌫", 53: "⎋", 76: "⌤", 115: "↖", 116: "⇞", 117: "⌦", 119: "↘", 121: "⇟",
         123: "←", 124: "→", 125: "↓", 126: "↑",
         122: "F1", 120: "F2", 99: "F3", 118: "F4", 96: "F5", 97: "F6", 98: "F7", 100: "F8", 101: "F9", 109: "F10",
         103: "F11", 111: "F12",

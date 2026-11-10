@@ -18,6 +18,18 @@ final class AudioEncoder {
         let status: OSStatus
         let step: String
         var description: String { "\(step) failed (\(status)\(Self.fourCC(status)))" }
+        var localizedDescription: String {
+            let suffix = Self.fourCC(status)
+            switch step {
+            case "AAC-ELD's format": return String(localized: "AAC-ELD's format failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "AudioConverterNew": return String(localized: "AudioConverterNew failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "the bitrate": return String(localized: "the bitrate failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "the output format": return String(localized: "the output format failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "the priming": return String(localized: "the priming failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            case "the magic cookie": return String(localized: "the magic cookie failed (\(String(status))\(suffix))", comment: "音频状态：编码器步骤失败，插值为系统状态码及其字符形式")
+            default: return description
+            }
+        }
         /// OSStatus values that are four printable characters ('fmt?') read better that way.
         private static func fourCC(_ s: OSStatus) -> String {
             let v = UInt32(bitPattern: s)

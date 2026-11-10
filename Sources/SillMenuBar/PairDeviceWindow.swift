@@ -37,7 +37,7 @@ final class PairDeviceWindowController: NSWindowController, NSWindowDelegate {
         self.model = model
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 440, height: 600), styleMask: [.titled, .closable],
                               backing: .buffered, defer: true)
-        window.title = "Pair iPhone or iPad"
+        window.title = String(localized: "Pair iPhone or iPad", comment: "手动或设备请求配对窗口的标题")
         window.isReleasedWhenClosed = false
         window.collectionBehavior.insert([.moveToActiveSpace, .fullScreenAuxiliary])
         // Before the window is ever on screen (`show` sets it again with its offer).
@@ -157,8 +157,8 @@ struct PairDeviceView: View {
             // A device-opened window is the home door's: the remote door's state is not its own.
             if offer.byDevice { return .waiting(triesLeft: triesLeft, wrongFrom: wrongFrom) }
             switch status.listener {
-            case .portInUse(let p): return .doorDown("Can’t pair while port \(p) is in use.")
-            case .failed: return .doorDown("Can’t pair: remote access couldn’t start. Sill tries again every 30 seconds.")
+            case .portInUse(let p): return .doorDown(String(localized: "Can’t pair while port \(String(p)) is in use.", comment: "配对窗口无法配对的提示；插值为占用的端口"))
+            case .failed: return .doorDown(String(localized: "Can’t pair: remote access couldn’t start. Sill tries again every 30 seconds.", comment: "配对窗口远程访问启动失败的提示"))
             case .off, .listening: return .waiting(triesLeft: triesLeft, wrongFrom: wrongFrom)
             }
         case .paired(let name): return .paired(name)
@@ -236,7 +236,9 @@ struct PairDeviceView: View {
                 }
                 countdown
                 if let wrongFrom {
-                    Label("A wrong code came from \(wrongFrom). \(triesLeft) tr\(triesLeft == 1 ? "y" : "ies") left.",
+                    Label(triesLeft == 1
+                          ? String(localized: "A wrong code came from \(wrongFrom). 1 try left.", comment: "配对码错误警告；插值为错误请求来源，仅剩一次机会")
+                          : String(localized: "A wrong code came from \(wrongFrom). \(String(triesLeft)) tries left.", comment: "配对码错误警告；插值为错误请求来源及剩余次数"),
                           systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                 }
@@ -274,7 +276,9 @@ struct PairDeviceView: View {
                 }
                 countdown
                 if let wrongFrom {
-                    Label("A wrong code came from \(wrongFrom). \(triesLeft) tr\(triesLeft == 1 ? "y" : "ies") left.",
+                    Label(triesLeft == 1
+                          ? String(localized: "A wrong code came from \(wrongFrom). 1 try left.", comment: "配对码错误警告；插值为错误请求来源，仅剩一次机会")
+                          : String(localized: "A wrong code came from \(wrongFrom). \(String(triesLeft)) tries left.", comment: "配对码错误警告；插值为错误请求来源及剩余次数"),
                           systemImage: "exclamationmark.triangle.fill")
                         .foregroundStyle(.orange)
                 }
@@ -310,12 +314,30 @@ struct PairDeviceView: View {
     /// A window a device opened: its first line, "iPad (iPad14,1) on this network asked to pair.",
     /// which VoiceOver also announces as it comes up (PairDeviceWindowController.show).
     static func askedLine(_ offer: RemoteAccess.PairingOffer) -> String {
-        "\(offer.requestedBy ?? "A device") \(offer.askedFrom ?? "on this network") asked to pair."
+        let from = offer.askedFrom ?? "on this network"
+        switch (offer.requestedBy, from) {
+        case (let name?, "on this network"):
+            return String(localized: "\(name) on this network asked to pair.", comment: "配对窗口首行；插值为通过本地网络请求配对的设备名")
+        case (let name?, "nearby"):
+            return String(localized: "\(name) nearby asked to pair.", comment: "配对窗口首行；插值为附近请求配对的设备名")
+        case (let name?, "on this Mac"):
+            return String(localized: "\(name) on this Mac asked to pair.", comment: "配对窗口首行；插值为本机请求配对的设备名")
+        case (nil, "on this network"):
+            return String(localized: "A device on this network asked to pair.", comment: "配对窗口首行；未命名设备通过本地网络请求配对")
+        case (nil, "nearby"):
+            return String(localized: "A device nearby asked to pair.", comment: "配对窗口首行；附近的未命名设备请求配对")
+        case (nil, "on this Mac"):
+            return String(localized: "A device on this Mac asked to pair.", comment: "配对窗口首行；本机的未命名设备请求配对")
+        case (let name?, _):
+            return String(localized: "\(name) \(from) asked to pair.", comment: "配对窗口首行；插值为设备名和其他来源说明")
+        case (nil, _):
+            return String(localized: "A device \(from) asked to pair.", comment: "配对窗口首行；插值为未命名设备的其他来源说明")
+        }
     }
 
     static func countdown(until end: Date, now: Date) -> String {
         let left = max(0, Int(end.timeIntervalSince(now).rounded(.up)))
-        return "Works once, for the next \(left / 60):\(String(format: "%02d", left % 60))."
+        return String(localized: "Works once, for the next \(String(left / 60)):\(String(format: "%02d", left % 60)).", comment: "配对码倒计时；插值依次为剩余分钟和两位秒数")
     }
 
     /// What to type on the device: Tailscale's name with its IPv4 under it, else a Tailscale IP,
@@ -389,7 +411,7 @@ final class CableNoticeWindowController: NSWindowController, NSWindowDelegate {
         self.model = model
         let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 440, height: 160), styleMask: [.titled, .closable],
                               backing: .buffered, defer: true)
-        window.title = "Paired over the USB Cable"
+        window.title = String(localized: "Paired over the USB Cable", comment: "USB 自动配对通知窗口的标题")
         window.isReleasedWhenClosed = false
         window.collectionBehavior.insert([.moveToActiveSpace, .fullScreenAuxiliary])
         super.init(window: window)
@@ -453,7 +475,7 @@ struct CableNoticeView: View {
 
     static let showsFor: Duration = .seconds(10)
 
-    static func firstLine(_ name: String) -> String { "\(name) is paired with this Mac." }
+    static func firstLine(_ name: String) -> String { String(localized: "\(name) is paired with this Mac.", comment: "USB 自动配对通知首行；插值为设备名") }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -470,7 +492,7 @@ struct CableNoticeView: View {
                 Text("It paired by itself over the USB cable, and can connect over Wi\u{2011}Fi and nearby from now on too.")
                     .fixedSize(horizontal: false, vertical: true)
                 if let removeProblem {
-                    Warning("\(name) is still paired: Sill couldn’t update the keychain (\(withoutFullStop(removeProblem))). Try again.")
+                    Warning(String(localized: "\(name) is still paired: Sill couldn’t update the keychain (\(withoutFullStop(removeProblem))). Try again.", comment: "USB 配对通知移除失败；插值为设备名和钥匙串故障原因"))
                 }
             }
             HStack {
