@@ -1,132 +1,1763 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "%@ asked to pair.": {},
-    "%@ can no longer connect.": {},
-    "%@ can no longer connect. To use it again, pair it again.": {},
-    "%@ — Not connected": {},
-    "%lld": {},
-    "120 fps": {},
-    "60 fps": {},
-    "A paired device can see and control this Mac.": {},
-    "A wrong code came from %@. %lld tr%@ left.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "A wrong code came from %1$@. %2$lld tr%3$@ left."
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ %@ asked to pair." : {
+      "comment" : "配对窗口首行；插值为设备名和其他来源说明",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ asked to pair."
           }
         }
       }
     },
-    "Address": {},
-    "Address name": {},
-    "Address name (optional)": {},
-    "Addresses": {},
-    "Allow connections from the internet": {},
-    "Allowed": {},
-    "Any device on your network (or nearby, with Direct Wireless Connection on) and any app on this Mac can see and control it without pairing. Connections are still encrypted.": {},
-    "Approve in System Settings…": {},
-    "Asking your router…": {},
-    "Away from home": {},
-    "Cancel": {},
-    "Can’t scan? Tap Enter Code Instead, and type:": {},
-    "Change It in Sharing Settings…": {},
-    "Change Port…": {},
-    "Change…": {},
-    "Check Now": {},
-    "Check for updates automatically": {},
-    "Code": {},
-    "Copied": {},
-    "Copies the command, to paste into Terminal": {},
-    "Copy": {},
-    "Didn’t ask for this? Click Cancel.": {},
-    "Direct wireless connection": {},
-    "Done": {},
-    "Firewall": {},
-    "Forward TCP port %@ on your router to this Mac (%@), and reserve that address for this Mac in the router’s settings.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "new",
-            "value": "Forward TCP port %1$@ on your router to this Mac (%2$@), and reserve that address for this Mac in the router’s settings."
+    "%@ %@ changed signature: expected %@, found %@" : {
+      "comment" : "虚拟显示器设置：系统方法签名变化，插值为类、方法及签名",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@ changed signature: expected %3$@, found %4$@"
           }
         }
       }
     },
-    "Frame rate limit": {},
-    "IPv6": {},
-    "If your iPhone or iPad can’t find this Mac, allow Sill in Privacy & Security › Local Network.": {},
-    "If your router has a dynamic DNS name, enter it so your devices keep finding this Mac when your internet address changes. Add :port if the router forwards a different outside port.": {},
-    "In Sill on your iPhone or iPad, tap this Mac, or tap Add a Mac… when you’re away, then point it at this code.": {},
-    "Internet": {},
-    "It paired by itself over the USB cable, and can connect over Wi‑Fi and nearby from now on too.": {},
-    "Last window": {},
-    "Launch at login": {},
-    "Local Network": {},
-    "Name": {},
-    "New Code": {},
-    "No VPN is running on this Mac. Install one such as Tailscale on this Mac and on your iPhone or iPad, or allow connections from the internet below.": {},
-    "No paired devices yet.": {},
-    "None": {},
-    "OK": {},
-    "Open Energy Settings…": {},
-    "Open Local Network…": {},
-    "Open Release Page…": {},
-    "Pair iPhone or iPad…": {},
-    "Paired Devices": {},
-    "Paired devices": {},
-    "Paired devices learn the new port the next time they connect at home.": {},
-    "Paired with %@.": {},
-    "Pairing code image": {},
-    "Pairing stopped after %lld wrong codes.": {},
-    "Plugged in, it pairs again by itself when it asks. Unplug it to keep it out.": {},
-    "Point it at this code, or tap Enter Code Instead and type the code.": {},
-    "Port": {},
-    "Prioritize encoding speed": {},
-    "Quality": {},
-    "Quit Sill": {},
-    "Relaunch Sill": {},
-    "Remote Access is off. Paired devices can connect away from home once you turn it on.": {},
-    "Remote access": {},
-    "Remove": {},
-    "Rename": {},
-    "Require pairing": {},
-    "Resolution": {},
-    "Retina": {},
-    "Reveal Log File": {},
-    "Router’s internet address": {},
-    "Running from": {},
-    "Save": {},
-    "Screen Recording starts working once Sill opens again.": {},
-    "Send audio (beta)": {},
-    "Share clipboard with devices": {},
-    "Show Devices…": {},
-    "Show Log…": {},
-    "Show the pairing window to screen sharing": {},
-    "Sleep": {},
-    "Standard": {},
-    "Status": {},
-    "Stream from a virtual display": {},
-    "Streamed where it is: %@": {},
-    "The hardware encoder is busy or not answering, so streams use the software encoder: up to 60 fps at Standard resolution. Sill switches back by itself once it keeps up again.": {},
-    "The hardware encoder is stuck, so streams use the software encoder: up to 60 fps at Standard resolution. Restarting the Mac fixes this.": {},
-    "The login item and the permissions follow this copy of Sill. Keep one copy, in Applications.": {},
-    "This Mac can’t be reached while it’s asleep. While a device is connected from away, Sill keeps it from going to sleep by itself.": {},
-    "This code expired.": {},
-    "This code no longer works.": {},
-    "This is the Mac’s name.": {},
-    "This network. Use it with a VPN into your home network, such as WireGuard on your router.": {},
-    "Try Again": {},
-    "Turn On Remote Access": {},
-    "Visible on your network as": {},
-    "Waiting for your approval": {},
-    "Works only if your router lets incoming IPv6 connections reach this Mac; most don’t.": {},
-    "Your paired devices show here once Sill can use its key again.": {},
-    "Your router didn’t say. You’ll find the address in its settings.": {},
-    "You’re all set. Open Sill on your iPhone or iPad.": {},
-    "home.example.net": {},
-    "or": {}
+    "%@ Connected" : {
+      "comment" : "状态卡连接标题，插值为设备简称"
+    },
+    "%@ Devices Connected" : {
+      "comment" : "状态卡连接标题，插值为设备数量"
+    },
+    "%@ Mbps" : {
+      "comment" : "Mac 自定义画质名称，插值为码率"
+    },
+    "%@ Wants to Pair" : {
+      "comment" : "配对请求标题，插值为设备简称"
+    },
+    "%@ and %@ need the USB cable or very fast Wi‑Fi; if the picture lags, step down." : {
+      "comment" : "Mac 串流设置说明，插值为两种高码率画质名称",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ and %2$@ need the USB cable or very fast Wi‑Fi; if the picture lags, step down."
+          }
+        }
+      }
+    },
+    "%@ asked to pair." : {
+
+    },
+    "%@ can no longer connect." : {
+
+    },
+    "%@ can no longer connect. To use it again, pair it again." : {
+
+    },
+    "%@ couldn’t be read: %@" : {
+      "comment" : "设备设置钥匙串读取错误：插值为条目标识和系统错误说明",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ couldn’t be read: %2$@"
+          }
+        }
+      }
+    },
+    "%@ couldn’t be saved: %@" : {
+      "comment" : "设备设置钥匙串保存错误：插值为条目标识和系统错误说明",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ couldn’t be saved: %2$@"
+          }
+        }
+      }
+    },
+    "%@ fps · frame age %@ · RTT %@" : {
+      "comment" : "状态卡设备统计，插值为帧率、画面延迟和往返延迟",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ fps · frame age %2$@ · RTT %3$@"
+          }
+        }
+      }
+    },
+    "%@ fps, still" : {
+      "comment" : "状态卡静止画面帧率，插值为帧率上限"
+    },
+    "%@ fps, the link can’t carry %@" : {
+      "comment" : "状态卡连接跟不上，插值为帧率和画质",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ fps, the link can’t carry %2$@"
+          }
+        }
+      }
+    },
+    "%@ fps, the link can’t carry %@ · RTT %@" : {
+      "comment" : "状态卡连接跟不上，插值为帧率、画质和往返延迟",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ fps, the link can’t carry %2$@ · RTT %3$@"
+          }
+        }
+      }
+    },
+    "%@ init returned nil" : {
+      "comment" : "虚拟显示器设置：系统对象初始化失败，插值为类名"
+    },
+    "%@ is locked" : {
+      "comment" : "锁屏覆盖层标题，插值为 Mac 名称"
+    },
+    "%@ is locked. Unlock it to see its windows." : {
+      "comment" : "应用抽屉和设置中的锁屏提示，插值为 Mac 名称"
+    },
+    "%@ is no longer open." : {
+      "comment" : "设备菜单：应用已关闭，插值为应用名称"
+    },
+    "%@ is not among the apps ScreenCaptureKit lists" : {
+      "comment" : "音频状态：系统未列出应用，插值为应用名称"
+    },
+    "%@ is paired with this Mac." : {
+      "comment" : "USB 自动配对通知首行；插值为设备名"
+    },
+    "%@ is still paired: Sill couldn’t update the keychain (%@). Try again." : {
+      "comment" : "USB 配对通知移除失败；插值为设备名和钥匙串故障原因\n设备面板中移除配对失败的警告；插值为设备名和钥匙串故障原因",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ is still paired: Sill couldn’t update the keychain (%2$@). Try again."
+          }
+        }
+      }
+    },
+    "%@ isn’t responding." : {
+      "comment" : "设备菜单：应用未响应，插值为应用名称"
+    },
+    "%@ ms" : {
+      "comment" : "状态卡时间，插值为毫秒数"
+    },
+    "%@ nearby asked to pair." : {
+      "comment" : "配对窗口首行；插值为附近请求配对的设备名"
+    },
+    "%@ of %@ fps" : {
+      "comment" : "状态卡帧率，插值为当前帧率和上限",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ of %2$@ fps"
+          }
+        }
+      }
+    },
+    "%@ on this Mac asked to pair." : {
+      "comment" : "配对窗口首行；插值为本机请求配对的设备名"
+    },
+    "%@ on this network asked to pair." : {
+      "comment" : "配对窗口首行；插值为通过本地网络请求配对的设备名"
+    },
+    "%@ times" : {
+      "comment" : "Aa 文字大小的 VoiceOver 播报，插值为缩放倍数"
+    },
+    "%@ · Retina" : {
+      "comment" : "Mac 画质及分辨率摘要，插值为画质名称"
+    },
+    "%@ · Standard" : {
+      "comment" : "Mac 画质及分辨率摘要，插值为画质名称"
+    },
+    "%@ — %@ Mbps" : {
+      "comment" : "Mac 画质菜单标题，插值为预设名称和码率",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ — %2$@ Mbps"
+          }
+        }
+      }
+    },
+    "%@ — Not connected" : {
+
+    },
+    "%@. Quit and reopen Sill to try again." : {
+      "comment" : "状态卡网络失败说明，插值为错误信息"
+    },
+    "%@×%@ · %@ · %@ Mbps" : {
+      "comment" : "状态卡串流参数，插值为尺寸、帧率和码率",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@×%2$@ · %3$@ · %4$@ Mbps"
+          }
+        }
+      }
+    },
+    "120 fps" : {
+
+    },
+    "60 fps" : {
+
+    },
+    "A code is showing." : {
+      "comment" : "配对请求提醒，验证码已显示"
+    },
+    "A device %@ asked to pair." : {
+      "comment" : "配对窗口首行；插值为未命名设备的其他来源说明"
+    },
+    "A device nearby asked to pair." : {
+      "comment" : "配对窗口首行；附近的未命名设备请求配对"
+    },
+    "A device on this Mac asked to pair." : {
+      "comment" : "配对窗口首行；本机的未命名设备请求配对"
+    },
+    "A device on this network asked to pair." : {
+      "comment" : "配对窗口首行；未命名设备通过本地网络请求配对"
+    },
+    "A paired device can see and control this Mac on your network, nearby, and from afar while Remote Access is on. If one is lost, remove it here." : {
+      "comment" : "设备面板页脚中配对权限的说明"
+    },
+    "A paired device can see and control this Mac." : {
+
+    },
+    "A wrong code came from %@. %@ tries left." : {
+      "comment" : "配对码错误警告；插值为错误请求来源及剩余次数",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "A wrong code came from %1$@. %2$@ tries left."
+          }
+        }
+      }
+    },
+    "A wrong code came from %@. 1 try left." : {
+      "comment" : "配对码错误警告；插值为错误请求来源，仅剩一次机会"
+    },
+    "AAC-ELD's format failed (%@%@)" : {
+      "comment" : "音频状态：编码器步骤失败，插值为系统状态码及其字符形式",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AAC-ELD's format failed (%1$@%2$@)"
+          }
+        }
+      }
+    },
+    "About Sill" : {
+      "comment" : "主菜单：关于应用"
+    },
+    "Access belongs to Sill itself. Access you gave Terminal for the SillHost command-line tool doesn’t carry over." : {
+      "comment" : "权限设置页脚：授权仅属于当前 Sill 应用"
+    },
+    "Accessibility" : {
+      "comment" : "权限行标题：辅助功能"
+    },
+    "Accessibility: Allowed" : {
+      "comment" : "状态菜单辅助功能已允许"
+    },
+    "Accessibility: Not Allowed…" : {
+      "comment" : "状态菜单辅助功能未允许"
+    },
+    "Address" : {
+
+    },
+    "Address name" : {
+      "comment" : "远程访问地址列表中的域名标签"
+    },
+    "Address name (optional)" : {
+
+    },
+    "Addresses" : {
+
+    },
+    "Allow Accessibility for Sill on the Mac (System Settings › Privacy & Security › Accessibility)." : {
+      "comment" : "设备菜单：Mac 辅助功能权限提示"
+    },
+    "Allow Accessibility…" : {
+      "comment" : "状态菜单辅助功能权限提醒标题"
+    },
+    "Allow Screen Recording…" : {
+      "comment" : "状态菜单权限提醒标题"
+    },
+    "Allow connections from the internet" : {
+
+    },
+    "Allow in System Settings…" : {
+      "comment" : "打开系统设置以允许读取剪贴板的按钮"
+    },
+    "Allowed" : {
+
+    },
+    "Allow…" : {
+      "comment" : "权限按钮：允许"
+    },
+    "An iPhone or iPad Needs Sill Updated" : {
+      "comment" : "状态菜单旧版设备提醒标题"
+    },
+    "Another user started controlling this Mac." : {
+      "comment" : "用户切换覆盖层标题"
+    },
+    "Another user started controlling this Mac. Log in to your account to reactivate screen sharing with Sill." : {
+      "comment" : "应用抽屉和设置中的用户切换提示"
+    },
+    "Any device on your network (or nearby, with Direct Wireless Connection on) and any app on this Mac can see and control it without pairing. Connections are still encrypted." : {
+
+    },
+    "Anyone on the internet can now reach port %@ and try to connect. Sill turns away every device you haven’t paired. Turning this off doesn’t close the port on your router: remove the forward there too." : {
+      "comment" : "远程访问面板中开放互联网连接的说明；插值为端口号"
+    },
+    "Approve Sill in System Settings › Login Items" : {
+      "comment" : "状态菜单登录启动待批准说明"
+    },
+    "Approve in System Settings…" : {
+
+    },
+    "Asking your router…" : {
+
+    },
+    "AudioConverterNew failed (%@%@)" : {
+      "comment" : "音频状态：编码器步骤失败，插值为系统状态码及其字符形式",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "AudioConverterNew failed (%1$@%2$@)"
+          }
+        }
+      }
+    },
+    "Available" : {
+      "comment" : "虚拟显示设置中的可用状态"
+    },
+    "Available for a window." : {
+      "comment" : "Aa 不可用时的 VoiceOver 提示"
+    },
+    "Available when Sill runs from its app bundle" : {
+      "comment" : "状态菜单登录启动不可用说明"
+    },
+    "Available when Sill runs from its app bundle." : {
+      "comment" : "通用设置中登录启动不可用的说明"
+    },
+    "Away from home" : {
+
+    },
+    "Away from home now: %@" : {
+      "comment" : "状态菜单画质副标题，插值为外出画质及分辨率"
+    },
+    "Balanced" : {
+      "comment" : "Mac 画质预设名称"
+    },
+    "Beta. Devices play the sound of what you stream: all of the streamed window’s app, or every app for the Desktop. The Mac keeps playing it too. A connected iPhone or iPad can also turn this on or off from Sill’s settings there, and mute it for itself alone. Nothing is recorded." : {
+      "comment" : "串流设置中的测试版音频说明"
+    },
+    "CGVirtualDisplay applySettings: returned NO (mode rejected)" : {
+      "comment" : "虚拟显示器设置：显示模式被系统拒绝"
+    },
+    "CGVirtualDisplay was created but reported displayID 0" : {
+      "comment" : "虚拟显示器设置：系统没有分配显示器标识"
+    },
+    "Cancel" : {
+
+    },
+    "Can’t pair while port %@ is in use." : {
+      "comment" : "配对窗口无法配对的提示；插值为占用的端口"
+    },
+    "Can’t pair: remote access couldn’t start. Sill tries again every 30 seconds." : {
+      "comment" : "配对窗口远程访问启动失败的提示"
+    },
+    "Can’t scan? Tap Enter Code Instead, and type:" : {
+
+    },
+    "Change It in Sharing Settings…" : {
+
+    },
+    "Change Port…" : {
+
+    },
+    "Change…" : {
+
+    },
+    "Check Now" : {
+
+    },
+    "Check for updates automatically" : {
+
+    },
+    "Checking…" : {
+      "comment" : "设置更新检查：正在检查"
+    },
+    "Choose a port from 1024 to 65535." : {
+      "comment" : "远程访问端口输入提示"
+    },
+    "Clear" : {
+      "comment" : "日志窗口：清空显示"
+    },
+    "Click Allow in System Settings: macOS asks about Sill once, then Privacy & Security opens, where you set Sill to Allow under Paste from Other Apps. Text a device sends with Paste still arrives." : {
+      "comment" : "Mac 设置中首次允许读取剪贴板的操作提示"
+    },
+    "Click to show a code." : {
+      "comment" : "配对请求提醒，提示显示验证码"
+    },
+    "Close" : {
+      "comment" : "窗口菜单：关闭"
+    },
+    "Code" : {
+
+    },
+    "Copied" : {
+      "comment" : "复制地址后的 VoiceOver 提示\n远程地址复制按钮：已复制\n防火墙命令复制后的 VoiceOver 提示\n防火墙命令复制按钮；已复制"
+    },
+    "Copies the command, to paste into Terminal" : {
+
+    },
+    "Copy" : {
+      "comment" : "编辑菜单：复制\n远程地址复制按钮\n防火墙命令复制按钮"
+    },
+    "Copy the %@ address" : {
+      "comment" : "远程地址复制按钮的 VoiceOver 标签；插值为连接方式"
+    },
+    "Copy the IPv6 address" : {
+      "comment" : "远程地址复制按钮的 VoiceOver 标签"
+    },
+    "Copy the router’s internet address" : {
+      "comment" : "远程地址复制按钮的 VoiceOver 标签"
+    },
+    "Copy this Mac’s address" : {
+      "comment" : "远程地址复制按钮的 VoiceOver 标签"
+    },
+    "Couldn’t check: %@" : {
+      "comment" : "设置更新检查失败：插值为错误说明\n设置更新检查连接错误：插值为系统错误说明"
+    },
+    "Couldn’t check: GitHub answered with an error (HTTP %@)." : {
+      "comment" : "设置更新检查错误：插值为 HTTP 状态码"
+    },
+    "Couldn’t check: GitHub didn’t answer within %@ seconds." : {
+      "comment" : "设置更新检查超时：插值为等待秒数"
+    },
+    "Couldn’t check: GitHub has no release of Sill yet." : {
+      "comment" : "设置更新检查结果：尚无发布版本"
+    },
+    "Couldn’t check: GitHub is limiting requests from this network. Try again after %@." : {
+      "comment" : "设置更新检查限流提示：插值为可重试时间"
+    },
+    "Couldn’t check: GitHub is limiting requests from this network. Try again in an hour." : {
+      "comment" : "设置更新检查限流提示：未知重试时间"
+    },
+    "Couldn’t check: GitHub’s answer wasn’t a release Sill understands." : {
+      "comment" : "设置更新检查错误：无法识别发布信息"
+    },
+    "Couldn’t check: this Mac isn’t connected to the internet." : {
+      "comment" : "设置更新检查连接错误：网络不可用"
+    },
+    "Couldn’t start; trying again" : {
+      "comment" : "远程访问菜单副标题，正在重试启动"
+    },
+    "Custom — %@ Mbps" : {
+      "comment" : "Mac 自定义画质菜单标题，插值为码率"
+    },
+    "Cut" : {
+      "comment" : "编辑菜单：剪切"
+    },
+    "Device (%@)" : {
+      "comment" : "设备列表：未命名设备，插值为设备型号"
+    },
+    "Device Connected" : {
+      "comment" : "状态卡连接标题，设备名称未知"
+    },
+    "Devices" : {
+      "comment" : "设置窗口：设备标签页"
+    },
+    "Devices Can’t Connect" : {
+      "comment" : "状态菜单设备连接提醒标题"
+    },
+    "Devices can connect but can’t see any windows." : {
+      "comment" : "状态卡屏幕录制权限说明"
+    },
+    "Devices can watch but not click or type." : {
+      "comment" : "状态菜单辅助功能权限说明"
+    },
+    "Devices can’t connect: Sill couldn’t use its key in your keychain (%@). Quit Sill and open it again, and choose Always Allow if the keychain asks." : {
+      "comment" : "设备面板连接不可用的警告；插值为钥匙串故障原因"
+    },
+    "Didn’t ask for this? Click Cancel." : {
+
+    },
+    "Didn’t reach %@. Try Paste again." : {
+      "comment" : "剪贴板发送未及时确认的提示，插值为 Mac 名称"
+    },
+    "Direct" : {
+      "comment" : "状态卡直连名称"
+    },
+    "Direct Wireless Connection" : {
+      "comment" : "状态菜单直接无线连接标题"
+    },
+    "Direct wireless connection" : {
+
+    },
+    "Dismiss" : {
+      "comment" : "关闭剪贴板芯片的按钮"
+    },
+    "Done" : {
+
+    },
+    "Each device asks for its own screen’s rate, up to this limit. Quality is per 60 fps; a 120 fps stream gets twice as much. %@ Changes apply at once: the current stream restarts for a moment." : {
+      "comment" : "串流设置页脚；插值为高速网络质量提示"
+    },
+    "Each iPhone or iPad pairs once: over the USB cable by itself, or on Wi‑Fi with a code this Mac shows when the device asks. Everything devices send and receive is encrypted." : {
+      "comment" : "设备面板中配对方式和加密的说明"
+    },
+    "Edit" : {
+      "comment" : "主菜单：编辑菜单"
+    },
+    "Efficient" : {
+      "comment" : "Mac 画质预设名称"
+    },
+    "Extreme" : {
+      "comment" : "Mac 画质预设名称"
+    },
+    "Find" : {
+      "comment" : "编辑菜单：查找子菜单"
+    },
+    "Find Next" : {
+      "comment" : "查找菜单：下一处"
+    },
+    "Find Previous" : {
+      "comment" : "查找菜单：上一处"
+    },
+    "Find…" : {
+      "comment" : "查找菜单：打开查找栏"
+    },
+    "Firewall" : {
+
+    },
+    "Forward TCP port %@ on your router to this Mac (%@), and reserve that address for this Mac in the router’s settings." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Forward TCP port %1$@ on your router to this Mac (%2$@), and reserve that address for this Mac in the router’s settings."
+          }
+        }
+      }
+    },
+    "Frame Rate" : {
+      "comment" : "状态菜单帧率标题"
+    },
+    "Frame rate limit" : {
+
+    },
+    "General" : {
+      "comment" : "设置窗口：通用标签页"
+    },
+    "Hardware Encoder Busy" : {
+      "comment" : "状态菜单硬件编码器忙碌提醒"
+    },
+    "Hardware Encoder Stuck" : {
+      "comment" : "状态菜单硬件编码器卡住提醒"
+    },
+    "High" : {
+      "comment" : "Mac 画质预设名称"
+    },
+    "IPv6" : {
+
+    },
+    "If your iPhone or iPad can’t find this Mac, allow Sill in Privacy & Security › Local Network." : {
+
+    },
+    "If your router has a dynamic DNS name, enter it so your devices keep finding this Mac when your internet address changes. Add :port if the router forwards a different outside port." : {
+
+    },
+    "In Sill on your iPhone or iPad, tap this Mac, or tap Add a Mac… when you’re away, then point it at this code." : {
+
+    },
+    "Internet" : {
+
+    },
+    "It isn’t available right now." : {
+      "comment" : "设备菜单：暂时不可用提示"
+    },
+    "It paired by itself over the USB cable, and can connect over Wi‑Fi and nearby from now on too." : {
+
+    },
+    "It tried to connect with an older Sill." : {
+      "comment" : "状态菜单旧版设备提醒说明"
+    },
+    "Its windows come back once it is unlocked." : {
+      "comment" : "未配对设备的锁屏覆盖层说明"
+    },
+    "Last checked %@." : {
+      "comment" : "设置更新检查：插值为上次检查日期"
+    },
+    "Last window" : {
+
+    },
+    "Launch at Login" : {
+      "comment" : "状态菜单登录启动标题"
+    },
+    "Launch at login" : {
+
+    },
+    "Lets Sill capture the windows you pick on your iPhone or iPad, and their sound when Send Audio is on. Nothing is recorded or saved; frames and sound go straight to your devices." : {
+      "comment" : "屏幕录制权限说明"
+    },
+    "Lets the iPhone and iPad you pair connect to this Mac from other networks: through a VPN such as Tailscale, or through a port you forward on your router. Sill turns away every device you haven’t paired, and encrypts everything the paired ones send and receive." : {
+      "comment" : "远程访问面板页脚中连接方式和加密的说明"
+    },
+    "Lets your iPhone and iPad connect when they’re near this Mac, even without a shared Wi‑Fi network, the way AirDrop does. While it’s on, this Mac’s Wi‑Fi keeps stepping away from your network, so streaming over Wi‑Fi can stutter. Anyone nearby with Sill can find this Mac; only devices you paired can connect, unless Require pairing is off." : {
+      "comment" : "通用设置中直接无线连接的说明"
+    },
+    "Lets your iPhone or iPad click, scroll and type on this Mac, and lets Sill move and size the window it streams." : {
+      "comment" : "辅助功能权限说明"
+    },
+    "Local Network" : {
+
+    },
+    "Locked" : {
+      "comment" : "状态菜单：Mac 已锁定"
+    },
+    "Log in to your account to reactivate screen sharing with Sill." : {
+      "comment" : "用户切换覆盖层的登录说明"
+    },
+    "Low" : {
+      "comment" : "Mac 画质预设名称"
+    },
+    "Lower latency when the Mac is busy, at a softer picture." : {
+      "comment" : "串流设置中优先编码速度的说明"
+    },
+    "Minimize" : {
+      "comment" : "窗口菜单：最小化"
+    },
+    "Name" : {
+
+    },
+    "Needed to show your windows on your devices." : {
+      "comment" : "状态菜单屏幕录制权限说明"
+    },
+    "Needs Accessibility" : {
+      "comment" : "虚拟显示设置中的状态：缺少辅助功能权限"
+    },
+    "Needs Screen Recording" : {
+      "comment" : "虚拟显示设置中的状态：缺少屏幕录制权限"
+    },
+    "Needs Screen Recording and Accessibility" : {
+      "comment" : "虚拟显示设置中的状态：缺少屏幕录制和辅助功能权限"
+    },
+    "Needs attention" : {
+      "comment" : "状态菜单警告图标的辅助功能说明"
+    },
+    "New Code" : {
+
+    },
+    "No VPN is running on this Mac. Install one such as Tailscale on this Mac and on your iPhone or iPad, or allow connections from the internet below." : {
+
+    },
+    "No paired devices yet." : {
+
+    },
+    "No shared network needed; Wi‑Fi streams can stutter" : {
+      "comment" : "状态菜单直接无线连接说明"
+    },
+    "None" : {
+      "comment" : "远程访问面板：尚无配对设备"
+    },
+    "Not Visible on the Network" : {
+      "comment" : "状态卡标题，网络不可见"
+    },
+    "Not advertised (test pattern mode)" : {
+      "comment" : "通用设置中的网络状态：测试图案模式未广播"
+    },
+    "Not advertised; test clients connect to port %@." : {
+      "comment" : "状态卡测试图案说明，插值为端口号"
+    },
+    "Not available on this version of macOS: %@" : {
+      "comment" : "虚拟显示设置中的不可用原因；插值为系统故障说明\n设备设置：系统不支持虚拟显示器，插值为错误说明"
+    },
+    "Not checked yet." : {
+      "comment" : "设置更新检查：尚未检查"
+    },
+    "Not visible (the listener failed)" : {
+      "comment" : "通用设置中的网络状态：监听失败"
+    },
+    "Not yet (waiting for the network)" : {
+      "comment" : "通用设置中的网络状态：等待网络"
+    },
+    "Nothing is getting through" : {
+      "comment" : "状态卡连接停滞说明"
+    },
+    "Nothing you copy goes between this %@ and %@ while this is off." : {
+      "comment" : "设置中共享剪贴板关闭时的说明，插值为设备类型和 Mac 名称",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Nothing you copy goes between this %1$@ and %2$@ while this is off."
+          }
+        }
+      }
+    },
+    "OK" : {
+
+    },
+    "Off" : {
+      "comment" : "Aa 文字大小关闭时的 VoiceOver 播报\nAa 文字大小控件的关闭状态\n远程访问菜单副标题，当前已关闭"
+    },
+    "Off for this session: %@" : {
+      "comment" : "虚拟显示设置中的停用状态；插值为停用原因"
+    },
+    "Off for this session: %@. Turn it off and on to try again." : {
+      "comment" : "设备设置：本次虚拟显示器已停用，插值为错误说明"
+    },
+    "On a Retina display, a quarter of the pixels to encode" : {
+      "comment" : "状态菜单标准分辨率说明"
+    },
+    "On · %@" : {
+      "comment" : "远程访问菜单副标题，插值为 VPN 名称"
+    },
+    "On · %@ and %@" : {
+      "comment" : "远程访问菜单副标题，插值为前面的 VPN 名称列表和最后一个名称",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "On · %1$@ and %2$@"
+          }
+        }
+      }
+    },
+    "On · %@ and the internet" : {
+      "comment" : "远程访问菜单副标题，插值为 VPN 名称列表"
+    },
+    "On · no VPN on this Mac" : {
+      "comment" : "远程访问菜单副标题，此 Mac 没有 VPN"
+    },
+    "On · the internet" : {
+      "comment" : "远程访问菜单副标题，仅通过互联网"
+    },
+    "Once a day, Sill asks GitHub whether a newer version is out. GitHub sees this Mac’s IP address and which version of Sill it has; nothing else is sent. Sill never downloads or installs anything by itself: a new version opens its page on GitHub, where you download it." : {
+      "comment" : "设置更新检查：自动检查的隐私与下载方式说明"
+    },
+    "Only needed for a port forward on your router. A VPN is simpler and keeps this Mac off the open internet." : {
+      "comment" : "远程访问面板中关闭互联网连接的说明"
+    },
+    "Open Energy Settings…" : {
+
+    },
+    "Open Local Network…" : {
+
+    },
+    "Open Privacy & Security…" : {
+      "comment" : "状态菜单打开隐私与安全设置"
+    },
+    "Open Release Page…" : {
+
+    },
+    "Open Sill on your iPhone or iPad. This Mac appears as “%@”." : {
+      "comment" : "状态卡等待设备说明，插值为此 Mac 的名称"
+    },
+    "Open System Settings…" : {
+      "comment" : "权限按钮：打开系统设置"
+    },
+    "Pair iPhone or iPad" : {
+      "comment" : "手动或设备请求配对窗口的标题"
+    },
+    "Pair iPhone or iPad…" : {
+      "comment" : "状态菜单打开设备配对"
+    },
+    "Paired %@" : {
+      "comment" : "配对设备摘要；插值为配对日期"
+    },
+    "Paired %@ %@" : {
+      "comment" : "配对设备摘要；插值依次为配对日期和配对方式",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paired %1$@ %2$@"
+          }
+        }
+      }
+    },
+    "Paired %@ %@ · last connected %@" : {
+      "comment" : "配对设备摘要；插值依次为配对日期、配对方式、最近连接时间",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paired %1$@ %2$@ · last connected %3$@"
+          }
+        }
+      }
+    },
+    "Paired %@ %@ · last connected %@ %@" : {
+      "comment" : "配对设备摘要；插值依次为配对日期、配对方式、最近连接时间、连接路径",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paired %1$@ %2$@ · last connected %3$@ %4$@"
+          }
+        }
+      }
+    },
+    "Paired %@ · last connected %@" : {
+      "comment" : "配对设备摘要；插值依次为配对日期、最近连接时间",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paired %1$@ · last connected %2$@"
+          }
+        }
+      }
+    },
+    "Paired %@ · last connected %@ %@" : {
+      "comment" : "配对设备摘要；插值依次为配对日期、最近连接时间、连接路径",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paired %1$@ · last connected %2$@ %3$@"
+          }
+        }
+      }
+    },
+    "Paired Devices" : {
+
+    },
+    "Paired devices" : {
+
+    },
+    "Paired devices learn the new port the next time they connect at home." : {
+
+    },
+    "Paired over the USB Cable" : {
+      "comment" : "USB 自动配对通知窗口的标题"
+    },
+    "Paired with %@." : {
+
+    },
+    "Pairing code image" : {
+
+    },
+    "Pairing is required until Sill quits: Sill couldn’t update the keychain (%@). Try again." : {
+      "comment" : "设备配对要求保存失败；插值为钥匙串故障原因"
+    },
+    "Pairing is still required: Sill couldn’t update the keychain (%@). Try again." : {
+      "comment" : "设备配对要求保存失败；插值为钥匙串故障原因"
+    },
+    "Pairing stopped after %lld wrong codes." : {
+
+    },
+    "Paste" : {
+      "comment" : "编辑菜单：粘贴"
+    },
+    "Paste on %@" : {
+      "comment" : "剪贴板芯片或设置行标题，插值为 Mac 名称"
+    },
+    "Paste on %@ Right Away" : {
+      "comment" : "设置中立即粘贴开关的标题，插值为 Mac 名称"
+    },
+    "Paste on %@ is available, near the bar." : {
+      "comment" : "剪贴板芯片出现时的 VoiceOver 播报，插值为 Mac 名称"
+    },
+    "Paste on %@. Pastes the text you copied on this %@ where %@’s cursor is." : {
+      "comment" : "立即粘贴开启时的 VoiceOver 说明，插值为 Mac 名称和设备类型",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paste on %1$@. Pastes the text you copied on this %2$@ where %3$@’s cursor is."
+          }
+        }
+      }
+    },
+    "Paste on %@. Sends the text you copied on this %@ to %@’s clipboard. Then press Command-V there." : {
+      "comment" : "剪贴板芯片的 VoiceOver 说明，插值为 Mac 名称和设备类型",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Paste on %1$@. Sends the text you copied on this %2$@ to %3$@’s clipboard. Then press Command-V there."
+          }
+        }
+      }
+    },
+    "Pasted on %@." : {
+      "comment" : "已在 Mac 上粘贴的提示与播报，插值为 Mac 名称"
+    },
+    "Pastes the text you copied on this %@ where %@’s cursor is." : {
+      "comment" : "立即粘贴按钮的辅助功能提示，插值为设备类型和 Mac 名称",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Pastes the text you copied on this %1$@ where %2$@’s cursor is."
+          }
+        }
+      }
+    },
+    "Per 60 fps; a 120 fps stream gets twice as much" : {
+      "comment" : "状态菜单画质副标题"
+    },
+    "Permissions" : {
+      "comment" : "状态菜单权限子菜单标题\n设置窗口：权限标签页"
+    },
+    "Pick a window on the device to start streaming." : {
+      "comment" : "状态卡已连接设备说明"
+    },
+    "Picked windows leave this screen while they stream" : {
+      "comment" : "虚拟显示器菜单副标题，说明窗口移动行为"
+    },
+    "Plugged in, it pairs again by itself when it asks. Unplug it to keep it out." : {
+
+    },
+    "Point it at this code, or tap Enter Code Instead and type the code." : {
+
+    },
+    "Port" : {
+
+    },
+    "Port %@ belongs to AirPlay Receiver. Choose another." : {
+      "comment" : "远程访问端口输入提示；插值为端口号"
+    },
+    "Port %@ is in use" : {
+      "comment" : "远程访问菜单副标题，插值为端口号"
+    },
+    "Port %@ is in use by another app, so devices can’t reach this Mac remotely. Sill tries again every 30 seconds." : {
+      "comment" : "远程访问端口占用的警告；插值为端口号"
+    },
+    "Port %@ is in use by another app." : {
+      "comment" : "状态菜单端口冲突说明，插值为端口号"
+    },
+    "Ports from 49152 up can be taken by any app at any moment." : {
+      "comment" : "远程访问端口输入提示"
+    },
+    "Prioritize encoding speed" : {
+
+    },
+    "Pro" : {
+      "comment" : "Mac 画质预设名称"
+    },
+    "Quality" : {
+      "comment" : "状态菜单画质标题"
+    },
+    "Quit Sill" : {
+      "comment" : "主菜单：退出应用\n权限生效按钮：退出 Sill\n状态菜单退出应用"
+    },
+    "Redo" : {
+      "comment" : "编辑菜单：重做"
+    },
+    "Registering on the local network…" : {
+      "comment" : "状态卡说明，正在注册本地网络"
+    },
+    "Registering…" : {
+      "comment" : "通用设置中的网络状态：正在注册"
+    },
+    "Relaunch Sill" : {
+      "comment" : "权限生效按钮：重新启动 Sill"
+    },
+    "Remote Access" : {
+      "comment" : "设置窗口：远程访问标签页"
+    },
+    "Remote Access Can’t Start" : {
+      "comment" : "状态菜单远程访问提醒标题"
+    },
+    "Remote Access is off. Paired devices can connect away from home once you turn it on." : {
+
+    },
+    "Remote Access…" : {
+      "comment" : "状态菜单远程访问标题"
+    },
+    "Remote access" : {
+
+    },
+    "Remote access couldn’t start (%@). Sill tries again every 30 seconds." : {
+      "comment" : "远程访问启动失败的警告；插值为故障原因"
+    },
+    "Remote access isn’t available: Sill couldn’t use the keychain (%@)." : {
+      "comment" : "远程访问不可用的警告；插值为钥匙串故障原因"
+    },
+    "Remove" : {
+
+    },
+    "Remove the part after %: it only works on this network." : {
+      "comment" : "远程访问地址名校验错误"
+    },
+    "Rename" : {
+
+    },
+    "Require pairing" : {
+
+    },
+    "Resolution" : {
+      "comment" : "状态菜单分辨率标题"
+    },
+    "Retina" : {
+      "comment" : "状态菜单分辨率选项"
+    },
+    "Reveal Log File" : {
+      "comment" : "日志窗口：在访达中显示日志文件"
+    },
+    "Router" : {
+      "comment" : "远程访问地址列表中的路由器标签"
+    },
+    "Router’s internet address" : {
+
+    },
+    "Running from" : {
+
+    },
+    "Save" : {
+
+    },
+    "Screen Recording" : {
+      "comment" : "权限行标题：屏幕录制"
+    },
+    "Screen Recording Is Off" : {
+      "comment" : "状态卡标题，屏幕录制未授权"
+    },
+    "Screen Recording starts working once Sill opens again." : {
+
+    },
+    "Screen Recording: Allowed" : {
+      "comment" : "状态菜单屏幕录制已允许"
+    },
+    "Screen Recording: Not Allowed…" : {
+      "comment" : "状态菜单屏幕录制未允许"
+    },
+    "ScreenCaptureKit didn’t list the display" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "Select All" : {
+      "comment" : "编辑菜单：全选"
+    },
+    "Send Audio (Beta)" : {
+      "comment" : "状态菜单发送声音标题"
+    },
+    "Send audio (beta)" : {
+
+    },
+    "Sends the text you copied on this %@ to %@’s clipboard." : {
+      "comment" : "粘贴按钮的辅助功能提示，插值为设备类型和 Mac 名称",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sends the text you copied on this %1$@ to %2$@’s clipboard."
+          }
+        }
+      }
+    },
+    "Sent to %@’s clipboard. Press Command-V there." : {
+      "comment" : "文字已发送的 VoiceOver 播报，插值为 Mac 名称"
+    },
+    "Sent to %@’s clipboard. Press ⌘V there." : {
+      "comment" : "文字已发送的提示，插值为 Mac 名称"
+    },
+    "Set Sill to Allow under Paste from Other Apps in Privacy & Security. Text a device sends with Paste still arrives." : {
+      "comment" : "Mac 设置中修改剪贴板读取权限的操作提示"
+    },
+    "Settings…" : {
+      "comment" : "主菜单：打开设置\n状态菜单打开设置"
+    },
+    "Share Clipboard" : {
+      "comment" : "设置中共享剪贴板开关的标题"
+    },
+    "Share clipboard with devices" : {
+
+    },
+    "Show Devices…" : {
+
+    },
+    "Show Log…" : {
+      "comment" : "状态菜单显示日志窗口"
+    },
+    "Show per-second stats" : {
+      "comment" : "日志窗口：显示每秒统计的开关"
+    },
+    "Show the pairing window to screen sharing" : {
+
+    },
+    "Sill" : {
+      "comment" : "主菜单：应用菜单名称\n菜单栏图标：无障碍应用名称"
+    },
+    "Sill %@ (%@). Free and open source." : {
+      "comment" : "通用设置页脚；插值依次为 Sill 版本号和构建号",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sill %1$@ (%2$@). Free and open source."
+          }
+        }
+      }
+    },
+    "Sill %@ Is Available…" : {
+      "comment" : "更新菜单：插值为可用版本号"
+    },
+    "Sill %@ is available." : {
+      "comment" : "设置更新检查结果：插值为可用版本号\n设置更新检查：插值为可用版本号"
+    },
+    "Sill %@. The picture is unaffected." : {
+      "comment" : "串流设置中的音频警告；插值为音频故障说明"
+    },
+    "Sill Couldn’t Start" : {
+      "comment" : "状态卡标题，启动失败"
+    },
+    "Sill Log" : {
+      "comment" : "日志窗口：窗口标题"
+    },
+    "Sill appears on your iPhone and iPad once this Mac is on Wi-Fi or Ethernet and Local Network access is allowed." : {
+      "comment" : "状态卡等待网络说明"
+    },
+    "Sill couldn’t use its key in your keychain." : {
+      "comment" : "状态菜单钥匙串异常说明"
+    },
+    "Sill couldn’t use its key in your keychain. Quit Sill and open it again, and choose Always Allow if the keychain asks." : {
+      "comment" : "状态卡钥匙串异常说明"
+    },
+    "Sill doesn’t check for updates in test pattern mode." : {
+      "comment" : "设置更新检查：测试图案模式说明"
+    },
+    "Sill is up to date." : {
+      "comment" : "设置更新检查结果：已是最新版本"
+    },
+    "Sill moves the window you pick onto an invisible display made for your device, so it keeps updating when other windows cover it and text is drawn at your device’s scale. The window leaves this screen while it streams and comes back when you stop streaming or quit Sill." : {
+      "comment" : "虚拟显示设置中窗口移动行为的说明"
+    },
+    "Sill streams at these while every connected device is away from home, through a VPN or over the internet, so a slow connection never starts at your home quality. A device away from home changes these, and never your Quality and Resolution above." : {
+      "comment" : "异地串流质量说明；当前未使用此质量"
+    },
+    "Sill streams at these while every connected device is away from home, through a VPN or over the internet, so a slow connection never starts at your home quality. A device away from home changes these, and never your Quality and Resolution above. Streaming at these now." : {
+      "comment" : "异地串流质量说明；当前正在使用此质量"
+    },
+    "Sill — %@" : {
+      "comment" : "菜单栏工具提示，插值为当前状态"
+    },
+    "Sill, %@" : {
+      "comment" : "菜单栏辅助功能标签，插值为当前状态"
+    },
+    "Sleep" : {
+
+    },
+    "Space" : {
+      "comment" : "设备菜单快捷键：空格键名称"
+    },
+    "Standard" : {
+      "comment" : "状态菜单分辨率选项"
+    },
+    "Start SillHost with --virtual-display to use it." : {
+      "comment" : "设备设置：启动主机时启用虚拟显示器"
+    },
+    "Starting…" : {
+      "comment" : "状态卡标题，正在启动"
+    },
+    "Status" : {
+
+    },
+    "Stream from a virtual display" : {
+
+    },
+    "Streamed where it is: %@" : {
+
+    },
+    "Streaming" : {
+      "comment" : "设置窗口：串流标签页"
+    },
+    "Streaming to %@" : {
+      "comment" : "状态卡串流标题，插值为设备简称"
+    },
+    "Streaming to %@ Devices" : {
+      "comment" : "状态卡串流标题，插值为设备数量"
+    },
+    "Streaming to a Device" : {
+      "comment" : "状态卡串流标题，设备名称未知"
+    },
+    "Streaming with the software encoder, up to 60 fps, until it is free again." : {
+      "comment" : "状态菜单编码器忙碌说明"
+    },
+    "Streaming with the software encoder, up to 60 fps. Restarting the Mac fixes this." : {
+      "comment" : "状态菜单编码器卡住说明"
+    },
+    "Test Pattern" : {
+      "comment" : "状态卡串流来源名称，测试图案\n状态菜单：测试画面标题"
+    },
+    "Test Pattern Mode" : {
+      "comment" : "状态卡标题，测试图案模式"
+    },
+    "Test Tone" : {
+      "comment" : "音频状态：测试音"
+    },
+    "Text you copy here can be pasted on a connected iPhone or iPad, and text sent from one with Paste becomes this Mac’s." : {
+      "comment" : "Mac 设置中共享剪贴板的说明"
+    },
+    "Text you copy on %@ is ready to paste on this %@. To paste on %@, copy text here and tap Paste: it goes where %@’s cursor is. With Paste on %@ Right Away off, Paste only puts it on %@’s clipboard." : {
+      "comment" : "设置中立即粘贴开启时的剪贴板说明，插值为 Mac 名称和设备类型",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Text you copy on %1$@ is ready to paste on this %2$@. To paste on %3$@, copy text here and tap Paste: it goes where %4$@’s cursor is. With Paste on %5$@ Right Away off, Paste only puts it on %6$@’s clipboard."
+          }
+        }
+      }
+    },
+    "Text you copy on %@ is ready to paste on this %@. To paste on %@, copy text here, tap Paste, then press ⌘V there." : {
+      "comment" : "设置中共享剪贴板开启时的说明，插值为 Mac 名称和设备类型",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Text you copy on %1$@ is ready to paste on this %2$@. To paste on %3$@, copy text here, tap Paste, then press ⌘V there."
+          }
+        }
+      }
+    },
+    "That doesn’t look like an address. Try home.example.net, or home.example.net:17455." : {
+      "comment" : "远程访问地址名校验错误"
+    },
+    "The Mac is locked" : {
+      "comment" : "锁屏覆盖层标题，Mac 名称未知"
+    },
+    "The Mac is locked." : {
+      "comment" : "设备菜单：Mac 已锁定提示"
+    },
+    "The Mac is locked. Unlock it to see its windows." : {
+      "comment" : "应用抽屉和设置中的锁屏提示，Mac 名称未知"
+    },
+    "The Mac keeps playing it too" : {
+      "comment" : "状态菜单发送声音说明"
+    },
+    "The devices you pair in Devices can connect from afar while Remote Access is on." : {
+      "comment" : "远程访问面板中配对设备连接权限的说明"
+    },
+    "The hardware encoder is busy or not answering, so streams use the software encoder: up to 60 fps at Standard resolution. Sill switches back by itself once it keeps up again." : {
+      "comment" : "串流面板硬件编码器暂不可用的提示"
+    },
+    "The hardware encoder is stuck, so streams use the software encoder: up to 60 fps at Standard resolution. Restarting the Mac fixes this." : {
+      "comment" : "串流面板硬件编码器卡住的提示"
+    },
+    "The last window streamed where it is: %@" : {
+      "comment" : "设备设置：上次窗口原位串流，插值为失败说明"
+    },
+    "The link can’t carry %@" : {
+      "comment" : "状态卡连接跟不上，插值为画质"
+    },
+    "The link can’t carry %@ · RTT %@" : {
+      "comment" : "状态卡连接跟不上，插值为画质和往返延迟",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "The link can’t carry %1$@ · RTT %2$@"
+          }
+        }
+      }
+    },
+    "The login item and the permissions follow this copy of Sill. Keep one copy, in Applications." : {
+
+    },
+    "The macOS firewall blocks %@ and its executable, so devices on the network cannot connect. In Terminal:" : {
+      "comment" : "通用设置：防火墙阻止应用及可执行文件，插值为应用包名"
+    },
+    "The macOS firewall blocks %@ and its executable." : {
+      "comment" : "状态菜单：防火墙阻止应用及可执行文件，插值为应用包名"
+    },
+    "The macOS firewall blocks %@, so devices on the network cannot connect. In Terminal:" : {
+      "comment" : "通用设置：防火墙阻止应用，插值为应用包名"
+    },
+    "The macOS firewall blocks %@." : {
+      "comment" : "状态菜单：防火墙阻止应用，插值为应用包名"
+    },
+    "The macOS firewall blocks Sill’s executable, so devices on the network cannot connect. In Terminal:" : {
+      "comment" : "通用设置：防火墙阻止可执行文件"
+    },
+    "The macOS firewall blocks Sill’s executable." : {
+      "comment" : "状态菜单：防火墙阻止可执行文件"
+    },
+    "The macOS firewall blocks all incoming connections, so devices on the network cannot connect. Turn off Block all incoming connections in System Settings › Network › Firewall › Options." : {
+      "comment" : "通用设置：防火墙阻止全部传入连接及解决方法"
+    },
+    "The macOS firewall blocks all incoming connections." : {
+      "comment" : "状态菜单：防火墙阻止全部传入连接"
+    },
+    "The menus changed. Open the menu again." : {
+      "comment" : "设备菜单：菜单变化提示"
+    },
+    "The streamed window is on the virtual display" : {
+      "comment" : "虚拟显示器菜单副标题，窗口已移至虚拟显示器"
+    },
+    "Then press ⌘V there." : {
+      "comment" : "剪贴板芯片副标题，提醒在 Mac 上粘贴"
+    },
+    "This Mac" : {
+      "comment" : "远程访问地址列表中的本机地址标签"
+    },
+    "This Mac can’t be reached while it’s asleep. While a device is connected from away, Sill keeps it from going to sleep by itself." : {
+
+    },
+    "This build of Sill has no version number, so it can’t check." : {
+      "comment" : "设置更新检查：构建没有版本号"
+    },
+    "This code expired." : {
+
+    },
+    "This code no longer works." : {
+
+    },
+    "This is the Mac’s name." : {
+
+    },
+    "This network. Use it with a VPN into your home network, such as WireGuard on your router." : {
+
+    },
+    "To unlock it from here, type its password and press Return. Its windows come back once it is unlocked." : {
+      "comment" : "已配对设备的锁屏覆盖层解锁说明"
+    },
+    "Too long to send: %@ takes up to %lld KB of text." : {
+      "comment" : "剪贴板文字过长提示，插值为 Mac 名称和容量上限（KB）",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Too long to send: %1$@ takes up to %2$lld KB of text."
+          }
+        }
+      }
+    },
+    "Too many requests. Open the menu again." : {
+      "comment" : "设备菜单：请求过多提示"
+    },
+    "Try Again" : {
+
+    },
+    "Turn On Remote Access" : {
+
+    },
+    "Turn this on to pair while you use this Mac through Screen Sharing or another remote desktop app, as you would a Mac without a display. While it’s on, anyone who can see this Mac’s screen remotely can read the code. Devices streaming this Mac never show the window." : {
+      "comment" : "设备面板中向屏幕共享显示配对窗口的说明"
+    },
+    "Ultra" : {
+      "comment" : "Mac 画质预设名称"
+    },
+    "Unavailable: %@" : {
+      "comment" : "虚拟显示器菜单副标题，插值为不可用原因"
+    },
+    "Unavailable: the keychain couldn’t be used" : {
+      "comment" : "远程访问菜单副标题，钥匙串不可用"
+    },
+    "Undo" : {
+      "comment" : "编辑菜单：撤销"
+    },
+    "Unlock this Mac, then tap it on the %@ again." : {
+      "comment" : "配对请求提醒，插值为设备简称"
+    },
+    "Unlocking…" : {
+      "comment" : "解锁后等待画面的覆盖层标题"
+    },
+    "Up to %@ fps" : {
+      "comment" : "状态菜单帧率选项，插值为帧率上限"
+    },
+    "Update Sill on your device to keep using %@. It needs version %@ or later." : {
+      "comment" : "设备连接页：设备需更新，插值为 Mac 名称和最低版本",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update Sill on your device to keep using %1$@. It needs version %2$@ or later."
+          }
+        }
+      }
+    },
+    "Update Sill on your iPad to keep using %@. It needs version %@ or later." : {
+      "comment" : "设备连接页：iPad 需更新，插值为 Mac 名称和最低版本",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update Sill on your iPad to keep using %1$@. It needs version %2$@ or later."
+          }
+        }
+      }
+    },
+    "Update Sill on your iPhone to keep using %@. It needs version %@ or later." : {
+      "comment" : "设备连接页：iPhone 需更新，插值为 Mac 名称和最低版本",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Update Sill on your iPhone to keep using %1$@. It needs version %2$@ or later."
+          }
+        }
+      }
+    },
+    "Uses a private macOS interface (CGVirtualDisplay). If a macOS update breaks it, Sill streams the window where it is." : {
+      "comment" : "虚拟显示设置中私有接口兼容性的说明"
+    },
+    "VPN (%@)" : {
+      "comment" : "远程访问地址列表中的 VPN 标签；插值为网络接口名"
+    },
+    "Virtual Display" : {
+      "comment" : "状态菜单虚拟显示器标题\n设置窗口：虚拟显示器标签页"
+    },
+    "Visible on your network as" : {
+
+    },
+    "Waiting for a Device" : {
+      "comment" : "状态卡标题，等待设备"
+    },
+    "Waiting for the Network" : {
+      "comment" : "状态卡标题，等待网络"
+    },
+    "Waiting for your approval" : {
+
+    },
+    "Where the cursor is." : {
+      "comment" : "立即粘贴开启时的剪贴板芯片副标题"
+    },
+    "Whole Desktop" : {
+      "comment" : "状态卡串流来源名称，整个桌面\n状态菜单：整个桌面标题"
+    },
+    "Whole Mac" : {
+      "comment" : "音频状态：整个 Mac 的声音"
+    },
+    "Window" : {
+      "comment" : "主菜单：窗口菜单"
+    },
+    "Wired" : {
+      "comment" : "状态卡有线连接名称"
+    },
+    "Wi‑Fi" : {
+      "comment" : "状态卡无线连接名称"
+    },
+    "Works once, for the next %@:%@." : {
+      "comment" : "配对码倒计时；插值依次为剩余分钟和两位秒数",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Works once, for the next %1$@:%2$@."
+          }
+        }
+      }
+    },
+    "Works only if your router lets incoming IPv6 connections reach this Mac; most don’t." : {
+
+    },
+    "You have %@; opens its download page" : {
+      "comment" : "更新菜单副标题：插值为当前版本号"
+    },
+    "Your devices can’t reach this Mac through %@ until it connects." : {
+      "comment" : "远程访问面板中 VPN 离线的说明；插值为 VPN 服务名"
+    },
+    "Your devices learn these when they pair and keep them current whenever they connect." : {
+      "comment" : "远程访问地址列表页脚中地址同步的说明"
+    },
+    "Your internet provider shares this address among many homes (%@), so a port forward can’t reach this Mac. Use a VPN such as Tailscale instead." : {
+      "comment" : "远程访问面板中运营商 NAT 的警告；插值为部分隐藏的公网地址"
+    },
+    "Your paired devices show here once Sill can use its key again." : {
+
+    },
+    "Your router didn’t say. You’ll find the address in its settings." : {
+
+    },
+    "Your router sits behind another router. Forward the port on both, or use a VPN." : {
+      "comment" : "远程访问面板中双重 NAT 的警告"
+    },
+    "You’re all set. Open Sill on your iPhone or iPad." : {
+
+    },
+    "a device" : {
+      "comment" : "设备列表：没有名称的设备"
+    },
+    "at home" : {
+      "comment" : "Mac 设备连接路径，在本地网络"
+    },
+    "by address" : {
+      "comment" : "Mac 设备连接路径，通过地址连接"
+    },
+    "capture on the display failed" : {
+      "comment" : "虚拟显示器设置：显示器捕获失败"
+    },
+    "couldn’t capture no sound: %@" : {
+      "comment" : "音频状态：没有可捕获的声音，插值为错误说明"
+    },
+    "couldn’t capture the sound of %@: %@" : {
+      "comment" : "音频状态：无法捕获应用声音，插值为应用名称和错误说明",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "couldn’t capture the sound of %1$@: %2$@"
+          }
+        }
+      }
+    },
+    "couldn’t capture the sound of the whole Mac: %@" : {
+      "comment" : "音频状态：无法捕获 Mac 声音，插值为错误说明"
+    },
+    "couldn’t capture the test tone: %@" : {
+      "comment" : "音频状态：无法捕获测试音，插值为错误说明"
+    },
+    "couldn’t encode the sound: AAC-ELD is unavailable (%@)" : {
+      "comment" : "音频状态：编码器不可用，插值为错误说明"
+    },
+    "couldn’t use the sound: %@" : {
+      "comment" : "音频状态：声音格式不可用，插值为错误说明"
+    },
+    "creating the display failed %@ times (%@)" : {
+      "comment" : "虚拟显示器设置：重复创建失败，插值为次数和错误说明",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "creating the display failed %1$@ times (%2$@)"
+          }
+        }
+      }
+    },
+    "directly" : {
+      "comment" : "Mac 设备连接路径，直接无线连接"
+    },
+    "error %@" : {
+      "comment" : "钥匙串错误的系统诊断：插值为系统状态码"
+    },
+    "home.example.net" : {
+
+    },
+    "invalid size: %@" : {
+      "comment" : "虚拟显示器设置：尺寸无效，插值为原因"
+    },
+    "just now" : {
+      "comment" : "配对设备最近连接的相对时间：刚刚"
+    },
+    "macOS asks before Sill reads the clipboard, so what you copy here stays on this Mac." : {
+      "comment" : "Mac 设置中剪贴板读取需要确认的警告"
+    },
+    "macOS doesn’t let Sill read the clipboard, so what you copy here stays on this Mac." : {
+      "comment" : "Mac 设置中剪贴板读取被拒绝的警告"
+    },
+    "needs Accessibility" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "needs Screen Recording" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "no P-256 key could be made" : {
+      "comment" : "设备设置错误：无法生成主机身份密钥"
+    },
+    "no display to capture from" : {
+      "comment" : "音频状态：没有可供捕获的显示器"
+    },
+    "no identity" : {
+      "comment" : "设备设置：没有可用的主机身份"
+    },
+    "no key could be made in the keychain (%@)" : {
+      "comment" : "设备设置密钥创建错误：插值为系统错误说明"
+    },
+    "no key could be made in the keychain (no reason given)" : {
+      "comment" : "设备设置密钥创建错误：系统未给出原因"
+    },
+    "nothing to capture" : {
+      "comment" : "音频状态：没有可捕获的内容"
+    },
+    "on this Mac" : {
+      "comment" : "Mac 设备连接路径，来自此 Mac"
+    },
+    "or" : {
+
+    },
+    "over Ethernet" : {
+      "comment" : "Mac 设备连接路径，通过以太网"
+    },
+    "over Wi‑Fi" : {
+      "comment" : "Mac 设备连接路径，通过 Wi-Fi"
+    },
+    "over the USB cable" : {
+      "comment" : "Mac 设备连接路径，通过 USB 线缆\n设备列表：使用 USB 连接线配对"
+    },
+    "over the internet" : {
+      "comment" : "Mac 设备连接路径，通过互联网"
+    },
+    "private class %@ does not respond to %@" : {
+      "comment" : "虚拟显示器设置：缺少系统方法，插值为类名和方法名",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "private class %1$@ does not respond to %2$@"
+          }
+        }
+      }
+    },
+    "private class %@ not found in CoreGraphics (API removed or renamed)" : {
+      "comment" : "虚拟显示器设置：缺少系统类，插值为类名"
+    },
+    "real window (virtual display: %@)" : {
+      "comment" : "状态卡串流参数中的实体窗口状态项目，插值为虚拟显示器不可用原因"
+    },
+    "software encoder" : {
+      "comment" : "状态卡串流参数中的软件编码器状态项目"
+    },
+    "sound" : {
+      "comment" : "状态卡串流参数中的声音状态项目"
+    },
+    "the app refused the move" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "the bitrate failed (%@%@)" : {
+      "comment" : "音频状态：编码器步骤失败，插值为系统状态码及其字符形式",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "the bitrate failed (%1$@%2$@)"
+          }
+        }
+      }
+    },
+    "the capture delivered %@ Hz with %@ channel, and Sill encodes 48 kHz stereo only" : {
+      "comment" : "音频状态：捕获格式不支持，插值为采样率和单声道数",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "the capture delivered %1$@ Hz with %2$@ channel, and Sill encodes 48 kHz stereo only"
+          }
+        }
+      }
+    },
+    "the capture delivered %@ Hz with %@ channels, and Sill encodes 48 kHz stereo only" : {
+      "comment" : "音频状态：捕获格式不支持，插值为采样率和声道数",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "the capture delivered %1$@ Hz with %2$@ channels, and Sill encodes 48 kHz stereo only"
+          }
+        }
+      }
+    },
+    "the display couldn’t be created" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "the display never came up" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "the host is shutting down" : {
+      "comment" : "音频状态：主机正在关闭"
+    },
+    "the key could not make a TLS identity" : {
+      "comment" : "设备设置：密钥无法创建 TLS 身份"
+    },
+    "the key couldn’t be read: %@" : {
+      "comment" : "设备设置密钥读取错误：插值为系统错误说明"
+    },
+    "the magic cookie failed (%@%@)" : {
+      "comment" : "音频状态：编码器步骤失败，插值为系统状态码及其字符形式",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "the magic cookie failed (%1$@%2$@)"
+          }
+        }
+      }
+    },
+    "the output format failed (%@%@)" : {
+      "comment" : "音频状态：编码器步骤失败，插值为系统状态码及其字符形式",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "the output format failed (%1$@%2$@)"
+          }
+        }
+      }
+    },
+    "the paired devices in the keychain are damaged" : {
+      "comment" : "设备设置错误：钥匙串中的已配对设备损坏"
+    },
+    "the priming failed (%@%@)" : {
+      "comment" : "音频状态：编码器步骤失败，插值为系统状态码及其字符形式",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "the priming failed (%1$@%2$@)"
+          }
+        }
+      }
+    },
+    "the random source failed" : {
+      "comment" : "设备设置错误：系统随机源失败"
+    },
+    "the recognition key in the keychain is damaged" : {
+      "comment" : "设备设置错误：钥匙串中的识别密钥损坏"
+    },
+    "the stream did not start within %@ s" : {
+      "comment" : "音频状态：捕获流启动超时，插值为秒数"
+    },
+    "the stream did not stop within %@ s" : {
+      "comment" : "音频状态：捕获流停止超时，插值为秒数"
+    },
+    "the system removed the virtual display %@ times" : {
+      "comment" : "虚拟显示器设置：被系统重复移除，插值为次数"
+    },
+    "the window didn’t move" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "the window wasn’t found through Accessibility" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "the window went away" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "this Mac is locked" : {
+      "comment" : "虚拟显示器设置：窗口原位串流的原因"
+    },
+    "this Mac’s address" : {
+      "comment" : "配对窗口：没有可用地址时的占位提示"
+    },
+    "this Mac’s key couldn’t sign it" : {
+      "comment" : "设备设置：Mac 密钥无法签署设置"
+    },
+    "through %@" : {
+      "comment" : "Mac 设备连接路径，插值为 VPN 服务名称"
+    },
+    "through your VPN" : {
+      "comment" : "Mac 设备连接路径，通过 VPN"
+    },
+    "unavailable" : {
+      "comment" : "状态卡虚拟显示器不可用原因的回退显示"
+    },
+    "virtual display" : {
+      "comment" : "状态卡串流参数中的虚拟显示器状态项目"
+    },
+    "with a code" : {
+      "comment" : "设备列表：使用配对码配对"
+    },
+    "with the QR code" : {
+      "comment" : "设备列表：使用二维码配对"
+    },
+    "“%@”" : {
+      "comment" : "通用设置中的网络名称；插值为本机名称"
+    }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
