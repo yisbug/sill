@@ -146,6 +146,9 @@ cp "$icon_out"/compiled/* "$stage/Contents/Resources/" 2>/dev/null || true
 if [ -f Packaging/Localizable.xcstrings ]; then
     xcrun xcstringstool compile Packaging/Localizable.xcstrings --output-directory "$stage/Contents/Resources" \
         || { echo "error: xcstringstool could not compile Packaging/Localizable.xcstrings" >&2; exit 1; }
+    # 开发语言英文的条目没有显式译文时，xcstringstool 不生成 en.lproj；补一个空目录，
+    # 让系统知道 Sill.app 支持英文，不会给英文用户挑中文。
+    mkdir -p "$stage/Contents/Resources/en.lproj"
 fi
 
 # SILL_SIGN_IDENTITY (a name, part of one, or a SHA-1 hash), else the first Apple Development
