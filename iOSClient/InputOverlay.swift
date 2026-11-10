@@ -746,8 +746,11 @@ final class InputOverlayView: UIView, UITextInput, UIGestureRecognizerDelegate {
     @objc var writingToolsBehavior: UIWritingToolsBehavior { get { .none } set {} }
     @available(iOS 18.0, *)
     @objc var mathExpressionCompletionType: UITextMathExpressionCompletionType { get { .no } set {} }
+    // 只有 iOS 27 SDK（Xcode 27，Swift 6.4 起）有这个类型；用 Xcode 26 编译时跳过。
+    #if compiler(>=6.4)
     @available(iOS 27.0, *)
     @objc var grammarCheckingType: UITextGrammarCheckingType { get { .no } set {} }
+    #endif
 
     /// Always true: there is text on the Mac, and the delete key has to keep working even though
     /// this view holds no text of its own.

@@ -218,7 +218,7 @@ struct StreamScreen: View {
     }
     #endif
 
-    var body: some View {
+    private var screen: some View {
         // Which layout, and at which size — see `DuoLayout` for the thresholds and the Duo posture
         // behind each one.
         GeometryReader { geo in
@@ -358,6 +358,11 @@ struct StreamScreen: View {
         .onChange(of: scaleOpen) { _, open in if open { setSettings(false) } }
         .onChange(of: windowMenu) { _, menu in if menu != nil { setSettings(false) } }
         .ignoresSafeArea(edges: .bottom)
+    }
+
+    // 修饰链拆成两段：整条链一次推断时，Xcode 26 的编译器报"无法在合理时间内完成类型检查"。
+    var body: some View {
+        screen
         .onAppear {
             // Where the software keyboard is, from now on: the laptop pose's key row follows it (#215).
             _ = KeyboardFrameMonitor.shared
