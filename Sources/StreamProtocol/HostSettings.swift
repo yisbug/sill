@@ -316,6 +316,18 @@ public enum QualityPreset: Int, CaseIterable, Identifiable, Sendable {
 
     public var name: String {
         switch self {
+        case .low: String(localized: "Low", comment: "画质预设显示名称")
+        case .efficient: String(localized: "Efficient", comment: "画质预设显示名称")
+        case .balanced: String(localized: "Balanced", comment: "画质预设显示名称")
+        case .high: String(localized: "High", comment: "画质预设显示名称")
+        case .pro: String(localized: "Pro", comment: "画质预设显示名称")
+        case .ultra: String(localized: "Ultra", comment: "画质预设显示名称")
+        case .extreme: String(localized: "Extreme", comment: "画质预设显示名称")
+        }
+    }
+
+    private var englishName: String {
+        switch self {
         case .low: "Low"
         case .efficient: "Efficient"
         case .balanced: "Balanced"
@@ -327,24 +339,24 @@ public enum QualityPreset: Int, CaseIterable, Identifiable, Sendable {
     }
 
     /// "Balanced — 15 Mbps".
-    public var title: String { "\(name) — \(rawValue / 1_000_000) Mbps" }
+    public var title: String { String(localized: "\(name) — \(rawValue / 1_000_000) Mbps", comment: "画质选项标题，插值为预设名称和每秒兆比特数") }
 
     /// The one sentence, in the Mac's Settings › Streaming footer and the device's Quality footer,
     /// on what the top presets need.
     public static var fastLinkNote: String {
-        "\(ultra.name) and \(extreme.name) need the USB cable or very fast Wi\u{2011}Fi; if the picture lags, step down."
+        String(localized: "\(ultra.name) and \(extreme.name) need the USB cable or very fast Wi\u{2011}Fi; if the picture lags, step down.", comment: "画质设置页的高速连接提示，插值为两个最高画质预设名称")
     }
 
     /// The label for any stored bitrate: a preset's title, or "Custom — 12 Mbps" for one set by
     /// hand (`defaults write`, a launch argument).
     public static func title(forBitrate bitrate: Int) -> String {
-        QualityPreset(rawValue: bitrate)?.title ?? "Custom — \(mbps(bitrate)) Mbps"
+        QualityPreset(rawValue: bitrate)?.title ?? String(localized: "Custom — \(mbps(bitrate)) Mbps", comment: "自定义画质选项标题，插值为每秒兆比特数")
     }
 
     /// A quality in a sentence: a preset's name ("Pro"), or "12 Mbps" for a bitrate set by hand
     /// (docs/remote-bundle-plan.md §4.1: the host's log, the Mac's card and the device's callouts).
     public static func name(forBitrate bitrate: Int) -> String {
-        QualityPreset(rawValue: bitrate)?.name ?? "\(mbps(bitrate)) Mbps"
+        QualityPreset(rawValue: bitrate)?.englishName ?? "\(mbps(bitrate)) Mbps"
     }
 
     /// A quality with its resolution: "Low · Standard", "Pro · Retina", "12 Mbps · Retina". Plain
