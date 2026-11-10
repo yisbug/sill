@@ -898,6 +898,10 @@ final class StreamClient: ObservableObject {
     /// keyboard's characters as keys only to a Mac that says so (KeyTyping); to one before it they go
     /// through iPadOS's text system, as they always did. Cleared with the session.
     var hostKeyRepeat: Int?
+    /// 这台 Mac 能接语音输入（`WindowList.voice`，kind 100–102；VoiceInputButton）：1 时显示语音悬浮球，nil 不显示。
+    @Published var hostVoice: Int?
+    /// kind 101：一个语音片段的结果，交给悬浮球（VoiceInputController）。主线程。
+    var onVoiceResult: ((VoiceResult) -> Void)?
     /// The clipboard (kind 32, StreamClient+Clipboard, docs/clipboard-plan.md): what this session's
     /// Mac takes and sends (`WindowList.clipboard`, 1 for text), nil from a Mac before it or with Share
     /// clipboard with devices off. Cleared with the session.
@@ -3560,6 +3564,7 @@ final class StreamClient: ObservableObject {
         hostProtocol = nil
         hostGestures = nil
         hostKeyRepeat = nil
+        hostVoice = nil
         remoteRoute = nil
         macInfo = nil
         macInfoSaved = false
@@ -4200,6 +4205,7 @@ final class StreamClient: ObservableObject {
                 if self.hostProtocol != list.protocol { self.hostProtocol = list.protocol }
                 if self.hostGestures != list.gestures { self.hostGestures = list.gestures }
                 self.hostKeyRepeat = list.keyRepeat
+                if self.hostVoice != list.voice { self.hostVoice = list.voice }
                 // A locked Mac's list has no windows: the drawer and the panel say why, the cover over the
                 // stream too (LockedMac).
                 if self.lockWhy != why { self.lockWhy = why }
@@ -4356,6 +4362,14 @@ final class StreamClient: ObservableObject {
             DispatchQueue.main.async {
                 guard self.connection === from else { return }
                 self.goodbye = goodbye
+            }
+        case .voiceResult:
+            // 语音片段的结果（VoiceInputController）：只认现在这条连接上的。
+            guard let result = Wire.decode(VoiceResult.self, from: data) else { return }
+            let from = connection
+            DispatchQueue.main.async {
+                guard self.connection === from else { return }
+                self.onVoiceResult?(result)
             }
         case .clipboard:
             // Text copied on the Mac (StreamClient+Clipboard): written to this device's clipboard while

@@ -280,6 +280,17 @@ struct StreamScreen: View {
                         .position(x: panel.midX, y: panel.midY)
                         .transition(.opacity)
                 }
+                // 语音悬浮球（VoiceInputButton）：布局之上，导览与配对覆盖层之下；只在串流画面之内（不盖顶栏和键盘行），
+                // 避开剪贴板芯片与链路提示；设置面板、抽屉、导览、配对覆盖层打开时藏起。
+                if let panel = tourTargets[.stream] {
+                    let chip = clipboardChipAllowed && (client.clipboardChip || client.clipboardNote != nil)
+                    VoiceInputLayer(client: client, area: panel,
+                                    avoiding: VoiceInputLayer.avoiding(panel: panel,
+                                                                       chip: chip ? ClipboardPolicy.chipCorner(landscape: layout == .landscape, linkLineShown: shownLinkLine != nil) : nil,
+                                                                       linkLine: shownLinkLine != nil),
+                                    landscape: layout == .landscape,
+                                    covered: settingsOpen || drawerOpen || overlayShown || tour != nil)
+                }
                 // The tour: a sibling above the layouts, as the pairing overlay is, and under it: an
                 // outside link puts the tour aside until the overlay has closed.
                 if let run = tour, !overlayShown {
