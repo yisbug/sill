@@ -344,10 +344,11 @@ struct StreamScreen: View {
                 closeWindowMenu()
             }
             .background(TouchWatcher(watch: touches))
-            // The layouts and the overlays share this screen's space, and so its fold; the inner
-            // display gives the picture the status bar's strip in every pose.
+            // The layouts and the overlays share this screen's space, and so its fold.
             .duoFold(posture, size: geo.size, screen: "stream screen")
-            .duoStatusBar(posture, size: geo.size)
+            // 串流界面一律隐藏状态栏（沉浸式全屏）：顶栏贴着屏幕顶边，不再排在时间、电量那一条下面。
+            // 放在背景里，显示与隐藏不会重建界面；连接界面等其他界面照常显示状态栏。
+            .background { Color.clear.statusBarHidden(true) }
             .environment(\.largerPictureOffered, offersLarger)
             #if DEBUG
             // The console's line for the gates: what Larger Picture's rule made of the switch and of

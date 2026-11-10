@@ -47,18 +47,6 @@ extension View {
     /// The app's root: the Duo's hinge into the environment. Nothing at all before iOS 27.1.
     func readsDuoPosture() -> some View { modifier(DuoPostureReader()) }
 
-    /// The stream screen's status bar (DuoPosture.hidesStatusBar): hidden on the inner display in
-    /// every pose, so the picture keeps the 82 pt above the fold upright and the 84 pt strip's
-    /// width sideways; shown everywhere else, as before. In a background, so that hiding and
-    /// showing it never rebuilds the screen's views; off the Duo it adds nothing.
-    func duoStatusBar(_ posture: DuoPosture, size: CGSize) -> some View {
-        background {
-            if DuoPosture.hidesStatusBar(posture.pose(size)) {
-                Color.clear.statusBarHidden(true)
-            }
-        }
-    }
-
     /// The stream screen's fold for everything under it, and, in DEBUG, one console line each time
     /// the posture changes ("duo: stream screen: book, the fold x 455.5–495.5 in the way, 951×669").
     func duoFold(_ posture: DuoPosture, size: CGSize, screen: String) -> some View {
