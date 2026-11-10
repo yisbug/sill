@@ -18,8 +18,10 @@ enum AwayCopy {
 
     /// The same for VoiceOver: "Low, Standard", "12 megabits per second, Retina".
     static func spoken(_ bitrate: Int, _ captureScale: Double) -> String {
-        let name = QualityPreset(rawValue: bitrate)?.name ?? "\(QualityPreset.mbps(bitrate)) megabits per second"
-        return "\(name), \(captureScale >= 1.5 ? "Retina" : "Standard")"
+        let name = QualityPreset(rawValue: bitrate)?.name ?? String(localized: "\(QualityPreset.mbps(bitrate)) megabits per second", comment: "画质设置或串流连接提示；插值为码率")
+        return captureScale >= 1.5
+            ? String(localized: "\(name), Retina", comment: "画质的 VoiceOver 名称；插值为码率名称")
+            : String(localized: "\(name), Standard", comment: "画质的 VoiceOver 名称；插值为码率名称")
     }
 
     /// A title kept whole on its line ("Low · Standard", "12 Mbps · Retina"): no-break spaces.
@@ -36,11 +38,11 @@ enum AwayCopy {
     static func headerLine(_ away: AwayQuality?) -> (text: String, spoken: String)? {
         guard let a = away, a.thisConnectionAway else { return nil }
         if a.awayRunning {
-            return ("Away: \(whole(title(a.awayBitrate, a.awayCaptureScale)))",
-                    ", away quality, \(spoken(a.awayBitrate, a.awayCaptureScale))")
+            return (String(localized: "Away: \(whole(title(a.awayBitrate, a.awayCaptureScale)))", comment: "画质设置或串流连接提示；插值为画质名称"),
+                    String(localized: ", away quality, \(spoken(a.awayBitrate, a.awayCaptureScale))", comment: "画质设置或串流连接提示；插值为画质名称"))
         }
-        return ("Home quality: \(whole(title(a.homeBitrate, a.homeCaptureScale))) (a device at home is connected)",
-                ", home quality, \(spoken(a.homeBitrate, a.homeCaptureScale)), because a device at home is connected")
+        return (String(localized: "Home quality: \(whole(title(a.homeBitrate, a.homeCaptureScale))) (a device at home is connected)", comment: "画质设置或串流连接提示；插值为画质名称"),
+                String(localized: ", home quality, \(spoken(a.homeBitrate, a.homeCaptureScale)), because a device at home is connected", comment: "画质设置或串流连接提示；插值为画质名称"))
     }
 
     // MARK: The panel's footnote
@@ -52,13 +54,13 @@ enum AwayCopy {
         guard let a = away else { return nil }
         let home = whole(title(a.homeBitrate, a.homeCaptureScale))
         if a.thisConnectionAway, a.awayRunning {
-            return "Away from home, \(mac) streams at what you choose here and keeps it for next time. At home it goes back to \(home)."
+            return String(localized: "Away from home, \(mac) streams at what you choose here and keeps it for next time. At home it goes back to \(home).", comment: "画质设置或串流连接提示；插值为 Mac 名称、家庭画质名称")
         }
         if a.thisConnectionAway {
-            return "A device at home is connected, so \(mac) streams at its home quality, \(home). What you choose here applies once every device is away."
+            return String(localized: "A device at home is connected, so \(mac) streams at its home quality, \(home). What you choose here applies once every device is away.", comment: "画质设置或串流连接提示；插值为 Mac 名称、家庭画质名称")
         }
         guard remoteAccessOn else { return nil }
-        return "Away from home, \(mac) streams at \(whole(title(a.awayBitrate, a.awayCaptureScale)))."
+        return String(localized: "Away from home, \(mac) streams at \(whole(title(a.awayBitrate, a.awayCaptureScale))).", comment: "画质设置或串流连接提示；插值为 Mac 名称、画质名称")
     }
 
     // MARK: The link
@@ -72,7 +74,7 @@ enum AwayCopy {
             return (title(bitrate, scale), spoken(bitrate, scale), change)
         }
         let name = QualityPreset.name(forBitrate: bitrate)
-        return (name, QualityPreset(rawValue: bitrate)?.name ?? "\(QualityPreset.mbps(bitrate)) megabits per second", change)
+        return (name, QualityPreset(rawValue: bitrate)?.name ?? String(localized: "\(QualityPreset.mbps(bitrate)) megabits per second", comment: "画质设置或串流连接提示；插值为码率"), change)
     }
 
     /// The callout while the link is behind, and its button. First match wins: away while a device at
@@ -95,13 +97,13 @@ enum AwayCopy {
         guard let link, link.isBehind else { return nil }
         let quality = QualityPreset.name(forBitrate: link.bitrate)
         if let a = away, a.thisConnectionAway, !a.awayRunning {
-            return Callout(text: "The link can’t carry \(quality), which \(mac) keeps while a device at home is connected.", button: nil)
+            return Callout(text: String(localized: "The link can’t carry \(quality), which \(mac) keeps while a device at home is connected.", comment: "画质设置或串流连接提示；插值为当前画质名称、Mac 名称"), button: nil)
         }
         if let s = suggestion(link) {
-            return Callout(text: "The link can’t carry \(quality). \(whole(s.title)) is recommended.",
-                           button: Callout.Button(title: "Use \(whole(s.title))", spoken: "Use \(s.spoken)", change: s.change))
+            return Callout(text: String(localized: "The link can’t carry \(quality). \(whole(s.title)) is recommended.", comment: "画质设置或串流连接提示；插值为当前画质名称、建议画质名称"),
+                           button: Callout.Button(title: String(localized: "Use \(whole(s.title))", comment: "画质设置或串流连接提示；插值为画质名称"), spoken: String(localized: "Use \(s.spoken)", comment: "画质设置或串流连接提示；插值为画质名称"), change: s.change))
         }
-        return Callout(text: "The link to \(mac) is too slow for a steady picture, even at Low.", button: nil)
+        return Callout(text: String(localized: "The link to \(mac) is too slow for a steady picture, even at Low.", comment: "画质设置或串流连接提示；插值为 Mac 名称"), button: nil)
     }
 
     /// The old slow-link callout (the round trip over 250 ms away from home) shows only for a Mac that
@@ -115,8 +117,8 @@ enum AwayCopy {
     /// Settings." when the panel offers something to pick, else "The link to Mac mini can’t keep up."
     static func streamLine(link: LinkReport?, away: AwayQuality?, mac: String) -> String? {
         guard let c = callout(link: link, away: away, mac: mac), let link else { return nil }
-        if c.button != nil { return "The link can’t keep up with \(QualityPreset.name(forBitrate: link.bitrate)). Lower it in Settings." }
-        return "The link to \(mac) can’t keep up."
+        if c.button != nil { return String(localized: "The link can’t keep up with \(QualityPreset.name(forBitrate: link.bitrate)). Lower it in Settings.", comment: "画质设置或串流连接提示；插值为画质名称") }
+        return String(localized: "The link to \(mac) can’t keep up.", comment: "画质设置或串流连接提示；插值为 Mac 名称")
     }
 }
 

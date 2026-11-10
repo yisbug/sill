@@ -17,6 +17,15 @@ enum ConnectionList {
     /// The section of the Macs with no group, once any Mac has one. Never a group's own name: a group
     /// called Other would be a second section of that title.
     static let otherTitle = "Other"
+    static func displayGroup(_ name: String) -> String {
+        switch name {
+        case "Home": return String(localized: "Home", comment: "连接页预设分组名称：家庭")
+        case "Work": return String(localized: "Work", comment: "连接页预设分组名称：工作")
+        case "Personal": return String(localized: "Personal", comment: "连接页预设分组名称：个人")
+        case "Other": return String(localized: "Other", comment: "连接页未分组 Mac 的分区标题")
+        default: return name
+        }
+    }
     static let maxGroupLength = 32
     static let twoColumnMinWidth: CGFloat = 340
 

@@ -121,8 +121,8 @@ struct AddMacCard: View {
                 .font(.system(size: 13))
                 .foregroundStyle(Palette.muted)
                 .fixedSize(horizontal: false, vertical: true)
-            Text(typed ? "Type the address and code that Sill shows on your Mac."
-                       : "On your Mac, choose Pair iPhone or iPad… in the Sill menu, then point this \(device) at the code.")
+            Text(typed ? String(localized: "Type the address and code that Sill shows on your Mac.", comment: "添加 Mac 卡片：手动输入配对说明")
+                       : String(localized: "On your Mac, choose Pair iPhone or iPad… in the Sill menu, then point this \(device) at the code.", comment: "添加 Mac 卡片：扫码说明，插值为设备类型"))
                 .font(.system(size: 13))
                 .foregroundStyle(Palette.text)
                 .fixedSize(horizontal: false, vertical: true)
@@ -135,13 +135,13 @@ struct AddMacCard: View {
         VStack(alignment: .leading, spacing: 8) {
             // The home card dials the door its ask reached: the code alone.
             if home == nil {
-                PairingField(prompt: "100.101.102.103 or mac.example.net", label: "Address", text: $address,
+                PairingField(prompt: String(localized: "100.101.102.103 or mac.example.net", comment: "配对地址输入框：地址示例"), label: String(localized: "Address", comment: "配对地址输入框：无障碍标签"), text: $address,
                              keyboard: .URL, submit: .next)
                     .focused($focus, equals: .address)
                     .onSubmit { focus = .code }
                 if let problem, problem.field == .address { ProblemLine(text: problem.text) }
             }
-            PairingField(prompt: "0000 0000 0000", label: "Code", text: $code, keyboard: PairingField.codeKeyboard, submit: .go, monospaced: true)
+            PairingField(prompt: String(localized: "0000 0000 0000", comment: "配对码输入框：格式示例"), label: String(localized: "Code", comment: "配对码输入框：无障碍标签"), text: $code, keyboard: PairingField.codeKeyboard, submit: .go, monospaced: true)
                 .focused($focus, equals: .code)
                 .onSubmit(pair)
                 .onChange(of: code) { _, typed in
@@ -212,7 +212,7 @@ struct AddMacCard: View {
 
     @ViewBuilder private var pathToggle: some View {
         if CodeScanner.isSupported || scannerMode != .live {
-            Button(typed ? "Scan Code Instead" : "Enter Code Instead") {
+            Button(typed ? String(localized: "Scan Code Instead", comment: "配对卡片：切换到扫码按钮") : String(localized: "Enter Code Instead", comment: "配对卡片：切换到手动输入按钮")) {
                 client.pairing = .idle
                 focus = nil
                 typed.toggle()
@@ -396,7 +396,7 @@ struct LinkConfirmation: View {
     let pair: () -> Void
     let cancel: () -> Void
 
-    private var at: String { link.addresses.first?.text ?? "its address" }
+    private var at: String { link.addresses.first?.text ?? String(localized: "its address", comment: "配对链接确认：缺少地址时的显示文字") }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {

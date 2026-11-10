@@ -495,8 +495,8 @@ struct PortraitStreamScreen: View {
                              offered: client.textScaleOffersOff, available: client.textScaleSelectable)
                 .tourTarget(.textSize)
 
-            barButton(open: keyboardShown, symbol: "keyboard", label: "Keyboard", width: width,
-                      accessibilityLabel: keyboardShown ? "Hide the keyboard" : "Show the keyboard",
+            barButton(open: keyboardShown, symbol: "keyboard", label: String(localized: "Keyboard", comment: "串流工具栏：按钮名称"), width: width,
+                      accessibilityLabel: keyboardShown ? String(localized: "Hide the keyboard", comment: "串流工具栏：无障碍操作标签") : String(localized: "Show the keyboard", comment: "串流工具栏：无障碍操作标签"),
                       action: {
                           setSettings(false, false)
                           overlay.toggleKeyboard()
@@ -626,8 +626,8 @@ struct PortraitStreamScreen: View {
     }
 
     private func appsButton(width: CGFloat? = nil) -> some View {
-        barButton(open: drawerOpen, symbol: "magnifyingglass", label: "Apps", width: width,
-                  accessibilityLabel: drawerOpen ? "Close the app list" : "Open the app list",
+        barButton(open: drawerOpen, symbol: "magnifyingglass", label: String(localized: "Apps", comment: "串流工具栏：按钮名称"), width: width,
+                  accessibilityLabel: drawerOpen ? String(localized: "Close the app list", comment: "串流工具栏：无障碍操作标签") : String(localized: "Open the app list", comment: "串流工具栏：无障碍操作标签"),
                   action: {
                       setSettings(false, false)
                       withAnimation(.easeOut(duration: 0.18)) { drawerOpen.toggle() }
@@ -635,15 +635,15 @@ struct PortraitStreamScreen: View {
     }
 
     private func desktopButton(width: CGFloat? = nil) -> some View {
-        barButton(open: client.active == .desktop, symbol: "desktopcomputer", label: "Desktop", width: width,
-                  accessibilityLabel: "Show the full Mac desktop",
+        barButton(open: client.active == .desktop, symbol: "desktopcomputer", label: String(localized: "Desktop", comment: "串流工具栏：按钮名称"), width: width,
+                  accessibilityLabel: String(localized: "Show the full Mac desktop", comment: "串流工具栏：显示桌面的无障碍标签"),
                   action: { client.select(.desktop) })
     }
 
     /// Leave's old slot: Disconnect is the Settings panel's pinned last row now.
     private func settingsButton(width: CGFloat? = nil) -> some View {
-        barButton(open: settingsOpen, symbol: "gearshape", label: "Settings", width: width,
-                  accessibilityLabel: settingsOpen ? "Close settings" : "Settings for \(client.macName.isEmpty ? "the Mac" : client.macName)",
+        barButton(open: settingsOpen, symbol: "gearshape", label: String(localized: "Settings", comment: "串流工具栏：按钮名称"), width: width,
+                  accessibilityLabel: settingsOpen ? String(localized: "Close settings", comment: "串流工具栏：关闭设置的无障碍标签") : String(localized: "Settings for \(client.macName.isEmpty ? String(localized: "the Mac", comment: "串流工具栏：Mac 名称缺失时的称呼") : client.macName)", comment: "串流工具栏：打开设置的无障碍标签，插值为 Mac 名称"),
                   action: { setSettings(!settingsOpen, true) })
             .tourTarget(.settings)
     }
@@ -880,16 +880,16 @@ private struct KeyRow: View {
     private var capsHold: Bool { !(keys == .phone && dynamicTypeSize.isAccessibilitySize) }
 
     private static let all: [Key] = [
-        .press("esc", HIDKey.escape, "Escape"),
-        .press("tab", HIDKey.tab, "Tab"),
-        .modifier("ctrl", .control, "Control"),
-        .modifier("opt", .option, "Option"),
-        .modifier("cmd", .command, "Command"),
-        .modifier("shift", .shift, "Shift"),
-        .arrow("chevron.left", HIDKey.leftArrow, "Left arrow"),
-        .arrow("chevron.down", HIDKey.downArrow, "Down arrow"),
-        .arrow("chevron.up", HIDKey.upArrow, "Up arrow"),
-        .arrow("chevron.right", HIDKey.rightArrow, "Right arrow"),
+        .press("esc", HIDKey.escape, String(localized: "Escape", comment: "键盘快捷键行：按键的无障碍名称")),
+        .press("tab", HIDKey.tab, String(localized: "Tab", comment: "键盘快捷键行：按键的无障碍名称")),
+        .modifier("ctrl", .control, String(localized: "Control", comment: "键盘快捷键行：按键的无障碍名称")),
+        .modifier("opt", .option, String(localized: "Option", comment: "键盘快捷键行：按键的无障碍名称")),
+        .modifier("cmd", .command, String(localized: "Command", comment: "键盘快捷键行：按键的无障碍名称")),
+        .modifier("shift", .shift, String(localized: "Shift", comment: "键盘快捷键行：按键的无障碍名称")),
+        .arrow("chevron.left", HIDKey.leftArrow, String(localized: "Left arrow", comment: "键盘快捷键行：按键的无障碍名称")),
+        .arrow("chevron.down", HIDKey.downArrow, String(localized: "Down arrow", comment: "键盘快捷键行：按键的无障碍名称")),
+        .arrow("chevron.up", HIDKey.upArrow, String(localized: "Up arrow", comment: "键盘快捷键行：按键的无障碍名称")),
+        .arrow("chevron.right", HIDKey.rightArrow, String(localized: "Right arrow", comment: "键盘快捷键行：按键的无障碍名称")),
         .keyboard,
         .spotlight,
     ]
@@ -948,14 +948,14 @@ private struct KeyRow: View {
             latchKey(key, title, flag, label: label)
         case .keyboard:
             cap(open: keyboardShown,
-                label: keyboardShown ? "Hide the keyboard" : "Show the keyboard",
+                label: keyboardShown ? String(localized: "Hide the keyboard", comment: "串流工具栏：无障碍操作标签") : String(localized: "Show the keyboard", comment: "串流工具栏：无障碍操作标签"),
                 action: { tap(key) }) {
                 Image(systemName: "keyboard")
                     .font(.system(size: 20))
                     .foregroundStyle(keyboardShown ? Palette.accent : Palette.text)
             }
         case .spotlight:
-            cap(open: false, label: "Open Spotlight on the Mac", action: { tap(key) }) {
+            cap(open: false, label: String(localized: "Open Spotlight on the Mac", comment: "键盘快捷键行：Spotlight 的无障碍操作标签"), action: { tap(key) }) {
                 Image(systemName: Spotlight.symbol)
                     .font(.system(size: 19))
                     .foregroundStyle(Palette.text)
@@ -1041,7 +1041,7 @@ private struct KeyRow: View {
     private func latchKey(_ key: Key, _ title: String, _ flag: KeyModifiers, label: String) -> some View {
         let on = latched.contains(flag)
         return cap(open: on,
-                   label: on ? "\(label), held. Tap to release." : "\(label), hold for the next key",
+                   label: on ? String(localized: "\(label), held. Tap to release.", comment: "键盘快捷键行：已锁定修饰键的无障碍标签，插值为按键名称") : String(localized: "\(label), hold for the next key", comment: "键盘快捷键行：修饰键的无障碍标签，插值为按键名称"),
                    largeContent: title, action: { tap(key) }) {
             Text(title)
                 .font(.system(size: 13, weight: .medium))

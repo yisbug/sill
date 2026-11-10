@@ -67,7 +67,7 @@ struct FoundMac: Identifiable, Hashable {
     var id: String { route == .remote ? "remote:\(macID ?? name)" : "\(route.rawValue):\(name)" }
     /// The word at the end of its row: "Remote" for a saved Mac dialed away from home, else its home
     /// word (`homeWord`): how its Mac is reachable (`method`), "Not paired" or "Update Sill", or nil.
-    var word: String? { route == .remote ? "Remote" : homeWord.word }
+    var word: String? { route == .remote ? String(localized: "Remote", comment: "连接页中已保存 Mac 的远程连接方式") : homeWord.word }
 }
 
 /// How the current connection runs (`Session.route`): set when it starts, again at `.ready` and by
@@ -99,6 +99,15 @@ enum RemoteRoute: Equatable {
 
     /// "through Tailscale", "through your VPN", "over the internet", "by address".
     var phrase: String {
+        switch self {
+        case .vpn(let name?): return String(localized: "through \(name)", comment: "远程连接方式从句，插值为 VPN 名称")
+        case .vpn(nil): return String(localized: "through your VPN", comment: "未命名 VPN 的远程连接方式从句")
+        case .internet: return String(localized: "over the internet", comment: "互联网远程连接方式从句")
+        case .address: return String(localized: "by address", comment: "指定地址的远程连接方式从句")
+        }
+    }
+
+    var consolePhrase: String {
         switch self {
         case .vpn(let name?): return "through \(name)"
         case .vpn(nil): return "through your VPN"
@@ -222,9 +231,9 @@ final class StreamClient: ObservableObject {
 
     /// The connect screen's idle status lines: only these follow the nearby search and Local Network
     /// access (updateDiscovery); any other status (a disconnect, a failure) stays as it was set.
-    static let lookingOnNetwork = "Looking for Macs on this network"
-    static let lookingNearby = "Looking for Macs on this network and nearby"
-    static let allowLocalNetwork = "To find your Mac, allow Local Network for Sill in Settings."
+    static let lookingOnNetwork = String(localized: "Looking for Macs on this network", comment: "连接页搜索或本地网络访问权限提示")
+    static let lookingNearby = String(localized: "Looking for Macs on this network and nearby", comment: "连接页搜索或本地网络访问权限提示")
+    static let allowLocalNetwork = String(localized: "To find your Mac, allow Local Network for Sill in Settings.", comment: "连接页搜索或本地网络访问权限提示")
 
     // Switcher catalog, as the host sends it. Published on main.
     @Published var macName = ""
@@ -1508,12 +1517,12 @@ final class StreamClient: ObservableObject {
         for mac in next where mac.route != .remote {
             let seen = (mac.direct ? nearby : network).first { $0.name == mac.name }
             let named = seen.map { s in s.interfaces.isEmpty ? s.policy.map { "\($0.name) (\($0.type))" } : s.interfaces.map { "\($0.name) (\($0.type))" } } ?? []
-            let word = mac.homeWord == .method(mac.method) ? "" : ", \(mac.homeWord.word ?? "no word")"
+            let word = mac.homeWord == .method(mac.method) ? "" : ", \(mac.homeWord.consoleWord ?? "no word")"
             let door = mac.door == .plain ? (word.isEmpty ? "" : " (no p\(word))") : " (p=\(mac.door == .open ? "0" : "1")\(word))"
             let byName = mac.savedByName.map { " (saved Mac \($0) by its name alone)" } ?? ""
             let kept = seen == nil || seen?.record != nil ? ""
                 : seen.flatMap({ records[$0.key] }) == nil ? " (no TXT record)" : " (TXT record kept: this result carries none)"
-            print("discovery: \(mac.name): \(mac.method?.word ?? "no word"), seen on \(named.joined(separator: ", "))\(byName)\(door)\(kept)")
+            print("discovery: \(mac.name): \(mac.method?.consoleWord ?? "no word"), seen on \(named.joined(separator: ", "))\(byName)\(door)\(kept)")
         }
         #endif
         macs = next
@@ -1787,7 +1796,7 @@ final class StreamClient: ObservableObject {
         session = Session(route: peerToPeer ? .direct : .network, macID: macID, bonjourName: bonjourName, home: trust, row: row,
                           endpoint: endpoint)
         goodbye = nil
-        status = peerToPeer ? "Connecting to \(name) directly…" : "Connecting to \(name)…"
+        status = peerToPeer ? String(localized: "Connecting to \(name) directly…", comment: "连接页状态提示，插值为 Mac 名称") : String(localized: "Connecting to \(name)…", comment: "连接页状态提示，插值为 Mac 名称")
         #if DEBUG
         if trust.tls { print("home: dialing \(name) over TLS, \(DiscoveryPolicy.pin(trust) == .anyKey ? "any key" : "pinned")") }
         #endif
@@ -1856,7 +1865,7 @@ final class StreamClient: ObservableObject {
                 // A tap's dial says so; the automatic reconnect's keeps its own line (DiscoveryPolicy.
                 // reconnectLine), which would otherwise flip with every dial.
                 DispatchQueue.main.async {
-                    if self.connection === c, self.reconnect == nil { self.status = "Waiting for \(name)…" }
+                    if self.connection === c, self.reconnect == nil { self.status = String(localized: "Waiting for \(name)…", comment: "连接页状态提示，插值为 Mac 名称") }
                 }
                 // A connection that never gets past waiting would block every reconnect path
                 // (they all require `connection == nil`): give it five seconds, then let it go. Its
@@ -1951,7 +1960,7 @@ final class StreamClient: ObservableObject {
         askedNearby = false
         connectedAt = Date()
         pinRefusedRows = []
-        status = "Connected to \(name)"
+        status = String(localized: "Connected to \(name)", comment: "连接页状态提示，插值为 Mac 名称")
         updateDiscovery()   // stops the nearby browser; the network one keeps running
         #if DEBUG
         if let endpoint, let test = UserDefaults.standard.string(forKey: "SillMoveTest") {
@@ -2081,7 +2090,7 @@ final class StreamClient: ObservableObject {
         let now = ProcessInfo.processInfo.systemUptime
         lastMoveAttempt = now
         lastMoveUp = now
-        status = "Switching to Wi\u{2011}Fi…"
+        status = String(localized: "Switching to Wi\u{2011}Fi…", comment: "连接页切换到 Wi-Fi 的状态提示")
         if let wired = wiredDial(for: mac) {
             #if DEBUG
             print("discovery: moving the session to the network on \(wired.via)")
@@ -2613,7 +2622,7 @@ final class StreamClient: ObservableObject {
         pathSignals = PathSignals()
         lastPongAt = ProcessInfo.processInfo.systemUptime
         setRoute(from: c.currentPath, fresh: true)   // the new connection's, which carries the session now
-        status = "Connected to \(hostName)"
+        status = String(localized: "Connected to \(hostName)", comment: "连接页状态提示，插值为 Mac 名称")
         soundAcrossMove = macHasSound
         settings.reset()
         settingsProblem = nil
@@ -2700,7 +2709,7 @@ final class StreamClient: ObservableObject {
             endSession()
             return
         }
-        if connected { status = "Connected to \(hostName)" }
+        if connected { status = String(localized: "Connected to \(hostName)", comment: "连接页状态提示，插值为 Mac 名称") }
         switch move.kind {
         case .fromRemote:
             // Still remote. A move that did not complete: the next try waits DiscoveryPolicy.upWait,
@@ -3221,11 +3230,11 @@ final class StreamClient: ObservableObject {
             let status = path.status == .satisfied ? "" : " (\(path.status))"
             let endpoint = Self.namesAddress(path) ? ""
                 : path.remoteEndpoint.map { " without an address (for \($0))" } ?? " without an endpoint"
-            print("session: kept \(route?.word ?? "no word"); ignored a path update\(status)\(endpoint): \(interfaces)")
+            print("session: kept \(route?.consoleWord ?? "no word"); ignored a path update\(status)\(endpoint): \(interfaces)")
         } else if fresh || next != route {
             let witness = scope.map { "the Mac's address on \(Self.listed([$0])); " }
                 ?? local.map { "this device's address on \(Self.listed([$0])); " } ?? ""
-            print("session: \(next?.word ?? "no word"), read from \(witness)path \(interfaces)")
+            print("session: \(next?.consoleWord ?? "no word"), read from \(witness)path \(interfaces)")
         }
         #endif
         if next != route { route = next }
@@ -4595,7 +4604,9 @@ extension StreamClient {
         if mockFrozen { return }
         #endif
         if settings.expire(now: ProcessInfo.processInfo.systemUptime, timeout: settingsTimeout) {
-            settingsProblem = "\(macName.isEmpty ? "The Mac" : macName) didn’t answer. Try again."
+            settingsProblem = macName.isEmpty
+                ? String(localized: "The Mac didn’t answer. Try again.", comment: "设置面板等待未知名称 Mac 响应超时的提示")
+                : String(localized: "\(macName) didn’t answer. Try again.", comment: "设置面板响应超时提示，插值为 Mac 名称")
         }
         scheduleSettingsExpiry()   // a later pick, or a timeout that grew with the RTT
     }
