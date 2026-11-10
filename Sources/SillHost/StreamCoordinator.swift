@@ -349,6 +349,9 @@ package final class StreamCoordinator {
     /// the menus do, so the picture always starts first, and nothing of it waits on the picture or the
     /// other way round.
     let audio = AudioPipeline()
+    /// 语音输入（kind 100–102，VoiceBridge；docs/voice-and-immersive-plan.md 第 2.5 节）：设备的片段交给本机
+    /// 的 meeppo-voice 识别，文字当作这台设备打的字输入（`typeVoiceText`）。
+    let voice = VoiceBridge()
     /// Connected devices that play the sound (the server's count, from their hellos).
     private var audioListeners = 0
     /// TEST ONLY. `SILL_TEST_MENU_PID=<pid>` on a --synthetic host: the test pattern's menus are that
@@ -487,6 +490,19 @@ package final class StreamCoordinator {
         audio.onFormat = { data, epoch in server.broadcastAudio(format: data, epoch: epoch) }
         audio.onPackets = { data, epoch in server.broadcastAudio(packets: data, epoch: epoch) }
         audio.onStatus = { [weak self] _ in self?.showAudio() }
+        // 语音输入：数据目录（测试钩子 SILL_TEST_VOICE_DIR 只在测试主机上生效，TestHooks），回结果、打字、日志里的名字。
+        let testVoiceDirectory = server.isTestHost ? env["SILL_TEST_VOICE_DIR"] : nil
+        voice.directory = { [weak self] in
+            VoicePolicy.dataDirectory(home: NSHomeDirectory(), configured: self?.config.voiceDataDirectory, testOverride: testVoiceDirectory)
+        }
+        voice.send = { [server] message, connection in server.send(message, to: connection) }
+        voice.inject = { [weak self] text, connection in await self?.typeVoiceText(text, from: connection) ?? .nothingStreams }
+        voice.deviceName = { [weak self] connection in self?.deviceName(connection) ?? "\(connection.endpoint)" }
+        voice.onAvailabilityChanged = { [weak self] available, broadcast in
+            guard let self else { return }
+            self.status.update { $0.voiceService = available }
+            if broadcast { self.broadcastList() }
+        }
         server.onAudioListenersChanged = { [weak self] count in
             Task { @MainActor in
                 guard let self else { return }
@@ -576,6 +592,7 @@ package final class StreamCoordinator {
                 if self.flipWait == id { self.flipWait = nil }
                 self.menus.clientLeft(connection)
                 self.clipboard.clientLeft(connection)
+                self.voice.clientLeft(connection)
                 // Its keys go up, and its buttons when the Mac no longer served it (`revoked`, read before
                 // it is forgotten below). Its input still held for an activation is judged as a departed
                 // device's from here on (`gone`: `leftWhileHeld`), and an identifier a later connection
@@ -601,6 +618,7 @@ package final class StreamCoordinator {
                 // SessionLock looks once a second while someone watches, and at once as the first comes.
                 SessionLock.shared.devices(count)
                 self.catalog.clientCount = count          // the catalog idles itself at 0
+                self.voice.devicesConnected = count > 0   // 有设备时每 2 秒看一次 meeppo-voice
                 // Nobody is watching: stop capturing and encoding. The next client picks afresh.
                 if count == 0 { self.viewport = nil; self.clientFPS = [:]; self.fitScales = [:] }   // the next device starts from scratch
                 if count == 0 { self.gestureChords.forget() }                 // and did not open a view it could close
@@ -820,6 +838,7 @@ package final class StreamCoordinator {
         }
         if let testMenuLine { print(testMenuLine) }   // TEST ONLY, and only with SILL_TEST_MENU_PID set
         if config.sendAudio { audio.prepare() }       // the codec, loaded before the first chunk needs it
+        voice.start()                // meeppo-voice 的发现文件，没有设备时 10 秒看一次
         server.start()
         remote?.apply(config)        // the remote door, when Remote Access is on (or a pairing window opens later)
         if promptForPermissions || CGPreflightScreenCaptureAccess() { await catalog.refreshWindows() }
@@ -1358,9 +1377,29 @@ package final class StreamCoordinator {
             // bring a window forward: a view a gesture opened is left behind, as after a click.
             gestureChords.forget()
             menus.press(r, from: connection, who: deviceName(connection))
+        case .voiceClip:
+            // 语音片段（VoiceBridge）：转给 meeppo-voice，结果单独回给这台设备；不在这里 await。
+            voice.clip(message.payload, from: connection)
+        case .voiceCancel:
+            voice.cancel(message.payload, from: connection)
         default:
             break
         }
+    }
+
+    /// 语音识别出的文字，当作 `connection` 那台设备发来的 kind 8 文字输入：同一入口（锁屏规则、激活串流
+    /// 应用、无处可落），只多回一个落点给 VoiceBridge。锁屏规则不收这段文字时回 `.locked`，什么都没在串流
+    /// 时回 `.nothingStreams`；连接已断或已被撤销的，不打字（结果也到不了它）。
+    private func typeVoiceText(_ text: String, from connection: NWConnection) async -> VoicePolicy.Landing {
+        let id = ObjectIdentifier(connection)
+        guard connections[id] != nil, !revoked.contains(id) else { return .nothingStreams }
+        let event = InputEvent.text(text)
+        let message = StreamMessage(kind: .input, timestamp: Date().timeIntervalSince1970, isKeyframe: false,
+                                    payload: Wire.encode(event))
+        guard case .take = lockDecision(message, input: event, from: id, reading: lockReading) else { return .locked }
+        guard currentSourceRect() != nil else { return .nothingStreams }
+        await handle(message, from: connection, arrived: lockReading)
+        return .typed
     }
 
     /// A device's session connected, or it sent a message: DisplayWake says whether someone is using
@@ -3335,6 +3374,9 @@ package final class StreamCoordinator {
         // This host repeats a device's held key (KeyRepeat), so a device sends it a hardware keyboard's
         // characters as keys.
         list.keyRepeat = KeyRepeat.generation
+        // 语音输入：找到可用的 meeppo-voice 时为 1（每次发列表时看一次发现文件，不在这里再广播）。
+        voice.refresh(broadcast: false)
+        list.voice = voice.available ? VoiceSupport.generation : nil
         // A locked Mac's list: no windows, no clipboard, `locked`, and off console `offConsole`
         // (LockPolicy); unlocked, as it is, byte for byte. Which went last, for `lockChanged`.
         let reading = lockReading

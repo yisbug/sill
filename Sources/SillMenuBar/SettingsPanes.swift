@@ -145,6 +145,8 @@ private struct GeneralPane: View {
             if let firewall = previewFirewall ?? model.coordinator?.status.snapshot.firewall, firewall.blocksDevices {
                 FirewallSection(verdict: firewall)
             }
+            // 语音输入：本机的 meeppo-voice 是否找到（VoiceBridge 每 2～10 秒看一次它的发现文件）。
+            VoiceInputSection(found: model.coordinator?.status.snapshot.voiceService ?? false)
             // How devices reach this Mac, so beside its name on the network. Applies at once without
             // restarting the stream (the listener is replaced); enabled in test pattern mode too,
             // where it is saved and changes only the listener.
@@ -539,6 +541,31 @@ private struct PermissionRow: View {
         } label: {
             Text(title)
             Text(explanation)
+        }
+    }
+}
+
+// MARK: 语音输入
+
+/// Settings › General 的一行：设备的语音悬浮球要靠本机的 meeppo-voice 识别。找到时说已连接，没找到时说打开它即可。
+struct VoiceInputSection: View {
+    let found: Bool
+
+    var body: some View {
+        Section {
+            LabeledContent("Voice input") {
+                if found {
+                    Label("Connected to meeppo-voice", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                } else {
+                    Text("meeppo-voice not found")
+                        .foregroundStyle(.secondary)
+                }
+            }
+        } footer: {
+            Footnote(found
+                     ? String(localized: "Your iPhone and iPad can dictate into what streams: what they record is recognized by meeppo-voice on this Mac.", comment: "通用设置：语音输入已连接时的说明")
+                     : String(localized: "Open meeppo-voice on this Mac to dictate from your iPhone or iPad.", comment: "通用设置：未找到语音识别服务时的说明"))
         }
     }
 }

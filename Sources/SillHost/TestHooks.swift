@@ -23,6 +23,8 @@ enum TestHooks {
         "SILL_TEST_REQUIRE_PAIRING",
         // The device gate's (DeviceGate): a floor above "0" refuses devices.
         "SILL_TEST_MIN_DEVICE_VERSION", "SILL_TEST_GOODBYE",
+        // 语音输入（VoiceBridge）：meeppo-voice 的数据目录，测试的替身服务写的发现文件在这里。
+        "SILL_TEST_VOICE_DIR",
     ]
 
     /// One line for each such variable set on a host that does not honour them; nothing on a test

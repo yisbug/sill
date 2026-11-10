@@ -52,6 +52,8 @@ final class HostSettings {
         static let shareClipboard = "shareClipboard"
         static let sendAudio = "sendAudio"
         static let showPairingWindowToScreenSharing = "showPairingWindowToScreenSharing"
+        /// 语音输入：meeppo-voice 的数据目录（只读，不注册默认值；没有时用 VoicePolicy 的默认目录）。
+        static let voiceDataDirectory = "voiceDataDirectory"
     }
 
     var config: HostConfig {
@@ -143,7 +145,7 @@ final class HostSettings {
             // Off: whoever can see this Mac's screen remotely could read a code (PairingWindowSharing).
             Key.showPairingWindowToScreenSharing: false,
         ])
-        config = HostConfig(maxFPS: defaults.integer(forKey: Key.maxFPS),
+        var loaded = HostConfig(maxFPS: defaults.integer(forKey: Key.maxFPS),
                             captureScale: CGFloat(defaults.double(forKey: Key.captureScale)),
                             bitrate: defaults.integer(forKey: Key.bitrate),
                             awayBitrate: defaults.integer(forKey: Key.awayBitrate),
@@ -160,6 +162,8 @@ final class HostSettings {
                             requirePairing: base.requirePairing,
                             shareClipboard: defaults.bool(forKey: Key.shareClipboard),
                             sendAudio: defaults.bool(forKey: Key.sendAudio)).validated()
+        loaded.voiceDataDirectory = defaults.string(forKey: Key.voiceDataDirectory)
+        config = loaded
         remoteAddressName = defaults.string(forKey: Key.remoteAddressName) ?? ""
         updateCheck = defaults.bool(forKey: Key.updateCheck)
         showPairingWindowToScreenSharing = defaults.bool(forKey: Key.showPairingWindowToScreenSharing)

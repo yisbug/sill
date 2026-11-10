@@ -36,6 +36,18 @@
           }
         }
       }
+    },
+    "NSMicrophoneUsageDescription": {
+      "comment": "麦克风权限说明",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 会录下你的语音，识别后输入到你的 Mac。"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

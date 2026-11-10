@@ -287,6 +287,16 @@ check(decodedOld != nil && decodedOld?.clipboard == nil, "an older host's list d
 check(Wire.decode(WindowList.self, from: Wire.encode(shares)).map { $0.clipboard == 1 && $0.gestures == 1 } == true, "clipboard round-trips beside gestures")
 check(StreamMessageKind.clipboard.rawValue == 32 && StreamMessageKind(rawValue: 32) == .clipboard, "kind 32 is the clipboard")
 check([29, 30, 31, 33].allSatisfy { StreamMessageKind(rawValue: $0) == nil }, "29, 30, 31 and 33 not this build's")
+// 语音输入（Voice.swift）：100–102 是本 fork 的；窗口列表的 `voice` 只增不改，nil 时不写，老的列表读出 nil。
+check(StreamMessageKind(rawValue: 100) == .voiceClip && StreamMessageKind(rawValue: 101) == .voiceResult
+      && StreamMessageKind(rawValue: 102) == .voiceCancel, "100, 101 and 102 are voice input")
+do {
+    var list = WindowList(macName: "M", windows: [], active: .desktop)
+    let plain = Wire.encode(list)
+    list.voice = 1
+    check(!(String(data: plain, encoding: .utf8) ?? "").contains("\"voice\"") && Wire.decode(WindowList.self, from: Wire.encode(list))?.voice == 1
+          && Wire.decode(WindowList.self, from: plain)?.voice == nil, "WindowList.voice: left out when nil, round-tripped, nil from an older host")
+}
 let clip = Clipboard(text: "Hello")
 check(json(clip) == #"{"text":"Hello"}"# && json(Clipboard()) == "{}" && json(Clipboard(stop: true)) == #"{"stop":true}"#, "kind 32's keys: \(json(clip))")
 check(Wire.decode(Clipboard.self, from: Data(#"{"text":"a","image":"AQID","later":1}"#.utf8)) == Clipboard(text: "a", image: Data([1, 2, 3])),

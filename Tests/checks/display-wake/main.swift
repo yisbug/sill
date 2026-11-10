@@ -101,7 +101,8 @@ for raw in 0...255 {
     eq(fresh.activity(msg(kind, kind == .input ? tap : nil), at: 100), personKinds[UInt8(raw)], "kind \(raw) (\(kind))")
 }
 // A kind added to the wire fails this until it is decided here (and in the rule).
-eq(kinds, 33, "every kind there is decided (a new kind: say here whether it is a person at the device)")
+// 语音输入的 100–102 不算：片段本身不是有人在用 Mac，识别出的文字打进去时走 kind 8 的入口，那时才算（input）。
+eq(kinds, 36, "every kind there is decided (a new kind: say here whether it is a person at the device)")
 for (raw, what) in [(6, "a pick, the device's own Desktop request among them"), (9, "the viewport"), (17, "a settings change"),
                     (21, "show your pairing code"), (27, "a menu fetched"), (32, "the clipboard"),
                     (43, "the Mac's sound, which only a host sends"), (44, "a keyframe request")] as [(UInt8, String)] {

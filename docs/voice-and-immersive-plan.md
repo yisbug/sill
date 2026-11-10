@@ -47,8 +47,8 @@ Sill 侧读取 `local-api.json`，校验 pid 还活着、端口在 127.0.0.1，�
 | 种类 | 方向 | 载荷 |
 |---|---|---|
 | `WindowList.voice` | Mac → 设备 | 可选 Int：1 表示这台 Mac 能接语音（已找到 meeppo-voice 且接口可用）；nil 或缺失时设备不显示悬浮球 |
-| kind 100 `voiceClip` | 设备 → Mac | 二进制：4 字节片段号 + 1 字节格式（1 = AAC-LC ADTS）+ 音频；单条上限 4 MiB（约 15 分钟），超出由设备分段提交 |
-| kind 101 `voiceResult` | Mac → 设备 | JSON：`clip`、`ok`、`text`（预览，最多 200 字）、`reason`（`noService` / `timeout` / `serviceError` / `locked` / `nothingStreams`）、`message`（人读的说明，按 Mac 语言） |
+| kind 100 `voiceClip` | 设备 → Mac | 二进制：4 字节大端片段号 + 1 字节格式（1 = m4a 容器里的 AAC，AVAudioRecorder 原样写出；其余保留）+ 音频；单条上限 4 MiB（32 kbps 约 17 分钟），超出的 Mac 回 `tooLarge`；设备一次最多录 10 分钟，到时自动提交 |
+| kind 101 `voiceResult` | Mac → 设备 | JSON：`clip`、`ok`、`text`（预览，最多 200 字）、`reason`（`noService` / `timeout` / `serviceError` / `locked` / `nothingStreams` / `tooLarge` / `busy`；同一设备同时只处理一个片段，第二个回 `busy`；设备遇到不认识的原因时显示 `message`）、`message`（人读的说明，按 Mac 语言） |
 | kind 102 `voiceCancel` | 设备 → Mac | JSON：`clip`；Mac 中断对应请求（meeppo-voice 支持连接关闭即取消） |
 
 ### 2.4 iPad 端
@@ -62,7 +62,7 @@ Sill 侧读取 `local-api.json`，校验 pid 还活着、端口在 127.0.0.1，�
 - **录音**：
   - 录音时把 AVAudioSession 从 `.playback` 切到 `.playAndRecord`，并暂停播放 Mac 的声音，避免录进去；结束后恢复。
   - 首次使用时申请麦克风权限，Info.plist 加 `NSMicrophoneUsageDescription`（中英文）。
-- **设置**：Settings › 本机里加"语音输入"开关（默认开），以及"显示悬浮球"开关。
+- **设置**：Settings › 本机里加"语音输入"开关（`Sill.voiceInput`，默认开；关掉即不显示悬浮球，本期不另设"显示悬浮球"开关）。
 - 现有的 iPadOS 系统听写（#138）照常可用，与悬浮球互不影响。
 
 ### 2.5 Mac 端

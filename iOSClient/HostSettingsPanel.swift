@@ -76,6 +76,8 @@ struct HostSettingsPanel: View {
     /// Paste on ‹Mac› Right Away (paste right away, ClipboardPolicy.pastesOnReceipt): on unless turned
     /// off, read by StreamClient+Clipboard at each receipt, never sent.
     @AppStorage(StreamClient.pasteRightAwayKey) private var pasteRightAway = true
+    /// 语音输入（VoiceInputButton）：这台设备的开关，默认开，不发给 Mac。
+    @AppStorage(VoiceInputPolicy.switchKey) private var voiceInputOn = true
     /// VoiceOver is on: it keeps three-finger swipes and taps for itself, so the This iPad group says
     /// its rows do the gestures instead.
     @State private var voiceOver = HostSettingsPanel.voiceOverRunning
@@ -626,6 +628,16 @@ struct HostSettingsPanel: View {
                     .accessibilityHidden(true)      // announced as it came
             }
             Footnote(text: ClipboardPolicy.Copy.footnote(on: clipboardOn, rightAway: pasteRightAway, mac: mac, device: device))
+        }
+        // 语音输入（docs/voice-and-immersive-plan.md 第 2.4 节）：只在 Mac 说能接时（它找到了 meeppo-voice）。
+        if (client.hostVoice ?? 0) >= VoiceSupport.generation {
+            Rows {
+                Toggle(isOn: $voiceInputOn) {
+                    Text("Voice Input").foregroundStyle(Palette.text)
+                }
+                .rowFrame()
+            }
+            Footnote(text: String(localized: "Shows a microphone over the picture. Tap it, speak, and tap it again: \(mac) recognizes what you said with meeppo-voice and types it where its cursor is. Control-Option-R does the same from a keyboard.", comment: "主机设置面板：语音输入开关的说明，插值为 Mac 名称"))
         }
         Rows {
             Toggle(isOn: $reverseScroll) {

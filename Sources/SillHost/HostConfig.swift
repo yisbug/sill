@@ -67,6 +67,10 @@ package struct HostConfig: Equatable, Sendable {
     /// shared field: Noah, 2026-10-27, docs/audio-plan.md's Q8 as revised); each device mutes it for
     /// itself alone, and that never reaches the Mac.
     package var sendAudio: Bool
+    /// 语音输入：meeppo-voice 的数据目录（其中的 `local-api.json`），nil 为默认的
+    /// `~/Library/Application Support/TypefreeDemo`（VoicePolicy.dataDirectory）。Sill.app 的 UserDefaults
+    /// `voiceDataDirectory`，CLI 的 `--voice-dir PATH`。只在下一次看发现文件时生效，不重启串流。
+    package var voiceDataDirectory: String? = nil
 
     /// Every knob is required, so the compiler finds each place that builds one when a knob is added.
     package init(maxFPS: Int, captureScale: CGFloat, bitrate: Int, awayBitrate: Int, awayCaptureScale: CGFloat,

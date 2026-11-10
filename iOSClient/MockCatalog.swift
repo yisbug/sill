@@ -112,6 +112,9 @@ enum MockCatalog {
         default:
             break
         }
+        // `-SillVoice on`：模拟的 Mac 能接语音输入（`WindowList.voice` 1），串流上显示语音悬浮球；
+        // `-SillVoiceState recording|sending|done|failed` 让它停在某个状态（VoiceInputController）。
+        if UserDefaults.standard.string(forKey: "SillVoice") == "on" { client.hostVoice = VoiceSupport.generation }
         // `-SillOverlayLine asking|shown|openonmac|locked|noanswer`: Pair This iPad…'s line over a
         // session at home that speaks TLS, as the Mac's answer to its ask sets it (the mock never
         // asks: over it the overlay reads "…is showing a code now." as over a plain door).
