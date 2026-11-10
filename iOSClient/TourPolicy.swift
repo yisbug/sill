@@ -539,24 +539,24 @@ enum TourPolicy {
 
     // MARK: The words (§7)
 
-    static let skipTitle = "Skip"
-    static let nextTitle = "Next"
-    static let doneTitle = "Done"
-    static let skipHint = "Ends the tour. Take the Tour in Settings shows it again."
+    static let skipTitle = String(localized: "Skip", comment: "串流导览文案")
+    static let nextTitle = String(localized: "Next", comment: "串流导览文案")
+    static let doneTitle = String(localized: "Done", comment: "串流导览文案")
+    static let skipHint = String(localized: "Ends the tour. Take the Tour in Settings shows it again.", comment: "串流导览文案")
     /// The Settings panel's last row.
-    static let takeTourTitle = "Take the Tour"
-    static func takeTourFootnote(device: String) -> String { "A short tour of Sill’s controls on this \(device)." }
-    static func takeTourHint(device: String) -> String { "Shows how to use Sill on this \(device)." }
+    static let takeTourTitle = String(localized: "Take the Tour", comment: "串流导览文案")
+    static func takeTourFootnote(device: String) -> String { String(localized: "A short tour of Sill’s controls on this \(device).", comment: "串流导览文案；插值为设备类型") }
+    static func takeTourHint(device: String) -> String { String(localized: "Shows how to use Sill on this \(device).", comment: "串流导览文案；插值为设备类型") }
 
     /// The title as VoiceOver reads it: its place in the run, when the run has more than one card.
     static func spokenTitle(_ copy: TourCopy, index: Int, count: Int) -> String {
-        count > 1 ? "\(copy.title), step \(index + 1) of \(count)" : copy.title
+        count > 1 ? String(localized: "\(copy.title), step \(index + 1) of \(count)", comment: "串流导览文案；插值为导览标题、当前步骤、步骤总数") : copy.title
     }
 
     /// What starts a row about what this version's tour adds (a row built with `new: true`): drawn
     /// semibold in the accent (TourCard.attributed), and read by VoiceOver with the row ("New: Pinch
     /// to zoom…"). Which rows carry it is this version's: the next tour version clears its marks.
-    static let newPrefix = "New:"
+    static let newPrefix = String(localized: "New:", comment: "串流导览文案")
 
     /// A step's card. ‹Mac› is the Mac's name ("your Mac" when there is none yet); ‹device› is
     /// "iPad" or "iPhone". Under VoiceOver the rows that name a gesture say VoiceOver's way instead,
@@ -578,76 +578,80 @@ enum TourPolicy {
     static func copy(_ t: TourTopic, _ layout: TourLayout, mac: String, device: String,
                      voiceOver: Bool, firstOfRun: Bool, keysOnItsSide: Bool = false, thumbnails: Bool = true,
                      features: TourFeatures) -> TourCopy {
-        let mac = mac.isEmpty ? "your Mac" : mac
+        let mac = mac.isEmpty ? String(localized: "your Mac", comment: "串流导览文案") : mac
+        let markedMac = escapedMarkup(mac)
+        let markedDevice = escapedMarkup(device)
         let iPad = device == "iPad"
         switch t {
         case .touch:
-            var rows = [row("hand.tap", [strong("Tap"), plain(" to click.")]),
-                        row("contextualmenu.and.cursorarrow", [strong("Touch and hold"), plain(" to right-click.")]),
-                        row("hand.draw", [strong("Drag"), plain(" to scroll.")])]
-            if iPad { rows.append(row("applepencil", [strong("Apple Pencil"), plain(" works as a mouse.")])) }
+            var rows = [row("hand.tap", spans(String(localized: "**Tap** to click.", comment: "串流导览文案；双星号标出强调文字"))),
+                        row("contextualmenu.and.cursorarrow", spans(String(localized: "**Touch and hold** to right-click.", comment: "串流导览文案；双星号标出强调文字"))),
+                        row("hand.draw", spans(String(localized: "**Drag** to scroll.", comment: "串流导览文案；双星号标出强调文字")))]
+            if iPad { rows.append(row("applepencil", spans(String(localized: "**Apple Pencil** works as a mouse.", comment: "串流导览文案；双星号标出强调文字")))) }
             // Pinch to zoom (StreamZoom, PR #196): this device's alone, 1× to 5× about the pinch;
             // zoomed in, two fingers are the picture's and one finger still the Mac's.
-            rows.append(row("plus.magnifyingglass", [strong("Pinch"), plain(" to zoom the picture here, up to 5×. Zoomed in, two fingers move it, and one finger still taps, holds and drags on \(mac).")], new: true))
+            rows.append(row("plus.magnifyingglass", spans(String(localized: "**Pinch** to zoom the picture here, up to 5×. Zoomed in, two fingers move it, and one finger still taps, holds and drags on \(markedMac).", comment: "串流导览文案；插值为Mac 名称；双星号标出强调文字")), new: true))
             // The three-finger gestures (TrackpadGestures, the Mac's GestureChords): only while this
             // device's switch is on and the Mac takes them. The pinch and the spread are the Settings
             // panel's rows.
             if features.gestures {
-                rows.append(row("hand.raised.fingers.spread", [strong("Swipe with three fingers"), plain(": up for Mission Control, down for App Exposé, and sideways between Spaces.")], new: true))
+                rows.append(row("hand.raised.fingers.spread", spans(String(localized: "**Swipe with three fingers**: up for Mission Control, down for App Exposé, and sideways between Spaces.", comment: "串流导览文案；双星号标出强调文字")), new: true))
             }
             let hint: String
             switch layout {
-            case .landscape: hint = "The picture of \(mac) fills the screen below the bar."
-            case .portrait: hint = "The picture of \(mac) fills the top half of the screen."
-            case .phone: hint = "The picture of \(mac) is at the top of the screen."
+            case .landscape: hint = String(localized: "The picture of \(mac) fills the screen below the bar.", comment: "串流导览文案；插值为Mac 名称")
+            case .portrait: hint = String(localized: "The picture of \(mac) fills the top half of the screen.", comment: "串流导览文案；插值为Mac 名称")
+            case .phone: hint = String(localized: "The picture of \(mac) is at the top of the screen.", comment: "串流导览文案；插值为Mac 名称")
             }
-            return TourCopy(title: "Tap, Hold, Drag and Pinch", subtitle: "What you do here happens on \(mac).", rows: rows, hint: hint)
+            return TourCopy(title: String(localized: "Tap, Hold, Drag and Pinch", comment: "串流导览文案"), subtitle: String(localized: "What you do here happens on \(mac).", comment: "串流导览文案；插值为Mac 名称"), rows: rows, hint: hint)
         case .bar:
             var rows: [TourRow]
             if voiceOver {
-                rows = [row("hand.point.up.left", [strong("Each window"), plain(" has actions: close, minimize, full screen, and move left or right. Swipe up or down to hear them.")])]
+                rows = [row("hand.point.up.left", spans(String(localized: "**Each window** has actions: close, minimize, full screen, and move left or right. Swipe up or down to hear them.", comment: "串流导览文案；双星号标出强调文字")))]
             } else {
-                rows = [row("hand.point.up.left", [strong("Touch and hold"), plain(" a window to close, minimize or go full screen. Keep holding and drag to move it.")])]
+                rows = [row("hand.point.up.left", spans(String(localized: "**Touch and hold** a window to close, minimize or go full screen. Keep holding and drag to move it.", comment: "串流导览文案；双星号标出强调文字")))]
             }
             // A phone with Larger Picture has no thumbnails: windows come from Apps, which shows an
             // open app's next window when it is chosen again (AppDrawer).
             if layout == .phone && !thumbnails {
                 rows[0] = voiceOver
-                    ? row("magnifyingglass", [strong("Apps"), plain(" lists the apps on \(mac). Choose an open one again for its next window.")])
-                    : row("magnifyingglass", [strong("Apps"), plain(" lists the apps on \(mac): tap an open one again for its next window.")])
+                    ? row("magnifyingglass", spans(String(localized: "**Apps** lists the apps on \(markedMac). Choose an open one again for its next window.", comment: "串流导览文案；插值为Mac 名称；双星号标出强调文字")))
+                    : row("magnifyingglass", spans(String(localized: "**Apps** lists the apps on \(markedMac): tap an open one again for its next window.", comment: "串流导览文案；插值为Mac 名称；双星号标出强调文字")))
             }
             // The Menus button (MacMenuButton): only while it is on screen.
             if features.menus {
-                rows.append(row("filemenu.and.selection", [strong("Menus"), plain(" has the menu bar of the app you’re using on \(mac).")], new: true))
+                rows.append(row("filemenu.and.selection", spans(String(localized: "**Menus** has the menu bar of the app you’re using on \(markedMac).", comment: "串流导览文案；插值为Mac 名称；双星号标出强调文字")), new: true))
             }
             // Virtual Display, on by default in Sill for Mac since PR #236 (HostConfig.app), with Aa in it:
             // the only row that names Aa. Aa sizes a window, never the Desktop (dimmed over it:
             // TextScale.selectable), and on the virtual display a window is the panel ÷ Aa's scale.
             // On, it says so; off, where the switch is. Both forms are New: the tour never told of it.
-            let aa = voiceOver ? [plain("; "), strong("Text size"), plain(" then makes its text larger or smaller: swipe up or down on it.")]
-                               : [plain("; "), strong("Aa"), plain(" then sizes its text.")]
             if features.virtualDisplay {
-                rows.append(row("display", [strong("Virtual Display"), plain(" is on: a window you pick streams from a display of its own on \(mac), so it keeps updating when something covers it")] + aa, new: true))
+                rows.append(row("display", spans(voiceOver
+                    ? String(localized: "**Virtual Display** is on: a window you pick streams from a display of its own on \(markedMac), so it keeps updating when something covers it; **Text size** then makes its text larger or smaller: swipe up or down on it.", comment: "导览虚拟显示器说明；插值为 Mac 名称，双星号标出控件名称")
+                    : String(localized: "**Virtual Display** is on: a window you pick streams from a display of its own on \(markedMac), so it keeps updating when something covers it; **Aa** then sizes its text.", comment: "导览虚拟显示器说明；插值为 Mac 名称，双星号标出控件名称")), new: true))
             } else {
-                rows.append(row("display", [strong("Virtual Display"), plain(", in Settings, streams a window you pick from a display of its own on \(mac), so it keeps updating when something covers it")] + aa, new: true))
+                rows.append(row("display", spans(voiceOver
+                    ? String(localized: "**Virtual Display**, in Settings, streams a window you pick from a display of its own on \(markedMac), so it keeps updating when something covers it; **Text size** then makes its text larger or smaller: swipe up or down on it.", comment: "导览虚拟显示器设置说明；插值为 Mac 名称，双星号标出控件名称")
+                    : String(localized: "**Virtual Display**, in Settings, streams a window you pick from a display of its own on \(markedMac), so it keeps updating when something covers it; **Aa** then sizes its text.", comment: "导览虚拟显示器设置说明；插值为 Mac 名称，双星号标出控件名称")), new: true))
             }
             // The Keyboard button is the bar's sideways and a phone's upright; the halves' keyboard
             // is a cap, which the laptop card names. A hardware keyboard's keys go to the Mac without
             // it (HardwareKeyboardPolicy), and with one attached it brings iPadOS's keyboard bar.
             if layout != .portrait {
-                rows.append(row("keyboard", [strong("Keyboard"), plain(" brings up the on-screen keyboard to type on \(mac).")]))
-                rows.append(row("keyboard.badge.ellipsis", [strong("A hardware keyboard"), plain(" types on \(mac) by itself, Esc included, and "), strong("Keyboard"), plain(" then brings up the keyboard bar.")], new: true))
+                rows.append(row("keyboard", spans(String(localized: "**Keyboard** brings up the on-screen keyboard to type on \(markedMac).", comment: "串流导览文案；插值为Mac 名称；双星号标出强调文字"))))
+                rows.append(row("keyboard.badge.ellipsis", spans(String(localized: "**A hardware keyboard** types on \(markedMac) by itself, Esc included, and **Keyboard** then brings up the keyboard bar.", comment: "串流导览文案；插值为Mac 名称；双星号标出强调文字")), new: true))
             }
             let hint: String
             switch layout {
-            case .landscape: hint = "In the bar at the top, after Apps."
-            case .portrait: hint = "In the bar below the picture, after Apps."
-            case .phone where !thumbnails: hint = features.menus ? "Under the picture, in the row of buttons: Apps, Menus, Aa and Keyboard."
-                                                                 : "Under the picture, in the row of buttons: Apps, Aa and Keyboard."
-            case .phone: hint = features.menus ? "Under the picture: Aa and Keyboard in the first row, the windows and Menus in the second."
-                                               : "Under the picture: Aa and Keyboard in the first row, the windows in the second."
+            case .landscape: hint = String(localized: "In the bar at the top, after Apps.", comment: "串流导览文案")
+            case .portrait: hint = String(localized: "In the bar below the picture, after Apps.", comment: "串流导览文案")
+            case .phone where !thumbnails: hint = features.menus ? String(localized: "Under the picture, in the row of buttons: Apps, Menus, Aa and Keyboard.", comment: "串流导览文案")
+                                                                 : String(localized: "Under the picture, in the row of buttons: Apps, Aa and Keyboard.", comment: "串流导览文案")
+            case .phone: hint = features.menus ? String(localized: "Under the picture: Aa and Keyboard in the first row, the windows and Menus in the second.", comment: "串流导览文案")
+                                               : String(localized: "Under the picture: Aa and Keyboard in the first row, the windows in the second.", comment: "串流导览文案")
             }
-            let title = features.menus ? "Windows and Menus" : "Windows"
+            let title = features.menus ? String(localized: "Windows and Menus", comment: "串流导览文案") : String(localized: "Windows", comment: "串流导览文案")
             return TourCopy(title: title, subtitle: nil, rows: rows, hint: hint)
         case .sharing:
             // The clipboard both ways (docs/clipboard-plan.md) and the Mac's sound (docs/audio-plan.md),
@@ -656,71 +660,100 @@ enum TourPolicy {
             // speaks of them.
             var rows: [TourRow] = []
             if features.clipboard {
-                rows.append(row("doc.on.clipboard", [plain("With "), strong("Share Clipboard"), plain(", text you copy on \(mac) is ready to paste on this \(device).")], new: true))
-                rows.append(row("doc.on.doc", [plain("Copy on this \(device), then come back to Sill: "), strong("Paste on \(mac)"),
-                                               plain(", on the note Sill shows then or in Settings,"),
-                                               plain(features.pasteRightAway ? " puts it where \(mac)’s cursor is." : " sends it to \(mac)’s clipboard.")], new: true))
+                rows.append(row("doc.on.clipboard", spans(String(localized: "With **Share Clipboard**, text you copy on \(markedMac) is ready to paste on this \(markedDevice).", comment: "串流导览文案；插值为Mac 名称、设备类型；双星号标出强调文字")), new: true))
+                rows.append(row("doc.on.doc", spans(features.pasteRightAway
+                    ? String(localized: "Copy on this \(markedDevice), then come back to Sill: **Paste on \(markedMac)**, on the note Sill shows then or in Settings, puts it where \(markedMac)’s cursor is.", comment: "导览剪贴板粘贴说明；插值为设备类型和 Mac 名称，双星号标出控件名称")
+                    : String(localized: "Copy on this \(markedDevice), then come back to Sill: **Paste on \(markedMac)**, on the note Sill shows then or in Settings, sends it to \(markedMac)’s clipboard.", comment: "导览剪贴板发送说明；插值为设备类型和 Mac 名称，双星号标出控件名称")), new: true))
             }
             if features.sound {
-                rows.append(row("speaker.wave.2", [strong("Send Audio"), plain(", a beta, plays \(mac)’s sound here, and "), strong("Mute"), plain(" silences this \(device) alone.")], new: true))
+                rows.append(row("speaker.wave.2", spans(String(localized: "**Send Audio**, a beta, plays \(markedMac)’s sound here, and **Mute** silences this \(markedDevice) alone.", comment: "串流导览文案；插值为Mac 名称、设备类型；双星号标出强调文字")), new: true))
             }
             if !features.clipboard && !features.sound {
-                rows.append(row("arrow.down.circle", [strong("Update Sill on \(mac)"), plain(" to copy and paste between it and this \(device), and to hear its sound here.")], new: true))
+                rows.append(row("arrow.down.circle", spans(String(localized: "**Update Sill on \(markedMac)** to copy and paste between it and this \(markedDevice), and to hear its sound here.", comment: "串流导览文案；插值为Mac 名称、设备类型；双星号标出强调文字")), new: true))
             }
-            let title = features.clipboard == features.sound ? "Clipboard and Sound" : features.clipboard ? "Clipboard" : "Sound"
+            let title = features.clipboard == features.sound ? String(localized: "Clipboard and Sound", comment: "串流导览文案") : features.clipboard ? String(localized: "Clipboard", comment: "串流导览文案") : String(localized: "Sound", comment: "串流导览文案")
             return TourCopy(title: title, subtitle: nil, rows: rows,
-                            hint: layout == .phone ? "In Settings, the last button in the row under the picture." : "In Settings, the last button in the bar.")
+                            hint: layout == .phone ? String(localized: "In Settings, the last button in the row under the picture.", comment: "串流导览文案") : String(localized: "In Settings, the last button in the bar.", comment: "串流导览文案"))
         case .settings:
-            var rows = [row("xmark.circle", [strong("Disconnect"), plain(" is at the bottom of Settings.")]),
-                        row("questionmark.circle", [strong("Take the Tour"), plain(" is there too, to see this again.")])]
+            var rows = [row("xmark.circle", spans(String(localized: "**Disconnect** is at the bottom of Settings.", comment: "串流导览文案；双星号标出强调文字"))),
+                        row("questionmark.circle", spans(String(localized: "**Take the Tour** is there too, to see this again.", comment: "串流导览文案；双星号标出强调文字")))]
             // This device's own new switches (its Settings group): a finger's drag and a thumbnail's
             // hold, which VoiceOver has no way of its own to make.
             if !voiceOver {
-                rows.append(row("arrow.up.arrow.down", [strong("Reverse Scrolling"), plain(" turns a finger’s drag and the on-screen trackpad’s two-finger scroll around.")], new: true))
-                rows.append(row("timer", [strong("Hold to Show Window Controls"), plain(" sets how long you hold a window’s thumbnail before its controls show.")], new: true))
+                rows.append(row("arrow.up.arrow.down", spans(String(localized: "**Reverse Scrolling** turns a finger’s drag and the on-screen trackpad’s two-finger scroll around.", comment: "串流导览文案；双星号标出强调文字")), new: true))
+                rows.append(row("timer", spans(String(localized: "**Hold to Show Window Controls** sets how long you hold a window’s thumbnail before its controls show.", comment: "串流导览文案；双星号标出强调文字")), new: true))
             }
             if layout == .landscape {
-                let turn = keysOnItsSide ? "Turn your \(device) on its side" : "Hold your \(device) upright"
-                rows.append(row(iPad ? "ipad" : "iphone", [strong(turn), plain(" for a trackpad and keys.")]))
+                rows.append(row(iPad ? "ipad" : "iphone", spans(keysOnItsSide
+                    ? String(localized: "**Turn your \(markedDevice) on its side** for a trackpad and keys.", comment: "导览横放设备的提示；插值为设备类型，双星号标出强调文字")
+                    : String(localized: "**Hold your \(markedDevice) upright** for a trackpad and keys.", comment: "导览竖放设备的提示；插值为设备类型，双星号标出强调文字"))))
             }
-            return TourCopy(title: "Settings", subtitle: nil, rows: rows,
-                            hint: layout == .phone ? "The last button in the row under the picture." : "The last button in the bar.")
+            return TourCopy(title: String(localized: "Settings", comment: "串流导览文案"), subtitle: nil, rows: rows,
+                            hint: layout == .phone ? String(localized: "The last button in the row under the picture.", comment: "串流导览文案") : String(localized: "The last button in the bar.", comment: "串流导览文案"))
         case .laptop:
             var rows: [TourRow]
             if voiceOver {
-                rows = [row("command", [strong("cmd, opt, ctrl and shift"), plain(" stay on for the next key: cmd, then C, copies.")],
-                            spoken: "Command, Option, Control and Shift stay on for the next key: Command, then C, copies.")]
+                rows = [row("command", spans(String(localized: "**cmd, opt, ctrl and shift** stay on for the next key: cmd, then C, copies.", comment: "串流导览文案；双星号标出强调文字")),
+                            spoken: String(localized: "Command, Option, Control and Shift stay on for the next key: Command, then C, copies.", comment: "串流导览文案"))]
             } else {
-                rows = [row("command", [strong("cmd, opt, ctrl and shift"), plain(" stay on for the next key or trackpad click: tap cmd, then C, to copy.")],
-                            spoken: "Command, Option, Control and Shift stay on for the next key or trackpad click: tap Command, then C, to copy.")]
+                rows = [row("command", spans(String(localized: "**cmd, opt, ctrl and shift** stay on for the next key or trackpad click: tap cmd, then C, to copy.", comment: "串流导览文案；双星号标出强调文字")),
+                            spoken: String(localized: "Command, Option, Control and Shift stay on for the next key or trackpad click: tap Command, then C, to copy.", comment: "串流导览文案"))]
             }
             // A phone's keyboard is row 1's button, which the bar card names; the halves' is a cap.
             if layout != .phone {
-                rows.append(row("keyboard", [strong("The keyboard key"), plain(" brings up the on-screen keyboard to type on \(mac).")]))
-                rows.append(row("keyboard.badge.ellipsis", [strong("A hardware keyboard"), plain(" types on \(mac) by itself, Esc included, and "), strong("the keyboard key"), plain(" then brings up the keyboard bar.")], new: true))
+                rows.append(row("keyboard", spans(String(localized: "**The keyboard key** brings up the on-screen keyboard to type on \(markedMac).", comment: "串流导览文案；插值为Mac 名称；双星号标出强调文字"))))
+                rows.append(row("keyboard.badge.ellipsis", spans(String(localized: "**A hardware keyboard** types on \(markedMac) by itself, Esc included, and **the keyboard key** then brings up the keyboard bar.", comment: "串流导览文案；插值为Mac 名称；双星号标出强调文字")), new: true))
             }
             if !voiceOver {
-                rows.append(row("cursorarrow.click.2", [strong("Tap with two fingers"), plain(" on the trackpad to right-click.")]))
-                rows.append(row("hand.draw", [strong("Touch and hold"), plain(" the trackpad, "), strong("then drag"), plain(", to move a window or select text.")]))
+                rows.append(row("cursorarrow.click.2", spans(String(localized: "**Tap with two fingers** on the trackpad to right-click.", comment: "串流导览文案；双星号标出强调文字"))))
+                rows.append(row("hand.draw", spans(String(localized: "**Touch and hold** the trackpad, **then drag**, to move a window or select text.", comment: "串流导览文案；双星号标出强调文字"))))
             }
             // Larger Picture (docs/larger-picture-plan.md), where the Settings panel offers it: on this
             // card, upright's alone, which a phone is always offered at its first upright turn (the
             // Settings card's would miss a tour taken sideways).
             if layout == .phone && features.largerPicture {
-                rows.append(row("rectangle.expand.vertical", [strong("Larger Picture"), plain(", in Settings: a window’s picture takes the place of the thumbnails and reaches down to where the keyboard comes up.")], new: true))
+                rows.append(row("rectangle.expand.vertical", spans(String(localized: "**Larger Picture**, in Settings: a window’s picture takes the place of the thumbnails and reaches down to where the keyboard comes up.", comment: "串流导览文案；双星号标出强调文字")), new: true))
             }
-            let subtitle = keysOnItsSide ? "On its side, Sill adds keys and a trackpad." : "Upright, Sill adds keys and a trackpad."
+            let subtitle = keysOnItsSide ? String(localized: "On its side, Sill adds keys and a trackpad.", comment: "串流导览文案") : String(localized: "Upright, Sill adds keys and a trackpad.", comment: "串流导览文案")
             let hint: String
             switch layout {
-            case .landscape, .portrait: hint = "Below the bar: the row of keys, then the trackpad."
-            case .phone: hint = thumbnails ? "Under the windows: the row of keys, then the trackpad." : "Under the buttons: the row of keys, then the trackpad."
+            case .landscape, .portrait: hint = String(localized: "Below the bar: the row of keys, then the trackpad.", comment: "串流导览文案")
+            case .phone: hint = thumbnails ? String(localized: "Under the windows: the row of keys, then the trackpad.", comment: "串流导览文案") : String(localized: "Under the buttons: the row of keys, then the trackpad.", comment: "串流导览文案")
             }
-            return TourCopy(title: "Keys and Trackpad", subtitle: firstOfRun ? subtitle : nil, rows: rows, hint: hint)
+            return TourCopy(title: String(localized: "Keys and Trackpad", comment: "串流导览文案"), subtitle: firstOfRun ? subtitle : nil, rows: rows, hint: hint)
         }
     }
 
-    private static func strong(_ text: String) -> TourSpan { TourSpan(text: text, strong: true) }
-    private static func plain(_ text: String) -> TourSpan { TourSpan(text: text, strong: false) }
+    // 双星号只标记翻译句中的强调文字；动态名称先转义，避免名称里的星号改变格式。
+    private static func escapedMarkup(_ text: String) -> String {
+        text.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "*", with: "\\*")
+    }
+
+    private static func spans(_ text: String) -> [TourSpan] {
+        let characters = Array(text)
+        var result: [TourSpan] = []
+        var current = ""
+        var strong = false
+        var index = 0
+        while index < characters.count {
+            let character = characters[index]
+            if character == "\\", index + 1 < characters.count,
+               characters[index + 1] == "\\" || characters[index + 1] == "*" {
+                current.append(characters[index + 1])
+                index += 2
+            } else if character == "*", index + 1 < characters.count, characters[index + 1] == "*" {
+                if !current.isEmpty { result.append(TourSpan(text: current, strong: strong)) }
+                current = ""
+                strong.toggle()
+                index += 2
+            } else {
+                current.append(character)
+                index += 1
+            }
+        }
+        if !current.isEmpty { result.append(TourSpan(text: current, strong: strong)) }
+        return result
+    }
     /// A row; `new`: about what this version adds, so "New: " goes ahead of its words, the same in
     /// what VoiceOver reads.
     private static func row(_ symbol: String, _ spans: [TourSpan], spoken: String? = nil, new: Bool = false) -> TourRow {

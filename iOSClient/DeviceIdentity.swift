@@ -55,7 +55,7 @@ enum DeviceIdentity {
         let key: SecKey
         switch DeviceKeyPolicy.load(answer) {
         case .use:
-            guard let stored else { throw IdentityError("the Keychain gave back no key") }
+            guard let stored else { throw IdentityError(String(localized: "the Keychain gave back no key", comment: "配对失败提示中的密钥错误原因：钥匙串没有返回密钥")) }
             key = stored
         case .make:
             key = try makeKey()
@@ -66,9 +66,9 @@ enum DeviceIdentity {
             #if DEBUG
             print("device key: the Keychain didn’t answer (\(status)); no new key made")
             #endif
-            throw IdentityError("the Keychain didn’t answer: \(status)")
+            throw IdentityError(String(localized: "the Keychain didn’t answer: \(status)", comment: "配对失败提示中的密钥错误原因，插值为钥匙串状态码"))
         }
-        guard let id = RemoteIdentity(privateKey: key) else { throw IdentityError("the key couldn’t make a certificate") }
+        guard let id = RemoteIdentity(privateKey: key) else { throw IdentityError(String(localized: "the key couldn’t make a certificate", comment: "配对失败提示中的密钥错误原因：无法创建证书")) }
         cached = id
         return id
     }
@@ -186,7 +186,9 @@ enum DeviceIdentity {
         attributes[kSecPrivateKeyAttrs as String] = privateAttributes
         var error: Unmanaged<CFError>?
         guard let key = SecKeyCreateRandomKey(attributes as CFDictionary, &error) else {
-            throw IdentityError("no key could be made (\(error.map { "\($0.takeRetainedValue())" } ?? "no reason given"))")
+            let reason = error.map { "\($0.takeRetainedValue())" }
+            throw IdentityError(reason.map { String(localized: "no key could be made (\($0))", comment: "配对失败提示中的密钥错误原因，插值为系统错误说明") }
+                ?? String(localized: "no key could be made (no reason given)", comment: "配对失败提示中的密钥错误原因：系统未提供原因"))
         }
         var added: Int32?
         for _ in 0..<2 {      // DeviceKeyPolicy.made: the read-back, at most one add, the read-back again
@@ -204,9 +206,9 @@ enum DeviceIdentity {
                 // Deleted again by its reference where it was kept after all, so it never turns up
                 // beside a key a pairing used.
                 SecItemDelete([kSecClass as String: kSecClassKey, kSecValueRef as String: key] as CFDictionary)
-                throw IdentityError("the Keychain didn’t keep it: \(status)")
+                throw IdentityError(String(localized: "the Keychain didn’t keep it: \(status)", comment: "配对失败提示中的密钥保存错误，插值为钥匙串状态码"))
             }
         }
-        throw IdentityError("the Keychain didn’t keep it")
+        throw IdentityError(String(localized: "the Keychain didn’t keep it", comment: "配对失败提示中的密钥错误原因：钥匙串未保存密钥"))
     }
 }

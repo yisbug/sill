@@ -1441,8 +1441,8 @@ private struct TopBar: View {
 
     var body: some View {
         HStack(spacing: metrics.gap) {
-            button(open: drawerOpen, symbol: "magnifyingglass", label: "Apps",
-                   accessibilityLabel: drawerOpen ? "Close the app list" : "Open the app list",
+            button(open: drawerOpen, symbol: "magnifyingglass", label: String(localized: "Apps", comment: "串流工具栏：按钮名称"),
+                   accessibilityLabel: drawerOpen ? String(localized: "Close the app list", comment: "串流工具栏：无障碍操作标签") : String(localized: "Open the app list", comment: "串流工具栏：无障碍操作标签"),
                    action: {
                        setSettings(false, false)
                        withAnimation(.easeOut(duration: 0.18)) { drawerOpen.toggle() }
@@ -1478,22 +1478,22 @@ private struct TopBar: View {
                              offered: client.textScaleOffersOff, available: client.textScaleSelectable)
                 .tourTarget(.textSize)
 
-            button(open: keyboardShown, symbol: "keyboard", label: "Keyboard",
-                   accessibilityLabel: keyboardShown ? "Hide the keyboard" : "Show the keyboard",
+            button(open: keyboardShown, symbol: "keyboard", label: String(localized: "Keyboard", comment: "串流工具栏：按钮名称"),
+                   accessibilityLabel: keyboardShown ? String(localized: "Hide the keyboard", comment: "串流工具栏：无障碍操作标签") : String(localized: "Show the keyboard", comment: "串流工具栏：无障碍操作标签"),
                    action: { setSettings(false, false); toggleKeyboard() })
                 .opacity(scaleOpen ? 0 : 1)
                 .allowsHitTesting(!scaleOpen)
                 .tourTarget(.keyboard)
 
-            button(open: client.active == .desktop, symbol: "desktopcomputer", label: "Desktop",
-                   accessibilityLabel: "Show the full Mac desktop",
+            button(open: client.active == .desktop, symbol: "desktopcomputer", label: String(localized: "Desktop", comment: "串流工具栏：按钮名称"),
+                   accessibilityLabel: String(localized: "Show the full Mac desktop", comment: "串流工具栏：显示桌面的无障碍标签"),
                    action: { client.select(.desktop) })
                 .opacity(scaleOpen ? 0 : 1)
                 .allowsHitTesting(!scaleOpen)
 
             // Leave's old slot: Disconnect is the Settings panel's pinned last row now.
-            button(open: settingsOpen, symbol: "gearshape", label: "Settings",
-                   accessibilityLabel: settingsOpen ? "Close settings" : "Settings for \(client.macName.isEmpty ? "the Mac" : client.macName)",
+            button(open: settingsOpen, symbol: "gearshape", label: String(localized: "Settings", comment: "串流工具栏：按钮名称"),
+                   accessibilityLabel: settingsOpen ? String(localized: "Close settings", comment: "串流工具栏：关闭设置的无障碍标签") : String(localized: "Settings for \(client.macName.isEmpty ? String(localized: "the Mac", comment: "串流工具栏：Mac 名称缺失时的称呼") : client.macName)", comment: "串流工具栏：打开设置的无障碍标签，插值为 Mac 名称"),
                    action: { setSettings(!settingsOpen, true) })
                 .opacity(scaleOpen ? 0 : 1)
                 .allowsHitTesting(!scaleOpen)
@@ -1728,7 +1728,7 @@ struct TextScaleControl: View {
                     Rectangle().fill(Palette.barLabel.opacity(0.6))
                         .frame(width: 2, height: 9)
                         .offset(x: x(value) - 1, y: midY - 4.5)
-                    Text(value == TextScale.off ? "Off" : TextScale.number(value))
+                    Text(value == TextScale.off ? String(localized: "Off", comment: "文本大小滑杆：关闭自动调整") : TextScale.number(value))
                         .font(.system(size: 10, weight: .medium))
                         .foregroundStyle(value == live ? Palette.text : Palette.barLabel)
                         .frame(width: step, alignment: .center)
@@ -2013,9 +2013,9 @@ struct WindowLightsMenu: View {
             ZStack {
                 Color.clear.contentShape(Rectangle()).onTapGesture(perform: dismiss)
                 HStack(spacing: 6) {
-                    light(.close, Color(hex: 0xFF5F57), "xmark", "Close")
-                    light(.minimize, Color(hex: 0xFEBC2E), "minus", "Minimize")
-                    light(.fullScreen, Color(hex: 0x28C840), "arrow.up.left.and.arrow.down.right", "Full Screen")
+                    light(.close, Color(hex: 0xFF5F57), "xmark", String(localized: "Close", comment: "窗口控制菜单：按钮名称"))
+                    light(.minimize, Color(hex: 0xFEBC2E), "minus", String(localized: "Minimize", comment: "窗口控制菜单：按钮名称"))
+                    light(.fullScreen, Color(hex: 0x28C840), "arrow.up.left.and.arrow.down.right", String(localized: "Full Screen", comment: "窗口控制菜单：按钮名称"))
                 }
                 .padding(.horizontal, 10)
                 .frame(width: w, height: h)
@@ -2074,7 +2074,7 @@ private struct WindowThumbnail: View {
         // Two stages: one long chain of modifiers here is more than the type checker will take.
         card
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel("\(window.appName) window: \(window.title)" + (isActive ? ", showing now" : ""))
+            .accessibilityLabel(isActive ? String(localized: "\(window.appName) window: \(window.title), showing now", comment: "窗口缩略图：当前窗口的无障碍标签，插值为应用名和窗口标题") : String(localized: "\(window.appName) window: \(window.title)", comment: "窗口缩略图：无障碍标签，插值为应用名和窗口标题"))
             .accessibilityAddTraits(.isButton)
             .accessibilityAction(.default) { onSelect() }
             .accessibilityAction(named: "Close window") { onCommand(.close) }
@@ -2193,12 +2193,12 @@ struct AppDrawer: View {
                 ScrollView {
                     VStack(spacing: 6) {
                         if !openApps.isEmpty {
-                            header("Open now")
+                            header(String(localized: "Open now", comment: "应用抽屉：已打开应用分组标题"))
                             ForEach(openApps) { app in
                                 DrawerRow(height: 50,
                                           highlighted: app.bundleID == activeBundleID,
                                           title: app.name,
-                                          trailing: app.windows.count == 1 ? "1 window" : "\(app.windows.count) windows",
+                                          trailing: app.windows.count == 1 ? String(localized: "1 window", comment: "应用抽屉：单个窗口数量") : String(localized: "\(app.windows.count) windows", comment: "应用抽屉：窗口数量，插值为数量"),
                                           action: { show(app) }) {
                                     AppIcon(image: client.icons[app.bundleID], name: app.name,
                                             size: 32, radius: 9, fontSize: 12)
@@ -2206,7 +2206,7 @@ struct AppDrawer: View {
                             }
                         }
                         if !closedApps.isEmpty {
-                            header("All apps").padding(.top, 2)
+                            header(String(localized: "All apps", comment: "应用抽屉：全部应用分组标题")).padding(.top, 2)
                             ForEach(closedApps) { app in
                                 DrawerRow(height: 46, highlighted: false, title: app.name, trailing: nil,
                                           action: { client.launch(bundleID: app.bundleID) }) {

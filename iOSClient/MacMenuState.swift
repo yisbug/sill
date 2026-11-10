@@ -100,7 +100,7 @@ struct MacMenuState: Equatable {
         let note: String
         /// The Mac refused it (a `pressed: false` answer); false: never sent (stale here).
         let byMac: Bool
-        var announcement: String { "Couldn’t choose \(title). \(note)" }
+        var announcement: String { String(localized: "Couldn’t choose \(title). \(note)", comment: "菜单操作失败的无障碍播报，插值为菜单项标题和原因") }
     }
 
     /// What `fetch` makes of an opened menu.
@@ -129,11 +129,15 @@ struct MacMenuState: Equatable {
         var note: String?
     }
 
-    static let changedNote = "The menus changed. Open the menu again."
-    static let notConnected = "Not connected."
-    static let noItems = "No items"
-    static func noAnswer(mac: String) -> String { "\(mac.isEmpty ? "The Mac" : mac) didn’t answer. Open the menu again." }
-    static func moreOnTheMac(_ count: Int) -> String { "\(count) more on the Mac" }
+    static let changedNote = String(localized: "The menus changed. Open the menu again.", comment: "Mac 菜单变化后要求重新打开菜单的提示")
+    static let notConnected = String(localized: "Not connected.", comment: "Mac 菜单在连接断开时的提示")
+    static let noItems = String(localized: "No items", comment: "Mac 菜单没有项目时的提示")
+    static func noAnswer(mac: String) -> String {
+        mac.isEmpty
+            ? String(localized: "The Mac didn’t answer. Open the menu again.", comment: "Mac 名称未知时的菜单请求超时提示")
+            : String(localized: "\(mac) didn’t answer. Open the menu again.", comment: "菜单请求超时提示，插值为 Mac 名称")
+    }
+    static func moreOnTheMac(_ count: Int) -> String { String(localized: "\(count) more on the Mac", comment: "菜单末尾的省略项目提示，插值为 Mac 上其余项目数量") }
     static let maxMenus = 32
     static let titleLimit = 100, keyLimit = 16, noteLimit = 300
     /// Choices waiting for their answer, at most (each is answered, or the connection ends).
@@ -188,7 +192,10 @@ struct MacMenuState: Equatable {
             app = Self.clean(m.app, limit: SafeText.labelLimit)
             stale = m.stale == true
             note = Self.clean(m.note, limit: Self.noteLimit)
-            if stale, note == nil { note = "\(app ?? "The app") isn’t responding." }
+            if stale, note == nil {
+                note = app.map { String(localized: "\($0) isn’t responding.", comment: "Mac 菜单所属应用无响应的提示，插值为应用名称") }
+                    ?? String(localized: "The app isn’t responding.", comment: "Mac 菜单所属应用名称未知时的无响应提示")
+            }
             menus = Self.topRows(items, version: v)
             // Rule 2: what was asked of another tree is answered here.
             var done: [Done] = []

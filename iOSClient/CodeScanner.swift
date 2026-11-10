@@ -86,10 +86,10 @@ struct CodeScanner: View {
                 }
             }
             .accessibilityElement(children: denied ? .contain : .ignore)
-            .accessibilityLabel(denied ? "" : mac.map(DiscoveryPolicy.HomeCopy.viewfinderLabel) ?? "Camera. Point it at the code on your Mac.")
+            .accessibilityLabel(denied ? "" : mac.map(DiscoveryPolicy.HomeCopy.viewfinderLabel) ?? String(localized: "Camera. Point it at the code on your Mac.", comment: "配对扫码取景框的无障碍提示"))
             if !denied {
-                Text(notSill ? "That’s not a Sill code." : retryNeedsTap ? "Tap the code to try again."
-                     : mac.map(DiscoveryPolicy.HomeCopy.viewfinderCaption) ?? "Point at the code on your Mac")
+                Text(notSill ? String(localized: "That’s not a Sill code.", comment: "扫码内容不是 Sill 配对码时的提示") : retryNeedsTap ? String(localized: "Tap the code to try again.", comment: "扫码配对失败后手动重试的提示")
+                     : mac.map(DiscoveryPolicy.HomeCopy.viewfinderCaption) ?? String(localized: "Point at the code on your Mac", comment: "配对扫码取景框下方的提示"))
                     .font(.system(size: 13))
                     .foregroundStyle(notSill ? Color.orange : Palette.muted)
                     .accessibilityHidden(!notSill && !retryNeedsTap)
@@ -114,7 +114,7 @@ struct CodeScanner: View {
         } else if !notSill {
             notSill = true
             notSillToken += 1
-            AccessibilityNotification.Announcement("That’s not a Sill code.").post()
+            AccessibilityNotification.Announcement(String(localized: "That’s not a Sill code.", comment: "扫码内容不是 Sill 配对码时的无障碍播报")).post()
         }
     }
 

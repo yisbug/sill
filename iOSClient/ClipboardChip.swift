@@ -11,7 +11,7 @@ struct ClipboardChip: View {
     /// Paste on ‹Mac› Right Away (StreamClient.pasteRightAwayOn), for the words.
     @AppStorage(StreamClient.pasteRightAwayKey) private var pasteRightAway = true
 
-    private var mac: String { client.macName.isEmpty ? "the Mac" : client.macName }
+    private var mac: String { client.macName.isEmpty ? String(localized: "the Mac", comment: "剪贴板提示中尚未取得名称的 Mac") : client.macName }
 
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -108,7 +108,7 @@ struct ClipboardPasteButton: View {
         .buttonBorderShape(.capsule)
         .labelStyle(.titleAndIcon)
         .tint(Palette.accent)
-        .accessibilityHint(ClipboardPolicy.Copy.pasteHint(mac: client.macName.isEmpty ? "the Mac" : client.macName,
+        .accessibilityHint(ClipboardPolicy.Copy.pasteHint(mac: client.macName.isEmpty ? String(localized: "the Mac", comment: "粘贴按钮无障碍提示中尚未取得名称的 Mac") : client.macName,
                                                           device: StreamClient.deviceWord, rightAway: pasteRightAway))
     }
 }

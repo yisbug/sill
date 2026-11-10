@@ -78,7 +78,7 @@ struct HostSettingsPanel: View {
     /// its rows do the gestures instead.
     @State private var voiceOver = HostSettingsPanel.voiceOverRunning
 
-    private var mac: String { client.macName.isEmpty ? "the Mac" : client.macName }
+    private var mac: String { client.macName.isEmpty ? String(localized: "the Mac", comment: "主机设置面板：Mac 名称缺失时的称呼") : client.macName }
     private static let shape = RoundedRectangle(cornerRadius: 20, style: .continuous)
     /// DEBUG `-SillSettingsEnd 1`: the rows start scrolled to their end, so a photo of a short
     /// screen shows the last groups (Direct Wireless, Away from home, This iPad, Take the Tour).
@@ -163,7 +163,7 @@ struct HostSettingsPanel: View {
         // is in the footer or the note. The haptic is a no-op on an iPad.
         .sensoryFeedback(.warning, trigger: client.settingsRefusals)
         .onChange(of: client.settingsRefusals) { _, _ in
-            AccessibilityNotification.Announcement("\(mac) kept its setting").post()
+            AccessibilityNotification.Announcement(String(localized: "\(mac) kept its setting", comment: "主机设置面板：设置被拒绝的无障碍播报，插值为 Mac 名称")).post()
         }
         .onChange(of: client.settingsProblem) { _, problem in
             if let problem { AccessibilityNotification.Announcement(problem).post() }
@@ -290,7 +290,7 @@ struct HostSettingsPanel: View {
                 if state.softwareEncoder {
                     // Neither a restart nor a return is promised: hosts before 2026-09-25 keep the
                     // software encoder until they relaunch, newer ones go back by themselves.
-                    Callout(text: "\(mac)’s hardware encoder is busy or not responding, so for now streams run at up to 60 fps at Standard.")
+                    Callout(text: String(localized: "\(mac)’s hardware encoder is busy or not responding, so for now streams run at up to 60 fps at Standard.", comment: "主机设置面板：硬件编码器忙碌提示，插值为 Mac 名称"))
                 }
                 if let problem = client.settingsProblem {
                     Callout(text: problem)
@@ -303,7 +303,7 @@ struct HostSettingsPanel: View {
                         Callout.Action(title: b.title, spoken: b.spoken) { client.changeSettings(b.change) }
                     })
                 } else if AwayCopy.showsRttCallout(away: state.away, remote: remoteRoute != nil, slowLink: client.slowLink) {
-                    Callout(text: "The picture is arriving slowly from \(mac). Choose Low quality or Standard resolution.")
+                    Callout(text: String(localized: "The picture is arriving slowly from \(mac). Choose Low quality or Standard resolution.", comment: "主机设置面板：连接缓慢提示，插值为 Mac 名称"))
                 }
                 streamRows(shown)
                 Footnote(text: streamFooter)
@@ -315,15 +315,15 @@ struct HostSettingsPanel: View {
                 // what it trades away.
                 Rows {
                     Toggle(isOn: binding(shown.prioritizeSpeed) { HostSettingsChange(prioritizeSpeed: $0) }) {
-                        RowTitle(title: "Prioritize Encoding Speed", since: client.settings.pendingSince(.prioritizeSpeed))
+                        RowTitle(title: String(localized: "Prioritize Encoding Speed", comment: "主机设置面板：优先编码速度行标题"), since: client.settings.pendingSince(.prioritizeSpeed))
                     }
                     .rowFrame()
                 }
-                Footnote(text: "Lower latency when \(mac) is busy, at a softer picture.")
+                Footnote(text: String(localized: "Lower latency when \(mac) is busy, at a softer picture.", comment: "主机设置面板：编码速度说明，插值为 Mac 名称"))
                 Rows {
                     let unavailable = !state.virtualDisplayAvailable && !shown.virtualDisplay
                     Toggle(isOn: binding(shown.virtualDisplay) { HostSettingsChange(virtualDisplay: $0) }) {
-                        RowTitle(title: "Virtual Display", since: client.settings.pendingSince(.virtualDisplay))
+                        RowTitle(title: String(localized: "Virtual Display", comment: "主机设置面板：虚拟显示器行标题"), since: client.settings.pendingSince(.virtualDisplay))
                     }
                     // Off and impossible on this host: disabled, the reason under it. On, it can
                     // always be turned off, as from the Mac's own menu.
@@ -334,9 +334,9 @@ struct HostSettingsPanel: View {
                 if let note = state.virtualDisplayNote {
                     Footnote(text: note, warning: true)
                 } else {
-                    Footnote(text: "The window you pick moves onto an invisible display on \(mac) while it streams, so it keeps updating when covered.")
+                    Footnote(text: String(localized: "The window you pick moves onto an invisible display on \(mac) while it streams, so it keeps updating when covered.", comment: "主机设置面板：虚拟显示器说明，插值为 Mac 名称"))
                 }
-                Footnote(text: "Applies to every device streaming from \(mac). The stream restarts for a moment.")
+                Footnote(text: String(localized: "Applies to every device streaming from \(mac). The stream restarts for a moment.", comment: "主机设置面板：主机设置影响范围，插值为 Mac 名称"))
                 // Send Audio (docs/audio-plan.md §7.7): after the closing footer, whose "the stream restarts"
                 // is not true of it (the sound has a stream of its own), like Direct Wireless after it. Set
                 // from here for every device, as Quality is (Noah, 2026-10-27: the plan's Q8 revised): the
@@ -358,7 +358,7 @@ struct HostSettingsPanel: View {
                     .disabled(send == nil)
                     .accessibilityLabel("Send Audio, beta")
                     .accessibilityInputLabels(["Send Audio"])
-                    .accessibilityHint(send == nil ? "Update Sill on \(mac) to use this." : "")
+                    .accessibilityHint(send == nil ? String(localized: "Update Sill on \(mac) to use this.", comment: "主机设置面板：设置不可用或断线提示，插值为 Mac 名称或设备类型") : "")
                     .rowFrame()
                     // Mute, right under Send Audio (Noah, 2026-10-27): this device's own (`soundMuted`,
                     // off by default, remembered, never sent), the only control of the Mac's sound on the
@@ -394,10 +394,10 @@ struct HostSettingsPanel: View {
                     let locked = Self.directWirelessLock(remote: remoteRoute != nil, takes: state.takesDirectWireless, mac: mac)
                     Rows {
                         Toggle(isOn: binding(direct) { HostSettingsChange(directWireless: $0) }) {
-                            RowTitle(title: "Direct Wireless Connection", since: client.settings.pendingSince(.directWireless))
+                            RowTitle(title: String(localized: "Direct Wireless Connection", comment: "主机设置面板：直接无线连接行标题"), since: client.settings.pendingSince(.directWireless))
                         }
                         // A warning about turning it off, so only while the switch shows on and works.
-                        .accessibilityHint(locked == nil && client.connectedDirectly && direct ? "Turning this off disconnects this \(device)." : "")
+                        .accessibilityHint(locked == nil && client.connectedDirectly && direct ? String(localized: "Turning this off disconnects this \(device).", comment: "主机设置面板：设置不可用或断线提示，插值为 Mac 名称或设备类型") : "")
                         // From afar, or unpaired, the Mac refuses it anyway: how devices near the Mac
                         // reach it is the Mac's and its paired devices' to change.
                         .disabled(locked != nil)
@@ -406,7 +406,7 @@ struct HostSettingsPanel: View {
                     Footnote(text: locked ?? directFooter(on: direct))
                 }
                 if !state.persistent {
-                    Footnote(text: "SillHost keeps these until it quits.")
+                    Footnote(text: String(localized: "SillHost keeps these until it quits.", comment: "主机设置面板：设置保留期限说明"))
                 }
                 awayFromHome
             } else if olderMac {
@@ -456,7 +456,7 @@ struct HostSettingsPanel: View {
     /// before anything scrolls.
     private func streamRows(_ shown: StreamSettings) -> some View {
         Rows {
-            AdaptiveRow(title: "Quality", since: client.settings.pendingSince(.bitrate)) {
+            AdaptiveRow(title: String(localized: "Quality", comment: "主机设置面板：串流参数行标题"), since: client.settings.pendingSince(.bitrate)) {
                 Picker("Quality", selection: binding(shown.bitrate) { HostSettingsChange(bitrate: $0) }) {
                     ForEach(QualityPreset.allCases) { Text($0.title).tag($0.rawValue) }
                     if QualityPreset(rawValue: shown.bitrate) == nil {
@@ -468,7 +468,7 @@ struct HostSettingsPanel: View {
                 .fixedSize()     // one line; the row stacks instead when it does not fit beside the title
             }
             RowDivider()
-            AdaptiveRow(title: "Resolution", since: client.settings.pendingSince(.captureScale)) {
+            AdaptiveRow(title: String(localized: "Resolution", comment: "主机设置面板：串流参数行标题"), since: client.settings.pendingSince(.captureScale)) {
                 Picker("Resolution", selection: binding(shown.captureScale) { HostSettingsChange(captureScale: $0) }) {
                     Text("Retina").tag(2.0)
                     Text("Standard").tag(1.0)
@@ -477,7 +477,7 @@ struct HostSettingsPanel: View {
                 .fixedSize()
             }
             RowDivider()
-            AdaptiveRow(title: "Frame Rate", since: client.settings.pendingSince(.maxFPS)) {
+            AdaptiveRow(title: String(localized: "Frame Rate", comment: "主机设置面板：串流参数行标题"), since: client.settings.pendingSince(.maxFPS)) {
                 // A Mac-held value such as 90 selects no segment, as on the Mac.
                 Picker("Frame Rate", selection: binding(shown.maxFPS) { HostSettingsChange(maxFPS: $0) }) {
                     Text("60 fps").tag(60)
@@ -526,9 +526,9 @@ struct HostSettingsPanel: View {
                 }
                 switch reach {
                 case .connected:
-                    if let r = remoteRoute { Footnote(text: "Connected \(r.phrase).") }
+                    if let r = remoteRoute { Footnote(text: String(localized: "Connected \(r.phrase).", comment: "主机设置面板：远程连接说明，插值为连接方式")) }
                 case .reaches:
-                    Footnote(text: "Away from home, Sill reaches \(mac) \(Self.reach(info)).")
+                    Footnote(text: String(localized: "Away from home, Sill reaches \(mac) \(Self.reach(info)).", comment: "主机设置面板：远程访问说明，插值为 Mac 名称和访问方式"))
                 case .turnOnRemoteAccess:
                     Footnote(text: Self.turnOnRemoteAccess(mac))
                 }
@@ -544,7 +544,7 @@ struct HostSettingsPanel: View {
                     .rowFrame()
                 }
                 Footnote(text: atHome ? DiscoveryPolicy.HomeCopy.pairThisDeviceAtHome(mac: mac, device: device)
-                                      : "Pair once to reach \(mac) through your VPN or the internet. \(mac) shows a code; scan it with this \(device).")
+                                      : String(localized: "Pair once to reach \(mac) through your VPN or the internet. \(mac) shows a code; scan it with this \(device).", comment: "主机设置面板：配对说明，插值为 Mac 名称和设备类型"))
             case .turnOnRemoteAccess:
                 Footnote(text: Self.turnOnRemoteAccess(mac))
             }
@@ -553,7 +553,7 @@ struct HostSettingsPanel: View {
 
     /// With Remote Access off on the Mac: how to reach it away from home.
     static func turnOnRemoteAccess(_ mac: String) -> String {
-        "To reach \(mac) away from home, turn on Remote Access in Sill’s Settings on the Mac."
+        String(localized: "To reach \(mac) away from home, turn on Remote Access in Sill’s Settings on the Mac.", comment: "主机设置面板：开启远程访问说明，插值为 Mac 名称")
     }
 
     // MARK: This device
@@ -654,15 +654,15 @@ struct HostSettingsPanel: View {
     /// the same; either way, that this device is muted while it is; for a Mac without sound (nil), what
     /// to update (no Mute row then). Each starts with "Beta.".
     static func sendAudioFooter(_ send: Bool?, muted: Bool, mac: String, device: String) -> String {
-        let mute = " Mute silences it on this \(device) alone; \(mac) keeps sending and playing it."
-            + (muted ? " This \(device) is muted." : "")
         switch send {
         case true?:
-            return "Beta. Every connected device hears what streams, and \(mac) keeps playing it too." + mute
+            return muted ? String(localized: "Beta. Every connected device hears what streams, and \(mac) keeps playing it too. Mute silences it on this \(device) alone; \(mac) keeps sending and playing it. This \(device) is muted.", comment: "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型")
+                : String(localized: "Beta. Every connected device hears what streams, and \(mac) keeps playing it too. Mute silences it on this \(device) alone; \(mac) keeps sending and playing it.", comment: "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型")
         case false?:
-            return "Beta. Turn this on to hear what streams on every connected device; \(mac) keeps playing it too." + mute
+            return muted ? String(localized: "Beta. Turn this on to hear what streams on every connected device; \(mac) keeps playing it too. Mute silences it on this \(device) alone; \(mac) keeps sending and playing it. This \(device) is muted.", comment: "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型")
+                : String(localized: "Beta. Turn this on to hear what streams on every connected device; \(mac) keeps playing it too. Mute silences it on this \(device) alone; \(mac) keeps sending and playing it.", comment: "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型")
         case nil:
-            return "Beta. Update Sill on \(mac) to hear its sound on this \(device)."
+            return String(localized: "Beta. Update Sill on \(mac) to hear its sound on this \(device).", comment: "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型")
         }
     }
 
@@ -672,8 +672,8 @@ struct HostSettingsPanel: View {
     /// (with the trackpad's and the mouse's settings, under Settings › General), which the switch
     /// leaves alone.
     static func reverseScrollFooter(device: String) -> String {
-        "Turns a finger’s drag and the trackpad’s two-finger scroll around."
-            + (device == "iPad" ? " A trackpad or mouse connected to the iPad follows its own Natural Scrolling setting." : "")
+        device == "iPad" ? String(localized: "Turns a finger’s drag and the trackpad’s two-finger scroll around. A trackpad or mouse connected to the iPad follows its own Natural Scrolling setting.", comment: "主机设置面板：iPad 反向滚动说明")
+            : String(localized: "Turns a finger’s drag and the trackpad’s two-finger scroll around.", comment: "主机设置面板：反向滚动说明")
     }
 
     /// The Mac's window list said it takes the gestures (`WindowList.gestures`).
@@ -684,41 +684,42 @@ struct HostSettingsPanel: View {
     /// it gives up, where windows come from instead, that the Mac fits a window to the taller picture
     /// once Aa sets its text size (or on the virtual display), and that a change applies as the panel
     /// closes (StreamScreen's `largerPictureHeld`).
-    static let largerPictureFooter = "Held upright, a window’s picture takes the place of the window thumbnails and reaches down to where the keyboard comes up. The Desktop keeps the thumbnails. Switch windows with Apps: tap an open app again for its next window. To fill the taller picture with a window, set its text size with Aa. A change applies when you close Settings."
+    static let largerPictureFooter = String(localized: "Held upright, a window’s picture takes the place of the window thumbnails and reaches down to where the keyboard comes up. The Desktop keeps the thumbnails. Switch windows with Apps: tap an open app again for its next window. To fill the taller picture with a window, set its text size with Aa. A change applies when you close Settings.", comment: "主机设置面板：更大画面开关的完整说明")
 
     /// What each gesture does on the Mac, and what the row does as an accessibility action: its one
     /// gesture, or, for the Spaces, one action each way (natural direction: a swipe left brings the
     /// Space on the right). The pinch opens Launchpad on macOS 14 and 15, from the same key.
     private static let gestureRows: [(symbol: String, gesture: String, action: String, does: [GestureRow.Action])] = [
-        ("arrow.up", "Swipe Up", "Mission Control", [GestureRow.Action(name: "Mission Control", gesture: .swipeUp)]),
-        ("arrow.down", "Swipe Down", "App Exposé", [GestureRow.Action(name: "App Exposé", gesture: .swipeDown)]),
-        ("arrow.left.and.right", "Swipe Left or Right", "Spaces", [GestureRow.Action(name: "Space on the Right", gesture: .swipeLeft),
-                                                                   GestureRow.Action(name: "Space on the Left", gesture: .swipeRight)]),
-        ("arrow.down.right.and.arrow.up.left", "Pinch", "Apps", [GestureRow.Action(name: "Apps", gesture: .pinch)]),
-        ("arrow.up.left.and.arrow.down.right", "Spread", "Show Desktop", [GestureRow.Action(name: "Show Desktop", gesture: .spread)]),
+        ("arrow.up", String(localized: "Swipe Up", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "Mission Control", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "Mission Control", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .swipeUp)]),
+        ("arrow.down", String(localized: "Swipe Down", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "App Exposé", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "App Exposé", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .swipeDown)]),
+        ("arrow.left.and.right", String(localized: "Swipe Left or Right", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "Spaces", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "Space on the Right", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .swipeLeft),
+                                                                   GestureRow.Action(name: String(localized: "Space on the Left", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .swipeRight)]),
+        ("arrow.down.right.and.arrow.up.left", String(localized: "Pinch", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "Apps", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "Apps", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .pinch)]),
+        ("arrow.up.left.and.arrow.down.right", String(localized: "Spread", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "Show Desktop", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "Show Desktop", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .spread)]),
     ]
 
     /// Under the switch: where the gestures go and what they do, or why nothing happens.
     private var gesturesFooter: String {
-        guard gesturesOn else { return "Three-finger strokes do nothing while this is off." }
-        guard macTakesGestures else { return "Update Sill on \(mac) to use these." }
+        guard gesturesOn else { return String(localized: "Three-finger strokes do nothing while this is off.", comment: "主机设置面板：三指手势关闭时的说明") }
+        guard macTakesGestures else { return String(localized: "Update Sill on \(mac) to use these.", comment: "主机设置面板：手势需要更新的说明，插值为 Mac 名称") }
         // VoiceOver keeps three-finger swipes and taps for itself, and no touch of them reaches Sill.
-        var text = voiceOver ? "VoiceOver keeps three-finger gestures for itself, so the rows above do them on \(mac) instead."
-            : "Three fingers on the trackpad or over the stream."
-        text += " While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. \(mac) does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing."
-        if device == "iPad" { text += " Four-finger swipes and a Magic Keyboard trackpad’s gestures stay with iPadOS." }
-        return text
+        if voiceOver {
+            return device == "iPad" ? String(localized: "VoiceOver keeps three-finger gestures for itself, so the rows above do them on \(mac) instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. \(mac) does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing. Four-finger swipes and a Magic Keyboard trackpad’s gestures stay with iPadOS.", comment: "主机设置面板：iPad 的 VoiceOver 手势说明，插值为 Mac 名称")
+                : String(localized: "VoiceOver keeps three-finger gestures for itself, so the rows above do them on \(mac) instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. \(mac) does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing.", comment: "主机设置面板：VoiceOver 手势说明，插值为 Mac 名称")
+        }
+        return device == "iPad" ? String(localized: "Three fingers on the trackpad or over the stream. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. \(mac) does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing. Four-finger swipes and a Magic Keyboard trackpad’s gestures stay with iPadOS.", comment: "主机设置面板：iPad 的手势说明，插值为 Mac 名称")
+            : String(localized: "Three fingers on the trackpad or over the stream. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. \(mac) does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing.", comment: "主机设置面板：手势说明，插值为 Mac 名称")
     }
 
     /// "through Tailscale (mac-mini.tail1234.ts.net)": the first VPN or internet address the Mac
     /// gave; otherwise "through your VPN or the internet".
     static func reach(_ info: MacInfo) -> String {
         guard let a = info.addresses.first(where: { $0.kind == MacAddress.vpn || $0.kind == MacAddress.internet }) else {
-            return "through your VPN or the internet"
+            return String(localized: "through your VPN or the internet", comment: "主机设置面板：远程访问方式从句")
         }
-        if a.kind == MacAddress.internet { return "over the internet (\(a.host))" }
-        let name = a.via.isEmpty || a.via.hasPrefix("VPN (") ? "your VPN" : a.via
-        return "through \(name) (\(a.host))"
+        if a.kind == MacAddress.internet { return String(localized: "over the internet (\(a.host))", comment: "主机设置面板：互联网访问方式从句，插值为主机地址") }
+        let name = a.via.isEmpty || a.via.hasPrefix("VPN (") ? String(localized: "your VPN", comment: "主机设置面板：未命名 VPN 的称呼") : a.via
+        return String(localized: "through \(name) (\(a.host))", comment: "主机设置面板：VPN 访问方式从句，插值为 VPN 名称和主机地址")
     }
 
     // MARK: Copy
@@ -730,13 +731,13 @@ struct HostSettingsPanel: View {
     /// own (see `header`). A no-break space before each "·" keeps it with the value before it, so a
     /// wrap at larger text never starts a line with one.
     static func readout(_ stream: RunningStream?, route: DiscoveryPolicy.Method? = nil) -> String {
-        let values = stream.map { ["\($0.width)×\($0.height)", "\($0.fps)\u{00A0}fps", "\($0.mbps)\u{00A0}Mbps"] } ?? ["Not streaming"]
+        let values = stream.map { ["\($0.width)×\($0.height)", String(localized: "\($0.fps)\u{00A0}fps", comment: "主机设置面板：参数及单位，插值为数值"), String(localized: "\($0.mbps)\u{00A0}Mbps", comment: "主机设置面板：参数及单位，插值为数值")] } ?? [String(localized: "Not streaming", comment: "主机设置面板：当前未串流的状态")]
         return (values + [route?.word].compactMap { $0 }).joined(separator: "\u{00A0}· ")
     }
 
     /// "48 ms", the last second's median round trip; "–" for a second without a pong.
     static func rttText(_ stats: StreamClient.LinkStats?) -> String {
-        stats?.rtt.map { "\($0.median)\u{00A0}ms" } ?? "–"
+        stats?.rtt.map { String(localized: "\($0.median)\u{00A0}ms", comment: "主机设置面板：参数及单位，插值为数值") } ?? "–"
     }
 
     /// The readout as VoiceOver says it, ending in how this device reaches the Mac: its link, or
@@ -746,19 +747,19 @@ struct HostSettingsPanel: View {
                               rttMs: Int? = nil) -> String {
         var link = route.map { ", " + spoken($0) } ?? ""
         if let remote {
-            link = ", connected \(remote.phrase)" + (rttMs.map { ", \($0) millisecond round trip" } ?? "")
+            link = ", " + (rttMs.map { String(localized: "connected \(remote.phrase), \($0) millisecond round trip", comment: "主机设置面板：远程连接及延迟的无障碍从句，插值为连接方式和毫秒数") } ?? String(localized: "connected \(remote.phrase)", comment: "主机设置面板：远程连接的无障碍从句，插值为连接方式"))
         }
-        guard let s = stream else { return "Not streaming" + link }
-        return "Streaming \(s.width) by \(s.height), \(s.fps) frames per second, \(s.mbps) megabits per second"
-            + (s.onVirtualDisplay ? ", on the virtual display" : "") + link
+        guard let s = stream else { return String(localized: "Not streaming\(link)", comment: "主机设置面板：未串流的无障碍读出，插值为可选连接方式") }
+        return s.onVirtualDisplay ? String(localized: "Streaming \(s.width) by \(s.height), \(s.fps) frames per second, \(s.mbps) megabits per second, on the virtual display\(link)", comment: "主机设置面板：虚拟显示器串流的无障碍读出，插值为分辨率、帧率、码率和连接方式")
+            : String(localized: "Streaming \(s.width) by \(s.height), \(s.fps) frames per second, \(s.mbps) megabits per second\(link)", comment: "主机设置面板：串流的无障碍读出，插值为分辨率、帧率、码率和连接方式")
     }
 
     /// The route as VoiceOver says it: a sentence's end rather than the bare word.
     private static func spoken(_ route: DiscoveryPolicy.Method) -> String {
         switch route {
-        case .wired: return "connected by cable"
-        case .wifi: return "connected over Wi-Fi"
-        case .direct: return "connected directly"
+        case .wired: return String(localized: "connected by cable", comment: "主机设置面板：无障碍连接方式从句")
+        case .wifi: return String(localized: "connected over Wi-Fi", comment: "主机设置面板：无障碍连接方式从句")
+        case .direct: return String(localized: "connected directly", comment: "主机设置面板：无障碍连接方式从句")
         }
     }
 
@@ -770,8 +771,8 @@ struct HostSettingsPanel: View {
     /// connection, and on a session it says is not paired (`takes` false:
     /// `HostSettingsState.takesDirectWireless`) from any device it did not pair.
     static func directWirelessLock(remote: Bool, takes: Bool, mac: String) -> String? {
-        if remote { return "Change this on \(mac), or from a device near it." }
-        if !takes { return "Change this on \(mac), or from a device paired with it." }
+        if remote { return String(localized: "Change this on \(mac), or from a device near it.", comment: "主机设置面板：远程连接不能修改设置的说明，插值为 Mac 名称") }
+        if !takes { return String(localized: "Change this on \(mac), or from a device paired with it.", comment: "主机设置面板：未配对设备不能修改设置的说明，插值为 Mac 名称") }
         return nil
     }
 
@@ -782,9 +783,8 @@ struct HostSettingsPanel: View {
     /// to it by itself), so it cannot come back until it does. Once the switch shows off (turned
     /// off here or on the Mac, with this connection still up for that moment) the warning is moot.
     private func directFooter(on: Bool) -> String {
-        var text = "Lets devices reach \(mac) without a shared Wi\u{2011}Fi network, the way AirDrop does. While it’s on, streaming over Wi\u{2011}Fi can stutter."
-        if on, client.connectedDirectly { text += " This \(device) is connected directly: turning this off disconnects it." }
-        return text
+        on && client.connectedDirectly ? String(localized: "Lets devices reach \(mac) without a shared Wi\u{2011}Fi network, the way AirDrop does. While it’s on, streaming over Wi\u{2011}Fi can stutter. This \(device) is connected directly: turning this off disconnects it.", comment: "主机设置面板：直接无线连接说明及断线提醒，插值为 Mac 名称和设备类型")
+            : String(localized: "Lets devices reach \(mac) without a shared Wi\u{2011}Fi network, the way AirDrop does. While it’s on, streaming over Wi\u{2011}Fi can stutter.", comment: "主机设置面板：直接无线连接说明，插值为 Mac 名称")
     }
 
     /// Under the stream rows: what Quality counts and what its top presets need (the Mac's
@@ -793,16 +793,16 @@ struct HostSettingsPanel: View {
     /// for 60 fps.
     private var streamFooter: String {
         _ = powerState
-        var text = "Quality is per 60 fps; a 120 fps stream gets twice as much. " + QualityPreset.fastLinkNote
+        var text = String(localized: "Quality is per 60 fps; a 120 fps stream gets twice as much. \(QualityPreset.fastLinkNote)", comment: "主机设置面板：质量及连接要求说明，插值为质量策略说明")
         let away = client.awayCapsFrameRate
         let wanted = StreamClient.wantedFPS(remote: away)
         guard wanted < 120 else { return text }
         if away, StreamClient.wantedFPS() > wanted {
-            text += " Away from home, this \(device) asks for \(wanted) fps, which halves the data your Mac sends."
+            text += " " + String(localized: "Away from home, this \(device) asks for \(wanted) fps, which halves the data your Mac sends.", comment: "主机设置面板：帧率限制说明，插值为设备类型和帧率")
         } else if ProcessInfo.processInfo.isLowPowerModeEnabled, StreamClient.screenMaximumFPS() >= 120 {
-            text += " Low Power Mode holds this \(device) to \(wanted) fps."
+            text += " " + String(localized: "Low Power Mode holds this \(device) to \(wanted) fps.", comment: "主机设置面板：帧率限制说明，插值为设备类型和帧率")
         } else {
-            text += " This \(device) shows up to \(wanted) fps."
+            text += " " + String(localized: "This \(device) shows up to \(wanted) fps.", comment: "主机设置面板：帧率限制说明，插值为设备类型和帧率")
         }
         return text
     }

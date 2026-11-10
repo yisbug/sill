@@ -117,7 +117,7 @@ struct MacMenuTrigger: UIViewRepresentable {
                 if isOpen { onOpen() } else { onClose() }
             }
         }
-        button.accessibilityLabel = "\(client.menus.app ?? "Mac") menus"
+        button.accessibilityLabel = String(localized: "\(client.menus.app ?? "Mac") menus", comment: "菜单按钮的无障碍名称，插值为 Mac 上的应用名称")
         let top = client.menus.top
         guard context.coordinator.built != top else { return }
         context.coordinator.built = top

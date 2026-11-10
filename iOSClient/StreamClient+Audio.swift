@@ -36,7 +36,7 @@ extension StreamClient {
     func headphonesOut() {
         guard !soundMuted else { return }
         setSoundMuted(true)
-        UIAccessibility.post(notification: .announcement, argument: "Sound muted: headphones disconnected.")
+        UIAccessibility.post(notification: .announcement, argument: String(localized: "Sound muted: headphones disconnected.", comment: "耳机断开后静音的 VoiceOver 通知"))
     }
 
     /// A kind 43 on the session's connection, handed to the sound's queue as it came. On `queue`.
