@@ -390,25 +390,25 @@ public enum ClipboardPolicy {
         public static var cap: String { "\(Clipboard.maxTextBytes / 1024) KB" }
 
         // The chip.
-        public static func chipTitle(mac: String) -> String { "Paste on \(mac)" }
-        public static let chipSubtitle = "Then press ⌘V there."
+        public static func chipTitle(mac: String) -> String { String(localized: "Paste on \(mac)", comment: "剪贴板芯片或设置行标题，插值为 Mac 名称") }
+        public static let chipSubtitle = String(localized: "Then press ⌘V there.", comment: "剪贴板芯片副标题，提醒在 Mac 上粘贴")
         /// The chip's words for VoiceOver, one element; its Paste button and Dismiss are their own.
         public static func chipSpoken(mac: String, device: String) -> String {
-            "Paste on \(mac). Sends the text you copied on this \(device) to \(mac)’s clipboard. Then press Command-V there."
+            String(localized: "Paste on \(mac). Sends the text you copied on this \(device) to \(mac)’s clipboard. Then press Command-V there.", comment: "剪贴板芯片的 VoiceOver 说明，插值为 Mac 名称和设备类型")
         }
-        public static let dismiss = "Dismiss"
+        public static let dismiss = String(localized: "Dismiss", comment: "关闭剪贴板芯片的按钮")
         /// Told to VoiceOver when the chip first shows for a copy (found in review: it came unannounced).
-        public static func chipAnnouncement(mac: String) -> String { "Paste on \(mac) is available, near the bar." }
+        public static func chipAnnouncement(mac: String) -> String { String(localized: "Paste on \(mac) is available, near the bar.", comment: "剪贴板芯片出现时的 VoiceOver 播报，插值为 Mac 名称") }
         /// The Paste button's hint, on the chip and in Settings.
         public static func pasteHint(mac: String, device: String) -> String {
-            "Sends the text you copied on this \(device) to \(mac)’s clipboard."
+            String(localized: "Sends the text you copied on this \(device) to \(mac)’s clipboard.", comment: "粘贴按钮的辅助功能提示，插值为设备类型和 Mac 名称")
         }
-        public static func sent(mac: String) -> String { "Sent to \(mac)’s clipboard. Press ⌘V there." }
-        public static func sentSpoken(mac: String) -> String { "Sent to \(mac)’s clipboard. Press Command-V there." }
-        public static func tooLong(mac: String) -> String { "Too long to send: \(mac) takes up to \(cap) of text." }
+        public static func sent(mac: String) -> String { String(localized: "Sent to \(mac)’s clipboard. Press ⌘V there.", comment: "文字已发送的提示，插值为 Mac 名称") }
+        public static func sentSpoken(mac: String) -> String { String(localized: "Sent to \(mac)’s clipboard. Press Command-V there.", comment: "文字已发送的 VoiceOver 播报，插值为 Mac 名称") }
+        public static func tooLong(mac: String) -> String { String(localized: "Too long to send: \(mac) takes up to \(Clipboard.maxTextBytes / 1024) KB of text.", comment: "剪贴板文字过长提示，插值为 Mac 名称和容量上限（KB）") }
         /// No receipt in time (`receiptWait`): the copy is not counted as dealt with, so the chip offers
         /// it again.
-        public static func notSent(mac: String) -> String { "Didn’t reach \(mac). Try Paste again." }
+        public static func notSent(mac: String) -> String { String(localized: "Didn’t reach \(mac). Try Paste again.", comment: "剪贴板发送未及时确认的提示，插值为 Mac 名称") }
 
         // Paste right away (`pastesOnReceipt`): with the switch on, the words say where the text goes;
         // with it off, the words above (the chip's subtitle, its spoken label and the Paste button's
@@ -416,56 +416,56 @@ public enum ClipboardPolicy {
         /// The chip's subtitle: under "Paste on ‹Mac›", where it goes. No longer than today's "Then press
         /// ⌘V there.", which the chip holds on a 375 pt iPhone at xLarge text, where "It goes where the
         /// cursor is." was cut short ("It goes where the cur…", found in review; at 393 pt "…the curso…").
-        public static func chipSubtitle(rightAway: Bool) -> String { rightAway ? "Where the cursor is." : chipSubtitle }
+        public static func chipSubtitle(rightAway: Bool) -> String { rightAway ? String(localized: "Where the cursor is.", comment: "立即粘贴开启时的剪贴板芯片副标题") : chipSubtitle }
         /// The chip's words for VoiceOver.
         public static func chipSpoken(mac: String, device: String, rightAway: Bool) -> String {
-            rightAway ? "Paste on \(mac). Pastes the text you copied on this \(device) where \(mac)’s cursor is."
+            rightAway ? String(localized: "Paste on \(mac). Pastes the text you copied on this \(device) where \(mac)’s cursor is.", comment: "立即粘贴开启时的 VoiceOver 说明，插值为 Mac 名称和设备类型")
                       : chipSpoken(mac: mac, device: device)
         }
         /// The Paste button's hint, on the chip and in Settings.
         public static func pasteHint(mac: String, device: String, rightAway: Bool) -> String {
-            rightAway ? "Pastes the text you copied on this \(device) where \(mac)’s cursor is." : pasteHint(mac: mac, device: device)
+            rightAway ? String(localized: "Pastes the text you copied on this \(device) where \(mac)’s cursor is.", comment: "立即粘贴按钮的辅助功能提示，插值为设备类型和 Mac 名称") : pasteHint(mac: mac, device: device)
         }
         /// A receipt with ⌘V (`receiptNote`), written and spoken alike.
-        public static func pasted(mac: String) -> String { "Pasted on \(mac)." }
+        public static func pasted(mac: String) -> String { String(localized: "Pasted on \(mac).", comment: "已在 Mac 上粘贴的提示与播报，插值为 Mac 名称") }
 
         // The Settings panel's This iPad group.
-        public static let switchTitle = "Share Clipboard"
-        public static func rowTitle(mac: String) -> String { "Paste on \(mac)" }
+        public static let switchTitle = String(localized: "Share Clipboard", comment: "设置中共享剪贴板开关的标题")
+        public static func rowTitle(mac: String) -> String { String(localized: "Paste on \(mac)", comment: "剪贴板芯片或设置行标题，插值为 Mac 名称") }
         /// The switch under Share Clipboard, shown while it is on.
-        public static func rightAwayTitle(mac: String) -> String { "Paste on \(mac) Right Away" }
+        public static func rightAwayTitle(mac: String) -> String { String(localized: "Paste on \(mac) Right Away", comment: "设置中立即粘贴开关的标题，插值为 Mac 名称") }
         /// The group's footnote with that switch: on, where Paste's text goes and what turning the switch
         /// off leaves; off (or Share Clipboard off), the footnote as it was.
         public static func footnote(on: Bool, rightAway: Bool, mac: String, device: String) -> String {
             guard on, rightAway else { return footnote(on: on, mac: mac, device: device) }
-            return "Text you copy on \(mac) is ready to paste on this \(device). To paste on \(mac), copy text here and tap Paste: it goes where \(mac)’s cursor is. With Paste on \(mac) Right Away off, Paste only puts it on \(mac)’s clipboard."
+            return String(localized: "Text you copy on \(mac) is ready to paste on this \(device). To paste on \(mac), copy text here and tap Paste: it goes where \(mac)’s cursor is. With Paste on \(mac) Right Away off, Paste only puts it on \(mac)’s clipboard.", comment: "设置中立即粘贴开启时的剪贴板说明，插值为 Mac 名称和设备类型")
         }
         public static func footnote(on: Bool, mac: String, device: String) -> String {
-            on ? "Text you copy on \(mac) is ready to paste on this \(device). To paste on \(mac), copy text here, tap Paste, then press ⌘V there."
-               : "Nothing you copy goes between this \(device) and \(mac) while this is off."
+            on ? String(localized: "Text you copy on \(mac) is ready to paste on this \(device). To paste on \(mac), copy text here, tap Paste, then press ⌘V there.", comment: "设置中共享剪贴板开启时的说明，插值为 Mac 名称和设备类型")
+               : String(localized: "Nothing you copy goes between this \(device) and \(mac) while this is off.", comment: "设置中共享剪贴板关闭时的说明，插值为设备类型和 Mac 名称")
         }
 
         // Sill for Mac's Settings › General, under Share clipboard with devices.
         /// Its footnote ("theirs here" read as if a device's copies came by themselves, so it names Paste;
         /// a password manager's copies go like any other since 2026-10-29, so it no longer excepts them).
-        public static let macFootnote = "Text you copy here can be pasted on a connected iPhone or iPad, and text sent from one with Paste becomes this Mac’s."
+        public static let macFootnote = String(localized: "Text you copy here can be pasted on a connected iPhone or iPad, and text sent from one with Paste becomes this Mac’s.", comment: "Mac 设置中共享剪贴板的说明")
         /// Under it while macOS does not allow every read (MacAccess): why what is copied here stays.
         public static func macAccessWarning(_ access: MacAccess) -> String? {
             switch access {
             case .allowed: return nil
-            case .notAsked, .asks: return "macOS asks before Sill reads the clipboard, so what you copy here stays on this Mac."
-            case .denied: return "macOS doesn’t let Sill read the clipboard, so what you copy here stays on this Mac."
+            case .notAsked, .asks: return String(localized: "macOS asks before Sill reads the clipboard, so what you copy here stays on this Mac.", comment: "Mac 设置中剪贴板读取需要确认的警告")
+            case .denied: return String(localized: "macOS doesn’t let Sill read the clipboard, so what you copy here stays on this Mac.", comment: "Mac 设置中剪贴板读取被拒绝的警告")
             }
         }
         /// …what to do about it, beside `macAccessButton`.
         public static func macAccessHint(_ access: MacAccess) -> String? {
             switch access {
             case .allowed: return nil
-            case .notAsked: return "Click Allow in System Settings: macOS asks about Sill once, then Privacy & Security opens, where you set Sill to Allow under Paste from Other Apps. Text a device sends with Paste still arrives."
-            case .asks, .denied: return "Set Sill to Allow under Paste from Other Apps in Privacy & Security. Text a device sends with Paste still arrives."
+            case .notAsked: return String(localized: "Click Allow in System Settings: macOS asks about Sill once, then Privacy & Security opens, where you set Sill to Allow under Paste from Other Apps. Text a device sends with Paste still arrives.", comment: "Mac 设置中首次允许读取剪贴板的操作提示")
+            case .asks, .denied: return String(localized: "Set Sill to Allow under Paste from Other Apps in Privacy & Security. Text a device sends with Paste still arrives.", comment: "Mac 设置中修改剪贴板读取权限的操作提示")
             }
         }
-        public static let macAccessButton = "Allow in System Settings…"
+        public static let macAccessButton = String(localized: "Allow in System Settings…", comment: "打开系统设置以允许读取剪贴板的按钮")
         /// The host's line when macOS's answer changes while a device shares the clipboard (`accessLine`).
         public static func macAccessLine(_ access: MacAccess) -> String {
             switch access {

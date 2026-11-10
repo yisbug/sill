@@ -41,7 +41,7 @@ public enum TextScale {
 
     /// "Off", or the scale with trailing zeros dropped and "×" after it: 0.5×, 1×, 1.25×.
     public static func title(at position: Double) -> String {
-        position == off ? "Off" : number(position) + "×"
+        position == off ? String(localized: "Off", comment: "Aa 文字大小控件的关闭状态") : number(position) + "×"
     }
 
     /// 0.5, 0.75, 1, 1.25, 1.5: trailing zeros dropped, and "1" rather than "1.0".
@@ -54,7 +54,9 @@ public enum TextScale {
 
     /// What VoiceOver speaks: "Off", or "1.25 times".
     public static func spoken(at position: Double) -> String {
-        position == off ? "Off" : number(position) + " times"
+        position == off
+            ? String(localized: "Off", comment: "Aa 文字大小关闭时的 VoiceOver 播报")
+            : String(localized: "\(number(position)) times", comment: "Aa 文字大小的 VoiceOver 播报，插值为缩放倍数")
     }
 
     /// The detent one step along for an accessibility increment (`up`) or decrement, stopping at the ends.
@@ -99,5 +101,5 @@ public enum TextScale {
     }
 
     /// What VoiceOver hears after a dimmed Aa's name and value.
-    public static let unavailableHint = "Available for a window."
+    public static let unavailableHint = String(localized: "Available for a window.", comment: "Aa 不可用时的 VoiceOver 提示")
 }
