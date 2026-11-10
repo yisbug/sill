@@ -1,1758 +1,4806 @@
 {
-  "sourceLanguage" : "en",
-  "strings" : {
-    "" : {
-
-    },
-    " · " : {
-
-    },
-    "%@ answered with another key, so this %@ didn’t reconnect. Tap it to connect." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ answered with another key, so this %2$@ didn’t reconnect. Tap it to connect."
+  "sourceLanguage": "en",
+  "strings": {
+    "": {},
+    " · ": {},
+    "%@ answered with another key, so this %@ didn’t reconnect. Tap it to connect.": {
+      "comment": "连接页或配对提示；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ answered with another key, so this %2$@ didn’t reconnect. Tap it to connect."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 返回了另一个密钥，因此这台 %@ 未重新连接。轻点以连接。"
+          }
         }
       }
-    },
-    "%@ answered, but Sill isn’t accepting remote connections there. Check that Sill is open and Remote Access is on. If you changed its port, connect at home once." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 名称"
     },
-    "%@ closed the connection. Sill will reconnect when it can." : {
-      "comment" : "连接页断开状态；插值为Mac 名称"
-    },
-    "%@ closed the connection. Tap it to try again." : {
-      "comment" : "连接页断开状态；插值为Mac 名称"
-    },
-    "%@ didn’t answer at %@. If your home’s internet address changed, connect at home once to update it, or add an address name on the Mac." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 名称、Mac 地址",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ didn’t answer at %2$@. If your home’s internet address changed, connect at home once to update it, or add an address name on the Mac."
+    "%@ answered, but Sill isn’t accepting remote connections there. Check that Sill is open and Remote Access is on. If you changed its port, connect at home once.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已响应，但那里的 Sill 未接受远程连接。请确认 Sill 已打开且远程访问已开启。如果你更改过端口，请在家时连接一次。"
           }
         }
       }
     },
-    "%@ didn’t answer. Check that Sill is open on it, then tap it again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
-    },
-    "%@ didn’t answer. It may be asleep, or %@ may be off on the Mac." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 名称、VPN 名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ didn’t answer. It may be asleep, or %2$@ may be off on the Mac."
+    "%@ closed the connection. Sill will reconnect when it can.": {
+      "comment": "连接页断开状态；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已关闭连接。Sill 会在可以连接时重新连接。"
           }
         }
       }
-    },
-    "%@ didn’t answer. It may be asleep." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 名称"
     },
-    "%@ didn’t answer. Open the menu again." : {
-      "comment" : "菜单请求超时提示，插值为 Mac 名称"
-    },
-    "%@ didn’t answer. Try again." : {
-      "comment" : "设置面板响应超时提示，插值为 Mac 名称\n连接页或配对提示；插值为Mac 名称"
-    },
-    "%@ didn’t show a code by itself. On the Mac, choose Pair iPhone or iPad… in the Sill menu." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
-    },
-    "%@ didn’t show a code. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %@ again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ didn’t show a code. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %2$@ again."
+    "%@ closed the connection. Tap it to try again.": {
+      "comment": "连接页断开状态；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已关闭连接。轻点以重试。"
           }
         }
       }
-    },
-    "%@ disconnected. It will reconnect when the Mac is back." : {
-      "comment" : "连接页断开状态；插值为Mac 名称"
     },
-    "%@ disconnected. Sill will reconnect when it can reach it." : {
-      "comment" : "连接页断开状态；插值为Mac 名称"
-    },
-    "%@ has a new key since this %@ paired. Tap it to pair again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ has a new key since this %2$@ paired. Tap it to pair again."
+    "%@ didn’t answer at %@. If your home’s internet address changed, connect at home once to update it, or add an address name on the Mac.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 名称、Mac 地址",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ didn’t answer at %2$@. If your home’s internet address changed, connect at home once to update it, or add an address name on the Mac."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未在 %@ 响应。如果你家中的互联网地址已更改，请在家时连接一次以更新地址，或在 Mac 上添加域名。"
           }
         }
       }
-    },
-    "%@ is already serving 8 devices." : {
-      "comment" : "连接页断开状态；插值为Mac 名称\n连接页远程连接失败提示，插值为Mac 名称"
-    },
-    "%@ is saved. Tap it to connect." : {
-      "comment" : "连接页已保存状态提示，插值为 Mac 名称\n连接页状态提示，插值为 Mac 名称"
     },
-    "%@ is showing a code now." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
-    },
-    "%@ is showing a code. Point this %@ at it." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ is showing a code. Point this %2$@ at it."
+    "%@ didn’t answer. Check that Sill is open on it, then tap it again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未响应。请确认上面的 Sill 已打开，然后再次轻点。"
           }
         }
       }
-    },
-    "%@ isn’t answering. It may be asleep. Sill keeps trying, or tap it to try now." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
-    },
-    "%@ isn’t pairing right now. On your Mac, choose Pair iPhone or iPad… first." : {
-      "comment" : "配对卡片错误提示，插值为 Mac 名称或地址称呼"
-    },
-    "%@ isn’t responding." : {
-      "comment" : "Mac 菜单所属应用无响应的提示，插值为应用名称"
     },
-    "%@ kept its setting" : {
-      "comment" : "主机设置面板：设置被拒绝的无障碍播报，插值为 Mac 名称"
-    },
-    "%@ lets devices connect without pairing. Pair this %@ once to keep connecting if that changes, and to reach %@ away from home while Remote Access is on. %@ shows a code; scan it with this %@." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ lets devices connect without pairing. Pair this %2$@ once to keep connecting if that changes, and to reach %3$@ away from home while Remote Access is on. %4$@ shows a code; scan it with this %5$@."
+    "%@ didn’t answer. It may be asleep, or %@ may be off on the Mac.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 名称、VPN 名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ didn’t answer. It may be asleep, or %2$@ may be off on the Mac."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未响应。它可能处于睡眠状态，或 Mac 上的 %@ 未开启。"
           }
         }
       }
     },
-    "%@ looks off on this %@. Turn it on, then tap %@." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 名称、设备类型、VPN 名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ looks off on this %2$@. Turn it on, then tap %3$@."
+    "%@ didn’t answer. It may be asleep.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未响应。它可能处于睡眠状态。"
           }
         }
       }
-    },
-    "%@ megabits per second" : {
-      "comment" : "画质设置或串流连接提示；插值为码率"
-    },
-    "%@ menus" : {
-      "comment" : "菜单按钮的无障碍名称，插值为 Mac 上的应用名称"
     },
-    "%@ no longer accepts this %@. Pair it again from Sill’s Settings on the Mac." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ no longer accepts this %2$@. Pair it again from Sill’s Settings on the Mac."
+    "%@ didn’t answer. Open the menu again.": {
+      "comment": "菜单请求超时提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未响应。请重新打开菜单。"
           }
         }
       }
     },
-    "%@ now asks devices to pair. Tap it to pair this %@." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称、设备类型\n连接页断开状态；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ now asks devices to pair. Tap it to pair this %2$@."
+    "%@ didn’t answer. Try again.": {
+      "comment": "设置面板响应超时提示，插值为 Mac 名称\n连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未响应。请重试。"
           }
         }
       }
     },
-    "%@ quit Sill. This %@ reconnects when it’s back." : {
-      "comment" : "连接页断开状态；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ quit Sill. This %2$@ reconnects when it’s back."
+    "%@ didn’t show a code by itself. On the Mac, choose Pair iPhone or iPad… in the Sill menu.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未自动显示配对码。请在 Mac 上的 Sill 菜单中选择“配对 iPhone 或 iPad…”。"
           }
         }
       }
     },
-    "%@ removed this %@. Tap it to pair again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ removed this %2$@. Tap it to pair again."
+    "%@ didn’t show a code. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %@ again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ didn’t show a code. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %2$@ again."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未显示配对码。请在 Mac 上的 Sill 菜单中选择“配对 iPhone 或 iPad…”，然后再次轻点 %@。"
+          }
         }
       }
     },
-    "%@ removed this %@. To use it again, pair it again." : {
-      "comment" : "连接页断开状态；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ removed this %2$@. To use it again, pair it again."
+    "%@ disconnected. It will reconnect when the Mac is back.": {
+      "comment": "连接页断开状态；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已断开连接。Mac 恢复可用后会重新连接。"
           }
         }
       }
-    },
-    "%@ runs an older Sill. Update Sill on the Mac to connect." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
-    },
-    "%@ s" : {
-      "comment" : "设置面板长按时长；插值为保留一位小数的秒数"
-    },
-    "%@ second" : {
-      "comment" : "长按时长的 VoiceOver 单数读法；插值为秒数"
     },
-    "%@ seconds" : {
-      "comment" : "长按时长的 VoiceOver 复数读法；插值为秒数"
-    },
-    "%@ stopped accepting connections from the internet. Connect through your VPN." : {
-      "comment" : "连接页断开状态；插值为Mac 名称"
-    },
-    "%@ stopped pairing after too many wrong codes. Choose Pair iPhone or iPad… on your Mac for a new code." : {
-      "comment" : "配对卡片错误提示，插值为 Mac 名称或地址称呼"
-    },
-    "%@ stopped pairing after too many wrong codes. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %@ again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ stopped pairing after too many wrong codes. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %2$@ again."
+    "%@ disconnected. Sill will reconnect when it can reach it.": {
+      "comment": "连接页断开状态；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已断开连接。Sill 会在能够访问它时重新连接。"
           }
         }
       }
-    },
-    "%@ turned off Remote Access." : {
-      "comment" : "连接页断开状态；插值为Mac 名称\n连接页远程连接失败提示，插值为Mac 名称"
     },
-    "%@ window" : {
-
-    },
-    "%@ window actions" : {
-
-    },
-    "%@ window: %@" : {
-      "comment" : "窗口缩略图：无障碍标签，插值为应用名和窗口标题",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ window: %2$@"
+    "%@ has a new key since this %@ paired. Tap it to pair again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ has a new key since this %2$@ paired. Tap it to pair again."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 %2$@ 配对后，%1$@ 的密钥已更改。轻点以重新配对。"
+          }
         }
       }
     },
-    "%@ window: %@, showing now" : {
-      "comment" : "窗口缩略图：当前窗口的无障碍标签，插值为应用名和窗口标题",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@ window: %2$@, showing now"
+    "%@ is already serving 8 devices.": {
+      "comment": "连接页断开状态；插值为Mac 名称\n连接页远程连接失败提示，插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已在为 8 台设备提供串流。"
           }
         }
       }
     },
-    "%@, %@" : {
-      "comment" : "连接页或配对提示；插值为Mac 名称、连接方式",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@, %2$@"
+    "%@ is saved. Tap it to connect.": {
+      "comment": "连接页已保存状态提示，插值为 Mac 名称\n连接页状态提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已保存。轻点以连接。"
           }
         }
       }
-    },
-    "%@, Remote" : {
-      "comment" : "连接页：远程 Mac 的无障碍标签，插值为 Mac 名称"
-    },
-    "%@, Retina" : {
-      "comment" : "画质的 VoiceOver 名称；插值为码率名称"
-    },
-    "%@, Standard" : {
-      "comment" : "画质的 VoiceOver 名称；插值为码率名称"
-    },
-    "%@, held. Tap to release." : {
-      "comment" : "键盘快捷键行：已锁定修饰键的无障碍标签，插值为按键名称"
-    },
-    "%@, hold for the next key" : {
-      "comment" : "键盘快捷键行：修饰键的无障碍标签，插值为按键名称"
     },
-    "%@, not paired" : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
-    },
-    "%@, step %lld of %lld" : {
-      "comment" : "串流导览文案；插值为导览标题、当前步骤、步骤总数",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@, step %2$lld of %3$lld"
+    "%@ is showing a code now.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 现在正显示配对码。"
           }
         }
       }
     },
-    "%@’s Sill is too old for this %@." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$@’s Sill is too old for this %2$@."
+    "%@ is showing a code. Point this %@ at it.": {
+      "comment": "连接页或配对提示；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ is showing a code. Point this %2$@ at it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 正显示配对码。请将这台 %@ 对准配对码。"
           }
         }
       }
-    },
-    "%@’s hardware encoder is busy or not responding, so for now streams run at up to 60 fps at Standard." : {
-      "comment" : "主机设置面板：硬件编码器忙碌提示，插值为 Mac 名称"
-    },
-    "%lld more on the Mac" : {
-      "comment" : "菜单末尾的省略项目提示，插值为 Mac 上其余项目数量"
-    },
-    "%lld windows" : {
-      "comment" : "应用抽屉：窗口数量，插值为数量"
-    },
-    "%lld Mbps" : {
-      "comment" : "主机设置面板：参数及单位，插值为数值"
-    },
-    "%lld fps" : {
-      "comment" : "主机设置面板：参数及单位，插值为数值"
-    },
-    "%lld ms" : {
-      "comment" : "主机设置面板：参数及单位，插值为数值"
     },
-    "**A hardware keyboard** types on %@ by itself, Esc included, and **Keyboard** then brings up the keyboard bar." : {
-      "comment" : "串流导览文案；插值为Mac 名称；双星号标出强调文字"
-    },
-    "**A hardware keyboard** types on %@ by itself, Esc included, and **the keyboard key** then brings up the keyboard bar." : {
-      "comment" : "串流导览文案；插值为Mac 名称；双星号标出强调文字"
-    },
-    "**Apple Pencil** works as a mouse." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Apps** lists the apps on %@. Choose an open one again for its next window." : {
-      "comment" : "串流导览文案；插值为Mac 名称；双星号标出强调文字"
-    },
-    "**Apps** lists the apps on %@: tap an open one again for its next window." : {
-      "comment" : "串流导览文案；插值为Mac 名称；双星号标出强调文字"
-    },
-    "**Disconnect** is at the bottom of Settings." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Drag** to scroll." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Each window** has actions: close, minimize, full screen, and move left or right. Swipe up or down to hear them." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Hold to Show Window Controls** sets how long you hold a window’s thumbnail before its controls show." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Hold your %@ upright** for a trackpad and keys." : {
-      "comment" : "导览竖放设备的提示；插值为设备类型，双星号标出强调文字"
-    },
-    "**Keyboard** brings up the on-screen keyboard to type on %@." : {
-      "comment" : "串流导览文案；插值为Mac 名称；双星号标出强调文字"
-    },
-    "**Larger Picture**, in Settings: a window’s picture takes the place of the thumbnails and reaches down to where the keyboard comes up." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Menus** has the menu bar of the app you’re using on %@." : {
-      "comment" : "串流导览文案；插值为Mac 名称；双星号标出强调文字"
-    },
-    "**Pinch** to zoom the picture here, up to 5×. Zoomed in, two fingers move it, and one finger still taps, holds and drags on %@." : {
-      "comment" : "串流导览文案；插值为Mac 名称；双星号标出强调文字"
-    },
-    "**Reverse Scrolling** turns a finger’s drag and the on-screen trackpad’s two-finger scroll around." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Send Audio**, a beta, plays %@’s sound here, and **Mute** silences this %@ alone." : {
-      "comment" : "串流导览文案；插值为Mac 名称、设备类型；双星号标出强调文字",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "**Send Audio**, a beta, plays %1$@’s sound here, and **Mute** silences this %2$@ alone."
+    "%@ isn’t answering. It may be asleep. Sill keeps trying, or tap it to try now.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未响应。它可能处于睡眠状态。Sill 会继续尝试，你也可以轻点以立即重试。"
           }
         }
       }
-    },
-    "**Swipe with three fingers**: up for Mission Control, down for App Exposé, and sideways between Spaces." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
     },
-    "**Take the Tour** is there too, to see this again." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Tap with two fingers** on the trackpad to right-click." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Tap** to click." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**The keyboard key** brings up the on-screen keyboard to type on %@." : {
-      "comment" : "串流导览文案；插值为Mac 名称；双星号标出强调文字"
-    },
-    "**Touch and hold** a window to close, minimize or go full screen. Keep holding and drag to move it." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Touch and hold** the trackpad, **then drag**, to move a window or select text." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Touch and hold** to right-click." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
-    },
-    "**Turn your %@ on its side** for a trackpad and keys." : {
-      "comment" : "导览横放设备的提示；插值为设备类型，双星号标出强调文字"
-    },
-    "**Update Sill on %@** to copy and paste between it and this %@, and to hear its sound here." : {
-      "comment" : "串流导览文案；插值为Mac 名称、设备类型；双星号标出强调文字",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "**Update Sill on %1$@** to copy and paste between it and this %2$@, and to hear its sound here."
+    "%@ isn’t pairing right now. On your Mac, choose Pair iPhone or iPad… first.": {
+      "comment": "配对卡片错误提示，插值为 Mac 名称或地址称呼",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 目前未在配对。请先在 Mac 上选择“配对 iPhone 或 iPad…”。"
           }
         }
       }
     },
-    "**Virtual Display** is on: a window you pick streams from a display of its own on %@, so it keeps updating when something covers it; **Aa** then sizes its text." : {
-      "comment" : "导览虚拟显示器说明；插值为 Mac 名称，双星号标出控件名称"
+    "%@ isn’t responding.": {
+      "comment": "Mac 菜单所属应用无响应的提示，插值为应用名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未响应。"
+          }
+        }
+      }
     },
-    "**Virtual Display** is on: a window you pick streams from a display of its own on %@, so it keeps updating when something covers it; **Text size** then makes its text larger or smaller: swipe up or down on it." : {
-      "comment" : "导览虚拟显示器说明；插值为 Mac 名称，双星号标出控件名称"
+    "%@ kept its setting": {
+      "comment": "主机设置面板：设置被拒绝的无障碍播报，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 保留了原设置"
+          }
+        }
+      }
     },
-    "**Virtual Display**, in Settings, streams a window you pick from a display of its own on %@, so it keeps updating when something covers it; **Aa** then sizes its text." : {
-      "comment" : "导览虚拟显示器设置说明；插值为 Mac 名称，双星号标出控件名称"
+    "%@ lets devices connect without pairing. Pair this %@ once to keep connecting if that changes, and to reach %@ away from home while Remote Access is on. %@ shows a code; scan it with this %@.": {
+      "comment": "连接页或配对提示；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ lets devices connect without pairing. Pair this %2$@ once to keep connecting if that changes, and to reach %3$@ away from home while Remote Access is on. %4$@ shows a code; scan it with this %5$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 允许设备无需配对即可连接。请将这台 %@ 配对一次，以便在此设置更改后继续连接，并在远程访问开启时从外出地点访问 %@。%@ 会显示配对码；请用这台 %@ 扫描。"
+          }
+        }
+      }
     },
-    "**Virtual Display**, in Settings, streams a window you pick from a display of its own on %@, so it keeps updating when something covers it; **Text size** then makes its text larger or smaller: swipe up or down on it." : {
-      "comment" : "导览虚拟显示器设置说明；插值为 Mac 名称，双星号标出控件名称"
+    "%@ looks off on this %@. Turn it on, then tap %@.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 名称、设备类型、VPN 名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ looks off on this %2$@. Turn it on, then tap %3$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 在这台 %@ 上似乎未开启。开启后，请轻点 %@。"
+          }
+        }
+      }
     },
-    "**cmd, opt, ctrl and shift** stay on for the next key or trackpad click: tap cmd, then C, to copy." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
+    "%@ megabits per second": {
+      "comment": "画质设置或串流连接提示；插值为码率",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每秒 %@ 兆比特"
+          }
+        }
+      }
     },
-    "**cmd, opt, ctrl and shift** stay on for the next key: cmd, then C, copies." : {
-      "comment" : "串流导览文案；双星号标出强调文字"
+    "%@ menus": {
+      "comment": "菜单按钮的无障碍名称，插值为 Mac 上的应用名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 菜单"
+          }
+        }
+      }
     },
-    ", away quality, %@" : {
-      "comment" : "画质设置或串流连接提示；插值为画质名称"
+    "%@ no longer accepts this %@. Pair it again from Sill’s Settings on the Mac.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ no longer accepts this %2$@. Pair it again from Sill’s Settings on the Mac."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 不再接受这台 %@。请在 Mac 上 Sill 的设置中重新配对。"
+          }
+        }
+      }
     },
-    ", home quality, %@, because a device at home is connected" : {
-      "comment" : "画质设置或串流连接提示；插值为画质名称"
+    "%@ now asks devices to pair. Tap it to pair this %@.": {
+      "comment": "连接页或配对提示；插值为Mac 名称、设备类型\n连接页断开状态；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ now asks devices to pair. Tap it to pair this %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 现在要求设备配对。轻点以将这台 %@ 配对。"
+          }
+        }
+      }
     },
-    "0000 0000 0000" : {
-      "comment" : "配对码输入框：格式示例"
+    "%@ quit Sill. This %@ reconnects when it’s back.": {
+      "comment": "连接页断开状态；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ quit Sill. This %2$@ reconnects when it’s back."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 上的 Sill 已退出。Sill 恢复运行后，这台 %@ 会重新连接。"
+          }
+        }
+      }
     },
-    "1 window" : {
-      "comment" : "应用抽屉：单个窗口数量"
+    "%@ removed this %@. Tap it to pair again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ removed this %2$@. Tap it to pair again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已移除这台 %@。轻点以重新配对。"
+          }
+        }
+      }
     },
-    "100.101.102.103 or mac.example.net" : {
-      "comment" : "配对地址输入框：地址示例"
+    "%@ removed this %@. To use it again, pair it again.": {
+      "comment": "连接页断开状态；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ removed this %2$@. To use it again, pair it again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已移除这台 %@。如需再次使用，请重新配对。"
+          }
+        }
+      }
     },
-    "120 fps" : {
-
+    "%@ runs an older Sill. Update Sill on the Mac to connect.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 上的 Sill 版本较旧。请更新 Mac 上的 Sill 以连接。"
+          }
+        }
+      }
     },
-    "60 fps" : {
-
+    "%@ s": {
+      "comment": "设置面板长按时长；插值为保留一位小数的秒数",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ s"
+          }
+        }
+      }
     },
-    "A code has 12 digits." : {
-      "comment" : "配对代码长度错误提示"
+    "%@ second": {
+      "comment": "长按时长的 VoiceOver 单数读法；插值为秒数",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 秒"
+          }
+        }
+      }
     },
-    "A device at home is connected, so %@ streams at its home quality, %@. What you choose here applies once every device is away." : {
-      "comment" : "画质设置或串流连接提示；插值为 Mac 名称、家庭画质名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "A device at home is connected, so %1$@ streams at its home quality, %2$@. What you choose here applies once every device is away."
+    "%@ seconds": {
+      "comment": "长按时长的 VoiceOver 复数读法；插值为秒数",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 秒"
           }
         }
       }
     },
-    "A short tour of Sill’s controls on this %@." : {
-      "comment" : "串流导览文案；插值为设备类型"
+    "%@ stopped accepting connections from the internet. Connect through your VPN.": {
+      "comment": "连接页断开状态；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已停止接受来自互联网的连接。请通过你的 VPN 连接。"
+          }
+        }
+      }
     },
-    "Aa" : {
-
+    "%@ stopped pairing after too many wrong codes. Choose Pair iPhone or iPad… on your Mac for a new code.": {
+      "comment": "配对卡片错误提示，插值为 Mac 名称或地址称呼",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 因配对码错误次数过多而停止配对。请在 Mac 上选择“配对 iPhone 或 iPad…”以获取新配对码。"
+          }
+        }
+      }
     },
-    "Add" : {
-
+    "%@ stopped pairing after too many wrong codes. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %@ again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ stopped pairing after too many wrong codes. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %2$@ again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 因配对码错误次数过多而停止配对。请在 Mac 上的 Sill 菜单中选择“配对 iPhone 或 iPad…”，然后再次轻点 %@。"
+          }
+        }
+      }
     },
-    "Add a Mac" : {
-      "comment" : "连接页：添加 Mac 时的标题"
+    "%@ turned off Remote Access.": {
+      "comment": "连接页断开状态；插值为Mac 名称\n连接页远程连接失败提示，插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已关闭远程访问。"
+          }
+        }
+      }
     },
-    "Add a Mac…" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "添加 Mac…"
+    "%@ window": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 窗口"
           }
         }
       }
     },
-    "Address" : {
-      "comment" : "配对地址输入框：无障碍标签"
+    "%@ window actions": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 窗口操作"
+          }
+        }
+      }
     },
-    "All apps" : {
-      "comment" : "应用抽屉：全部应用分组标题"
+    "%@ window: %@": {
+      "comment": "窗口缩略图：无障碍标签，插值为应用名和窗口标题",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ window: %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 窗口：%@"
+          }
+        }
+      }
     },
-    "Also looking nearby" : {
-      "comment" : "连接页：开始搜索附近 Mac 的无障碍播报",
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "也在搜索附近"
+    "%@ window: %@, showing now": {
+      "comment": "窗口缩略图：当前窗口的无障碍标签，插值为应用名和窗口标题",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ window: %2$@, showing now"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 窗口：%@，正在显示"
           }
         }
       }
     },
-    "Also looks for a Mac with Direct Wireless Connection turned on, without a Wi‑Fi network." : {
-
+    "%@, %@": {
+      "comment": "连接页或配对提示；插值为Mac 名称、连接方式",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@, %2$@"
+          }
+        }
+      }
     },
-    "App Exposé" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
+    "%@, Remote": {
+      "comment": "连接页：远程 Mac 的无障碍标签，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，远程"
+          }
+        }
+      }
     },
-    "Applies to every device streaming from %@. The stream restarts for a moment." : {
-      "comment" : "主机设置面板：主机设置影响范围，插值为 Mac 名称"
+    "%@, Retina": {
+      "comment": "画质的 VoiceOver 名称；插值为码率名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，Retina"
+          }
+        }
+      }
     },
-    "Apps" : {
-      "comment" : "串流工具栏：按钮名称\n主机设置面板：三指手势名称或对应操作"
+    "%@, Standard": {
+      "comment": "画质的 VoiceOver 名称；插值为码率名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，标准"
+          }
+        }
+      }
     },
-    "Asking %@ for a code…" : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "%@, held. Tap to release.": {
+      "comment": "键盘快捷键行：已锁定修饰键的无障碍标签，插值为按键名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，已按住。轻点以松开。"
+          }
+        }
+      }
     },
-    "Away from home" : {
-
+    "%@, hold for the next key": {
+      "comment": "键盘快捷键行：修饰键的无障碍标签，插值为按键名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，按住以用于下一个按键"
+          }
+        }
+      }
     },
-    "Away from home, %@ streams at %@." : {
-      "comment" : "画质设置或串流连接提示；插值为 Mac 名称、画质名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Away from home, %1$@ streams at %2$@."
+    "%@, not paired": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@，未配对"
           }
         }
       }
     },
-    "Away from home, %@ streams at what you choose here and keeps it for next time. At home it goes back to %@." : {
-      "comment" : "画质设置或串流连接提示；插值为 Mac 名称、家庭画质名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Away from home, %1$@ streams at what you choose here and keeps it for next time. At home it goes back to %2$@."
+    "%@, step %lld of %lld": {
+      "comment": "串流导览文案；插值为导览标题、当前步骤、步骤总数",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@, step %2$lld of %3$lld"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@，第 %2$lld 步，共 %3$lld 步"
+          }
         }
       }
     },
-    "Away from home, Sill reaches %@ %@." : {
-      "comment" : "主机设置面板：远程访问说明，插值为 Mac 名称和访问方式",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Away from home, Sill reaches %1$@ %2$@."
+    "%@’s Sill is too old for this %@.": {
+      "comment": "连接页或配对提示；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@’s Sill is too old for this %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 上的 Sill 版本过旧，无法与这台 %@ 配合使用。"
           }
         }
       }
     },
-    "Away from home, this %@ asks for %lld fps, which halves the data your Mac sends." : {
-      "comment" : "主机设置面板：帧率限制说明，插值为设备类型和帧率",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Away from home, this %1$@ asks for %2$lld fps, which halves the data your Mac sends."
+    "%@’s hardware encoder is busy or not responding, so for now streams run at up to 60 fps at Standard.": {
+      "comment": "主机设置面板：硬件编码器忙碌提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的硬件编码器正忙或未响应，因此串流暂时以标准分辨率运行，帧率最高为 60 fps。"
           }
         }
       }
     },
-    "Away: %@" : {
-      "comment" : "画质设置或串流连接提示；插值为画质名称"
+    "%lld more on the Mac": {
+      "comment": "菜单末尾的省略项目提示，插值为 Mac 上其余项目数量",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 上还有 %lld 项"
+          }
+        }
+      }
     },
-    "Below the bar: the row of keys, then the trackpad." : {
-      "comment" : "串流导览文案"
+    "%lld windows": {
+      "comment": "应用抽屉：窗口数量，插值为数量",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld 个窗口"
+          }
+        }
+      }
     },
-    "Beta" : {
-
+    "%lld Mbps": {
+      "comment": "主机设置面板：参数及单位，插值为数值",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld Mbps"
+          }
+        }
+      }
     },
-    "Beta. Every connected device hears what streams, and %@ keeps playing it too. Mute silences it on this %@ alone; %@ keeps sending and playing it." : {
-      "comment" : "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Beta. Every connected device hears what streams, and %1$@ keeps playing it too. Mute silences it on this %2$@ alone; %3$@ keeps sending and playing it."
+    "%lld fps": {
+      "comment": "主机设置面板：参数及单位，插值为数值",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld fps"
           }
         }
       }
     },
-    "Beta. Every connected device hears what streams, and %@ keeps playing it too. Mute silences it on this %@ alone; %@ keeps sending and playing it. This %@ is muted." : {
-      "comment" : "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Beta. Every connected device hears what streams, and %1$@ keeps playing it too. Mute silences it on this %2$@ alone; %3$@ keeps sending and playing it. This %4$@ is muted."
+    "%lld ms": {
+      "comment": "主机设置面板：参数及单位，插值为数值",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ms"
           }
         }
       }
     },
-    "Beta. Turn this on to hear what streams on every connected device; %@ keeps playing it too. Mute silences it on this %@ alone; %@ keeps sending and playing it." : {
-      "comment" : "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Beta. Turn this on to hear what streams on every connected device; %1$@ keeps playing it too. Mute silences it on this %2$@ alone; %3$@ keeps sending and playing it."
+    "**A hardware keyboard** types on %@ by itself, Esc included, and **Keyboard** then brings up the keyboard bar.": {
+      "comment": "串流导览文案；插值为Mac 名称；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**外接键盘**可直接在 %@ 上输入，包括 Esc；此时**键盘**会调出键盘栏。"
           }
         }
       }
     },
-    "Beta. Turn this on to hear what streams on every connected device; %@ keeps playing it too. Mute silences it on this %@ alone; %@ keeps sending and playing it. This %@ is muted." : {
-      "comment" : "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Beta. Turn this on to hear what streams on every connected device; %1$@ keeps playing it too. Mute silences it on this %2$@ alone; %3$@ keeps sending and playing it. This %4$@ is muted."
+    "**A hardware keyboard** types on %@ by itself, Esc included, and **the keyboard key** then brings up the keyboard bar.": {
+      "comment": "串流导览文案；插值为Mac 名称；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**外接键盘**可直接在 %@ 上输入，包括 Esc；此时**键盘键**会调出键盘栏。"
           }
         }
       }
     },
-    "Beta. Update Sill on %@ to hear its sound on this %@." : {
-      "comment" : "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Beta. Update Sill on %1$@ to hear its sound on this %2$@."
+    "**Apple Pencil** works as a mouse.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**Apple Pencil** 可用作鼠标。"
           }
         }
       }
     },
-    "Camera. Point it at the code on %@." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "**Apps** lists the apps on %@. Choose an open one again for its next window.": {
+      "comment": "串流导览文案；插值为Mac 名称；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**应用**会列出 %@ 上的应用。再次选择已打开的应用即可切换到它的下一个窗口。"
+          }
+        }
+      }
     },
-    "Camera. Point it at the code on your Mac." : {
-      "comment" : "配对扫码取景框的无障碍提示"
+    "**Apps** lists the apps on %@: tap an open one again for its next window.": {
+      "comment": "串流导览文案；插值为Mac 名称；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**应用**会列出 %@ 上的应用：再次轻点已打开的应用即可切换到它的下一个窗口。"
+          }
+        }
+      }
     },
-    "Cancel" : {
-
+    "**Disconnect** is at the bottom of Settings.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**断开连接**位于设置底部。"
+          }
+        }
+      }
     },
-    "Change this on %@, or from a device near it." : {
-      "comment" : "主机设置面板：远程连接不能修改设置的说明，插值为 Mac 名称"
+    "**Drag** to scroll.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**拖移**以滚动。"
+          }
+        }
+      }
     },
-    "Change this on %@, or from a device paired with it." : {
-      "comment" : "主机设置面板：未配对设备不能修改设置的说明，插值为 Mac 名称"
+    "**Each window** has actions: close, minimize, full screen, and move left or right. Swipe up or down to hear them.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**每个窗口**都有这些操作：关闭、最小化、全屏以及向左或向右移动。向上或向下轻扫即可听取这些操作。"
+          }
+        }
+      }
     },
-    "Clipboard" : {
-      "comment" : "串流导览文案"
+    "**Hold to Show Window Controls** sets how long you hold a window’s thumbnail before its controls show.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**按住显示窗口控制**可设置按住窗口缩略图多久后显示窗口控制。"
+          }
+        }
+      }
     },
-    "Clipboard and Sound" : {
-      "comment" : "串流导览文案"
+    "**Hold your %@ upright** for a trackpad and keys.": {
+      "comment": "导览竖放设备的提示；插值为设备类型，双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**将你的 %@ 竖放**，即可使用触控板和按键。"
+          }
+        }
+      }
     },
-    "Close" : {
-      "comment" : "窗口控制菜单：按钮名称"
+    "**Keyboard** brings up the on-screen keyboard to type on %@.": {
+      "comment": "串流导览文案；插值为Mac 名称；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**键盘**会调出屏幕键盘，让你在 %@ 上输入。"
+          }
+        }
+      }
     },
-    "Close settings" : {
-      "comment" : "串流工具栏：关闭设置的无障碍标签"
+    "**Larger Picture**, in Settings: a window’s picture takes the place of the thumbnails and reaches down to where the keyboard comes up.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置中的**更大画面**会用窗口画面取代缩略图，并将画面向下扩展到键盘弹出的位置。"
+          }
+        }
+      }
     },
-    "Close the app list" : {
-      "comment" : "串流工具栏：无障碍操作标签"
+    "**Menus** has the menu bar of the app you’re using on %@.": {
+      "comment": "串流导览文案；插值为Mac 名称；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**菜单**中有你正在 %@ 上使用的应用的菜单栏。"
+          }
+        }
+      }
     },
-    "Close window" : {
-
+    "**Pinch** to zoom the picture here, up to 5×. Zoomed in, two fingers move it, and one finger still taps, holds and drags on %@.": {
+      "comment": "串流导览文案；插值为Mac 名称；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**捏合**可缩放这里的画面，最高放大至 5 倍。放大后，用双指移动画面，单指仍可在 %@ 上轻点、按住和拖移。"
+          }
+        }
+      }
     },
-    "Code" : {
-      "comment" : "配对码输入框：无障碍标签"
+    "**Reverse Scrolling** turns a finger’s drag and the on-screen trackpad’s two-finger scroll around.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**反向滚动**会反转单指拖移和屏幕触控板双指滚动的方向。"
+          }
+        }
+      }
     },
-    "Command" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
+    "**Send Audio**, a beta, plays %@’s sound here, and **Mute** silences this %@ alone.": {
+      "comment": "串流导览文案；插值为Mac 名称、设备类型；双星号标出强调文字",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "**Send Audio**, a beta, plays %1$@’s sound here, and **Mute** silences this %2$@ alone."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试版功能**发送声音**可在这里播放 %@ 的声音，而**静音**只会将这台 %@ 静音。"
+          }
+        }
+      }
     },
-    "Command, Option, Control and Shift stay on for the next key or trackpad click: tap Command, then C, to copy." : {
-      "comment" : "串流导览文案"
+    "**Swipe with three fingers**: up for Mission Control, down for App Exposé, and sideways between Spaces.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**用三指轻扫**：向上打开 Mission Control，向下打开 App Exposé，横向轻扫可在桌面空间之间切换。"
+          }
+        }
+      }
     },
-    "Command, Option, Control and Shift stay on for the next key: Command, then C, copies." : {
-      "comment" : "串流导览文案"
+    "**Take the Tour** is there too, to see this again.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "那里还有**使用导览**，可再次查看这些说明。"
+          }
+        }
+      }
     },
-    "Connect" : {
-
+    "**Tap with two fingers** on the trackpad to right-click.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在触控板上**用双指轻点**即可右键点按。"
+          }
+        }
+      }
     },
-    "Connect Remotely" : {
-
+    "**Tap** to click.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**轻点**即可点按。"
+          }
+        }
+      }
     },
-    "Connect to a Mac" : {
-      "comment" : "连接页：默认标题"
+    "**The keyboard key** brings up the on-screen keyboard to type on %@.": {
+      "comment": "串流导览文案；插值为Mac 名称；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**键盘键**会调出屏幕键盘，让你在 %@ 上输入。"
+          }
+        }
+      }
     },
-    "Connected %@." : {
-      "comment" : "主机设置面板：远程连接说明，插值为连接方式"
+    "**Touch and hold** a window to close, minimize or go full screen. Keep holding and drag to move it.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**按住**窗口可关闭、最小化或全屏显示。继续按住并拖移即可移动窗口。"
+          }
+        }
+      }
     },
-    "Connected %@ · %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Connected %1$@ · %2$@"
+    "**Touch and hold** the trackpad, **then drag**, to move a window or select text.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**按住**触控板，**然后拖移**，即可移动窗口或选择文字。"
           }
         }
       }
     },
-    "Connected to %@" : {
-      "comment" : "连接页状态提示，插值为 Mac 名称"
+    "**Touch and hold** to right-click.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**按住**即可右键点按。"
+          }
+        }
+      }
     },
-    "Connecting to %@ directly…" : {
-      "comment" : "连接页状态提示，插值为 Mac 名称"
+    "**Turn your %@ on its side** for a trackpad and keys.": {
+      "comment": "导览横放设备的提示；插值为设备类型，双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**将你的 %@ 横放**，即可使用触控板和按键。"
+          }
+        }
+      }
     },
-    "Connecting to %@ remotely…" : {
-      "comment" : "连接页状态提示，插值为 Mac 名称"
+    "**Update Sill on %@** to copy and paste between it and this %@, and to hear its sound here.": {
+      "comment": "串流导览文案；插值为Mac 名称、设备类型；双星号标出强调文字",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "**Update Sill on %1$@** to copy and paste between it and this %2$@, and to hear its sound here."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**更新 %@ 上的 Sill**，即可在它与这台 %@ 之间拷贝和粘贴，并在这里听到它的声音。"
+          }
+        }
+      }
     },
-    "Connecting to %@…" : {
-      "comment" : "连接页状态提示，插值为 Mac 名称"
+    "**Virtual Display** is on: a window you pick streams from a display of its own on %@, so it keeps updating when something covers it; **Aa** then sizes its text.": {
+      "comment": "导览虚拟显示器说明；插值为 Mac 名称，双星号标出控件名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**虚拟显示器**已开启：你选择的窗口会从 %@ 上专用的显示器进行串流，即使被其他窗口遮挡也能持续更新；此时 **Aa** 可调整其中的文字大小。"
+          }
+        }
+      }
     },
-    "Connects through your VPN or the internet." : {
-      "comment" : "连接页：远程连接的无障碍提示"
+    "**Virtual Display** is on: a window you pick streams from a display of its own on %@, so it keeps updating when something covers it; **Text size** then makes its text larger or smaller: swipe up or down on it.": {
+      "comment": "导览虚拟显示器说明；插值为 Mac 名称，双星号标出控件名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**虚拟显示器**已开启：你选择的窗口会从 %@ 上专用的显示器进行串流，即使被其他窗口遮挡也能持续更新；此时可在**文字大小**上向上或向下轻扫，以放大或缩小其中的文字。"
+          }
+        }
+      }
     },
-    "Connects without a shared Wi‑Fi network" : {
-      "comment" : "连接页或配对提示"
+    "**Virtual Display**, in Settings, streams a window you pick from a display of its own on %@, so it keeps updating when something covers it; **Aa** then sizes its text.": {
+      "comment": "导览虚拟显示器设置说明；插值为 Mac 名称，双星号标出控件名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置中的**虚拟显示器**会将你选择的窗口从 %@ 上专用的显示器进行串流，即使被其他窗口遮挡也能持续更新；此时 **Aa** 可调整其中的文字大小。"
+          }
+        }
+      }
     },
-    "Connects without pairing: %@ lets any device in." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "**Virtual Display**, in Settings, streams a window you pick from a display of its own on %@, so it keeps updating when something covers it; **Text size** then makes its text larger or smaller: swipe up or down on it.": {
+      "comment": "导览虚拟显示器设置说明；插值为 Mac 名称，双星号标出控件名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置中的**虚拟显示器**会将你选择的窗口从 %@ 上专用的显示器进行串流，即使被其他窗口遮挡也能持续更新；此时可在**文字大小**上向上或向下轻扫，以放大或缩小其中的文字。"
+          }
+        }
+      }
     },
-    "Control" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
+    "**cmd, opt, ctrl and shift** stay on for the next key or trackpad click: tap cmd, then C, to copy.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**cmd、opt、ctrl 和 shift** 会保持按下状态，直到下次按键或点按触控板：先轻点 cmd，再轻点 C，即可拷贝。"
+          }
+        }
+      }
     },
-    "Copy on this %@, then come back to Sill: **Paste on %@**, on the note Sill shows then or in Settings, puts it where %@’s cursor is." : {
-      "comment" : "导览剪贴板粘贴说明；插值为设备类型和 Mac 名称，双星号标出控件名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Copy on this %1$@, then come back to Sill: **Paste on %2$@**, on the note Sill shows then or in Settings, puts it where %3$@’s cursor is."
+    "**cmd, opt, ctrl and shift** stay on for the next key: cmd, then C, copies.": {
+      "comment": "串流导览文案；双星号标出强调文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "**cmd、opt、ctrl 和 shift** 会保持按下状态，直到下次按键：先按 cmd，再按 C，即可拷贝。"
           }
         }
       }
     },
-    "Copy on this %@, then come back to Sill: **Paste on %@**, on the note Sill shows then or in Settings, sends it to %@’s clipboard." : {
-      "comment" : "导览剪贴板发送说明；插值为设备类型和 Mac 名称，双星号标出控件名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Copy on this %1$@, then come back to Sill: **Paste on %2$@**, on the note Sill shows then or in Settings, sends it to %3$@’s clipboard."
+    ", away quality, %@": {
+      "comment": "画质设置或串流连接提示；插值为画质名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "，外出时画质，%@"
           }
         }
       }
     },
-    "Couldn’t choose %@. %@" : {
-      "comment" : "菜单操作失败的无障碍播报，插值为菜单项标题和原因",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Couldn’t choose %1$@. %2$@"
+    ", home quality, %@, because a device at home is connected": {
+      "comment": "画质设置或串流连接提示；插值为画质名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "，在家时画质，%@，因为有一台在家设备已连接"
           }
         }
       }
     },
-    "Desktop" : {
-      "comment" : "串流工具栏：按钮名称"
+    "0000 0000 0000": {
+      "comment": "配对码输入框：格式示例"
     },
-    "Direct" : {
-      "comment" : "连接页和设置面板的直连名称"
+    "1 window": {
+      "comment": "应用抽屉：单个窗口数量",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 个窗口"
+          }
+        }
+      }
     },
-    "Direct Wireless Connection" : {
-      "comment" : "主机设置面板：直接无线连接行标题"
+    "100.101.102.103 or mac.example.net": {
+      "comment": "配对地址输入框：地址示例",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "100.101.102.103 或 mac.example.net"
+          }
+        }
+      }
+    },
+    "120 fps": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "120 fps"
+          }
+        }
+      }
+    },
+    "60 fps": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "60 fps"
+          }
+        }
+      }
+    },
+    "A code has 12 digits.": {
+      "comment": "配对代码长度错误提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对码包含 12 位数字。"
+          }
+        }
+      }
+    },
+    "A device at home is connected, so %@ streams at its home quality, %@. What you choose here applies once every device is away.": {
+      "comment": "画质设置或串流连接提示；插值为 Mac 名称、家庭画质名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "A device at home is connected, so %1$@ streams at its home quality, %2$@. What you choose here applies once every device is away."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有一台在家设备已连接，因此 %@ 正以在家时画质 %@ 串流。所有设备都外出后，才会应用你在这里选择的设置。"
+          }
+        }
+      }
+    },
+    "A short tour of Sill’s controls on this %@.": {
+      "comment": "串流导览文案；插值为设备类型",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "简要介绍这台 %@ 上的 Sill 控制方式。"
+          }
+        }
+      }
+    },
+    "Aa": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aa"
+          }
+        }
+      }
+    },
+    "Add": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加"
+          }
+        }
+      }
+    },
+    "Add a Mac": {
+      "comment": "连接页：添加 Mac 时的标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加 Mac"
+          }
+        }
+      }
+    },
+    "Add a Mac…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加 Mac…"
+          }
+        }
+      }
+    },
+    "Address": {
+      "comment": "配对地址输入框：无障碍标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址"
+          }
+        }
+      }
+    },
+    "All apps": {
+      "comment": "应用抽屉：全部应用分组标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所有应用"
+          }
+        }
+      }
+    },
+    "Also looking nearby": {
+      "comment": "连接页：开始搜索附近 Mac 的无障碍播报",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "也在搜索附近"
+          }
+        }
+      }
+    },
+    "Also looks for a Mac with Direct Wireless Connection turned on, without a Wi‑Fi network.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无需连接 Wi‑Fi 网络，也会搜索开启了无线直连的 Mac。"
+          }
+        }
+      }
+    },
+    "App Exposé": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Exposé"
+          }
+        }
+      }
+    },
+    "Applies to every device streaming from %@. The stream restarts for a moment.": {
+      "comment": "主机设置面板：主机设置影响范围，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "适用于所有正在从 %@ 接收串流的设备。串流会短暂重启。"
+          }
+        }
+      }
+    },
+    "Apps": {
+      "comment": "串流工具栏：按钮名称\n主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用"
+          }
+        }
+      }
+    },
+    "Asking %@ for a code…": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在向 %@ 请求配对码…"
+          }
+        }
+      }
+    },
+    "Away from home": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外出时"
+          }
+        }
+      }
+    },
+    "Away from home, %@ streams at %@.": {
+      "comment": "画质设置或串流连接提示；插值为 Mac 名称、画质名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Away from home, %1$@ streams at %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外出时，%@ 以 %@ 画质串流。"
+          }
+        }
+      }
+    },
+    "Away from home, %@ streams at what you choose here and keeps it for next time. At home it goes back to %@.": {
+      "comment": "画质设置或串流连接提示；插值为 Mac 名称、家庭画质名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Away from home, %1$@ streams at what you choose here and keeps it for next time. At home it goes back to %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外出时，%@ 会以你在这里选择的画质串流，并记住设置供下次使用。在家时则恢复为 %@ 画质。"
+          }
+        }
+      }
+    },
+    "Away from home, Sill reaches %@ %@.": {
+      "comment": "主机设置面板：远程访问说明，插值为 Mac 名称和访问方式",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Away from home, Sill reaches %1$@ %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外出时，Sill %2$@ 访问 %1$@。"
+          }
+        }
+      }
+    },
+    "Away from home, this %@ asks for %lld fps, which halves the data your Mac sends.": {
+      "comment": "主机设置面板：帧率限制说明，插值为设备类型和帧率",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Away from home, this %1$@ asks for %2$lld fps, which halves the data your Mac sends."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外出时，这台 %@ 会请求 %lld fps，从而将 Mac 发送的数据量减半。"
+          }
+        }
+      }
+    },
+    "Away: %@": {
+      "comment": "画质设置或串流连接提示；插值为画质名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "外出时：%@"
+          }
+        }
+      }
+    },
+    "Below the bar: the row of keys, then the trackpad.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "工具栏下方依次是按键行和触控板。"
+          }
+        }
+      }
+    },
+    "Beta": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试版"
+          }
+        }
+      }
+    },
+    "Beta. Every connected device hears what streams, and %@ keeps playing it too. Mute silences it on this %@ alone; %@ keeps sending and playing it.": {
+      "comment": "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Beta. Every connected device hears what streams, and %1$@ keeps playing it too. Mute silences it on this %2$@ alone; %3$@ keeps sending and playing it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试版。每台已连接设备都能听到串流内容的声音，%@ 也会继续播放。静音只会将这台 %@ 静音；%@ 会继续发送和播放声音。"
+          }
+        }
+      }
+    },
+    "Beta. Every connected device hears what streams, and %@ keeps playing it too. Mute silences it on this %@ alone; %@ keeps sending and playing it. This %@ is muted.": {
+      "comment": "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Beta. Every connected device hears what streams, and %1$@ keeps playing it too. Mute silences it on this %2$@ alone; %3$@ keeps sending and playing it. This %4$@ is muted."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试版。每台已连接设备都能听到串流内容的声音，%@ 也会继续播放。静音只会将这台 %@ 静音；%@ 会继续发送和播放声音。这台 %@ 已静音。"
+          }
+        }
+      }
+    },
+    "Beta. Turn this on to hear what streams on every connected device; %@ keeps playing it too. Mute silences it on this %@ alone; %@ keeps sending and playing it.": {
+      "comment": "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Beta. Turn this on to hear what streams on every connected device; %1$@ keeps playing it too. Mute silences it on this %2$@ alone; %3$@ keeps sending and playing it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试版。开启后，每台已连接设备都能听到串流内容的声音；%@ 也会继续播放。静音只会将这台 %@ 静音；%@ 会继续发送和播放声音。"
+          }
+        }
+      }
+    },
+    "Beta. Turn this on to hear what streams on every connected device; %@ keeps playing it too. Mute silences it on this %@ alone; %@ keeps sending and playing it. This %@ is muted.": {
+      "comment": "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Beta. Turn this on to hear what streams on every connected device; %1$@ keeps playing it too. Mute silences it on this %2$@ alone; %3$@ keeps sending and playing it. This %4$@ is muted."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试版。开启后，每台已连接设备都能听到串流内容的声音；%@ 也会继续播放。静音只会将这台 %@ 静音；%@ 会继续发送和播放声音。这台 %@ 已静音。"
+          }
+        }
+      }
+    },
+    "Beta. Update Sill on %@ to hear its sound on this %@.": {
+      "comment": "主机设置面板：声音开关和静音说明，插值为 Mac 名称和设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Beta. Update Sill on %1$@ to hear its sound on this %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "测试版。请更新 %@ 上的 Sill，以在这台 %@ 上听到它的声音。"
+          }
+        }
+      }
+    },
+    "Camera. Point it at the code on %@.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "相机。请将它对准 %@ 上的配对码。"
+          }
+        }
+      }
+    },
+    "Camera. Point it at the code on your Mac.": {
+      "comment": "配对扫码取景框的无障碍提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "相机。请将它对准 Mac 上的配对码。"
+          }
+        }
+      }
+    },
+    "Cancel": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "取消"
+          }
+        }
+      }
+    },
+    "Change this on %@, or from a device near it.": {
+      "comment": "主机设置面板：远程连接不能修改设置的说明，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在 %@ 上或通过附近的设备更改此项。"
+          }
+        }
+      }
+    },
+    "Change this on %@, or from a device paired with it.": {
+      "comment": "主机设置面板：未配对设备不能修改设置的说明，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在 %@ 上更改此设置，或使用已与其配对的设备更改。"
+          }
+        }
+      }
+    },
+    "Clipboard": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剪贴板"
+          }
+        }
+      }
+    },
+    "Clipboard and Sound": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "剪贴板与声音"
+          }
+        }
+      }
+    },
+    "Close": {
+      "comment": "窗口控制菜单：按钮名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
+    },
+    "Close settings": {
+      "comment": "串流工具栏：关闭设置的无障碍标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭设置"
+          }
+        }
+      }
+    },
+    "Close the app list": {
+      "comment": "串流工具栏：无障碍操作标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭应用列表"
+          }
+        }
+      }
+    },
+    "Close window": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭窗口"
+          }
+        }
+      }
+    },
+    "Code": {
+      "comment": "配对码输入框：无障碍标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对码"
+          }
+        }
+      }
+    },
+    "Command": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command"
+          }
+        }
+      }
+    },
+    "Command, Option, Control and Shift stay on for the next key or trackpad click: tap Command, then C, to copy.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command、Option、Control 和 Shift 会保持启用，直到你按下下一个按键或点按触控板：先轻点 Command，再轻点 C，即可拷贝。"
+          }
+        }
+      }
+    },
+    "Command, Option, Control and Shift stay on for the next key: Command, then C, copies.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command、Option、Control 和 Shift 会保持启用，直到你按下下一个按键：先轻点 Command，再轻点 C，即可拷贝。"
+          }
+        }
+      }
+    },
+    "Connect": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接"
+          }
+        }
+      }
+    },
+    "Connect Remotely": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "远程连接"
+          }
+        }
+      }
+    },
+    "Connect to a Mac": {
+      "comment": "连接页：默认标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "连接 Mac"
+          }
+        }
+      }
+    },
+    "Connected %@.": {
+      "comment": "主机设置面板：远程连接说明，插值为连接方式",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接，%@。"
+          }
+        }
+      }
+    },
+    "Connected %@ · %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Connected %1$@ · %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接，%@ · %@"
+          }
+        }
+      }
+    },
+    "Connected to %@": {
+      "comment": "连接页状态提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接到 %@"
+          }
+        }
+      }
+    },
+    "Connecting to %@ directly…": {
+      "comment": "连接页状态提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在直连 %@…"
+          }
+        }
+      }
+    },
+    "Connecting to %@ remotely…": {
+      "comment": "连接页状态提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在远程连接 %@…"
+          }
+        }
+      }
+    },
+    "Connecting to %@…": {
+      "comment": "连接页状态提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在连接 %@…"
+          }
+        }
+      }
+    },
+    "Connects through your VPN or the internet.": {
+      "comment": "连接页：远程连接的无障碍提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过你的 VPN 或互联网连接。"
+          }
+        }
+      }
+    },
+    "Connects without a shared Wi‑Fi network": {
+      "comment": "连接页或配对提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无需连接同一 Wi‑Fi 网络即可连接"
+          }
+        }
+      }
+    },
+    "Connects without pairing: %@ lets any device in.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无需配对即可连接：%@ 允许任何设备连接。"
+          }
+        }
+      }
+    },
+    "Control": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Control"
+          }
+        }
+      }
+    },
+    "Copy on this %@, then come back to Sill: **Paste on %@**, on the note Sill shows then or in Settings, puts it where %@’s cursor is.": {
+      "comment": "导览剪贴板粘贴说明；插值为设备类型和 Mac 名称，双星号标出控件名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Copy on this %1$@, then come back to Sill: **Paste on %2$@**, on the note Sill shows then or in Settings, puts it where %3$@’s cursor is."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在这台 %@ 上拷贝后，返回 Sill：轻点随后显示的提示或设置中的**在 %@ 上粘贴**，即可将内容粘贴到 %@ 的光标位置。"
+          }
+        }
+      }
+    },
+    "Copy on this %@, then come back to Sill: **Paste on %@**, on the note Sill shows then or in Settings, sends it to %@’s clipboard.": {
+      "comment": "导览剪贴板发送说明；插值为设备类型和 Mac 名称，双星号标出控件名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Copy on this %1$@, then come back to Sill: **Paste on %2$@**, on the note Sill shows then or in Settings, sends it to %3$@’s clipboard."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在这台 %@ 上拷贝后，返回 Sill：轻点随后显示的提示或设置中的**在 %@ 上粘贴**，即可将内容发送到 %@ 的剪贴板。"
+          }
+        }
+      }
+    },
+    "Couldn’t choose %@. %@": {
+      "comment": "菜单操作失败的无障碍播报，插值为菜单项标题和原因",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Couldn’t choose %1$@. %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法选择 %@。%@"
+          }
+        }
+      }
+    },
+    "Desktop": {
+      "comment": "串流工具栏：按钮名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "桌面"
+          }
+        }
+      }
+    },
+    "Direct": {
+      "comment": "连接页和设置面板的直连名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "直连"
+          }
+        }
+      }
+    },
+    "Direct Wireless Connection": {
+      "comment": "主机设置面板：直接无线连接行标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无线直连"
+          }
+        }
+      }
     },
-    "Disconnect" : {
-
+    "Disconnect": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "断开连接"
+          }
+        }
+      }
+    },
+    "Disconnect from %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "断开与 %@ 的连接"
+          }
+        }
+      }
+    },
+    "Done": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "完成"
+          }
+        }
+      }
+    },
+    "Down arrow": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向下箭头"
+          }
+        }
+      }
+    },
+    "Drag to move the pointer. Tap to click, two fingers to scroll.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "拖移以移动指针。轻点以点按，用双指滚动。"
+          }
+        }
+      }
+    },
+    "Ends the tour. Take the Tour in Settings shows it again.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "结束导览。你可以在设置中轻点“使用导览”，再次查看。"
+          }
+        }
+      }
+    },
+    "Enter Code Instead": {
+      "comment": "配对卡片：切换到手动输入按钮\n配对浮层：切换到手动输入按钮",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "改为输入配对码"
+          }
+        }
+      }
+    },
+    "Enter the Code from %@": {
+      "comment": "配对浮层：输入配对码标题，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入 %@ 上的配对码"
+          }
+        }
+      }
+    },
+    "Escape": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escape"
+          }
+        }
+      }
+    },
+    "Forget %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "忽略 %@"
+          }
+        }
+      }
+    },
+    "Forgot %@. It still lists this %@ until you remove it in Sill’s Settings on the Mac.": {
+      "comment": "连接页状态提示，插值为 Mac 名称和设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Forgot %1$@. It still lists this %2$@ until you remove it in Sill’s Settings on the Mac."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已忽略 %@。它仍会列出这台 %@，直到你在 Mac 上的 Sill 设置中将其移除。"
+          }
+        }
+      }
+    },
+    "Frame Rate": {
+      "comment": "主机设置面板：串流参数行标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "帧率"
+          }
+        }
+      }
+    },
+    "Full Screen": {
+      "comment": "窗口控制菜单：按钮名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全屏"
+          }
+        }
+      }
+    },
+    "Full screen": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "全屏"
+          }
+        }
+      }
+    },
+    "Get it at %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "前往 %@ 获取"
+          }
+        }
+      }
+    },
+    "Group": {
+      "comment": "连接页菜单：未分组时的标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分组"
+          }
+        }
+      }
+    },
+    "Group: %@": {
+      "comment": "连接页菜单：当前分组，插值为用户设置的分组名",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分组：%@"
+          }
+        }
+      }
+    },
+    "Held upright, a window’s picture takes the place of the window thumbnails and reaches down to where the keyboard comes up. The Desktop keeps the thumbnails. Switch windows with Apps: tap an open app again for its next window. To fill the taller picture with a window, set its text size with Aa. A change applies when you close Settings.": {
+      "comment": "主机设置面板：更大画面开关的完整说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "竖直握持时，窗口画面会取代窗口缩略图，并向下延伸到键盘弹出的位置。桌面仍会保留缩略图。你可以通过“应用”切换窗口：再次轻点已打开的应用，即可切换到它的下一个窗口。要让窗口填满增高后的画面，请通过 Aa 设置文字大小。关闭设置后，更改才会生效。"
+          }
+        }
+      }
+    },
+    "Hide the keyboard": {
+      "comment": "串流工具栏：无障碍操作标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐藏键盘"
+          }
+        }
+      }
+    },
+    "Hold to Show\nWindow\nControls": {
+      "comment": "设置面板窄布局的完整长按标题；用换行分成三行",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按住显示\n窗口\n控制"
+          }
+        }
+      }
+    },
+    "Hold to Show Window Controls": {
+      "comment": "设置面板缩略图长按时长的标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按住显示窗口控制"
+          }
+        }
+      }
+    },
+    "Hold to show window controls": {
+      "comment": "设置面板长按时长的 VoiceOver 标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按住显示窗口控制"
+          }
+        }
+      }
+    },
+    "Home": {
+      "comment": "连接页预设分组名称：家庭",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "家庭"
+          }
+        }
+      }
+    },
+    "Home quality: %@ (a device at home is connected)": {
+      "comment": "画质设置或串流连接提示；插值为画质名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在家时画质：%@（家中已有设备连接）"
+          }
+        }
+      }
+    },
+    "How long to hold a window’s thumbnail before its close, minimize and full-screen controls appear, and before it can be dragged to another place.": {
+      "comment": "设置面板长按时长的说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按住窗口缩略图多久后显示关闭、最小化和全屏控制，并允许将窗口拖移到其他位置。"
+          }
+        }
+      }
+    },
+    "In Settings, the last button in the bar.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位于设置中，也就是工具栏的最后一个按钮。"
+          }
+        }
+      }
+    },
+    "In Settings, the last button in the row under the picture.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位于设置中，也就是画面下方一排按钮中的最后一个。"
+          }
+        }
+      }
+    },
+    "In the bar at the top, after Apps.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位于顶部工具栏中，“应用”的后面。"
+          }
+        }
+      }
+    },
+    "In the bar below the picture, after Apps.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位于画面下方的工具栏中，“应用”的后面。"
+          }
+        }
+      }
+    },
+    "Keyboard": {
+      "comment": "串流工具栏：按钮名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "键盘"
+          }
+        }
+      }
+    },
+    "Keys and Trackpad": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按键与触控板"
+          }
+        }
+      }
+    },
+    "Larger Picture": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更大画面"
+          }
+        }
+      }
     },
-    "Disconnect from %@" : {
-
+    "Left arrow": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向左箭头"
+          }
+        }
+      }
+    },
+    "Lets devices reach %@ without a shared Wi‑Fi network, the way AirDrop does. While it’s on, streaming over Wi‑Fi can stutter.": {
+      "comment": "主机设置面板：直接无线连接说明，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "让设备无需连接同一 Wi‑Fi 网络即可连接 %@，原理与 AirDrop 相同。开启后，通过 Wi‑Fi 串流时可能会卡顿。"
+          }
+        }
+      }
+    },
+    "Lets devices reach %@ without a shared Wi‑Fi network, the way AirDrop does. While it’s on, streaming over Wi‑Fi can stutter. This %@ is connected directly: turning this off disconnects it.": {
+      "comment": "主机设置面板：直接无线连接说明及断线提醒，插值为 Mac 名称和设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Lets devices reach %1$@ without a shared Wi‑Fi network, the way AirDrop does. While it’s on, streaming over Wi‑Fi can stutter. This %2$@ is connected directly: turning this off disconnects it."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "让设备无需连接同一 Wi‑Fi 网络即可连接 %@，原理与 AirDrop 相同。开启后，通过 Wi‑Fi 串流时可能会卡顿。这台 %@ 正在直连，关闭此选项会使其断开连接。"
+          }
+        }
+      }
+    },
+    "Loading settings…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在加载设置…"
+          }
+        }
+      }
+    },
+    "Looking for Macs on this network": {
+      "comment": "连接页搜索或本地网络访问权限提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在查找此网络上的 Mac"
+          }
+        }
+      }
+    },
+    "Looking for Macs on this network and nearby": {
+      "comment": "连接页搜索或本地网络访问权限提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在查找此网络上和附近的 Mac"
+          }
+        }
+      }
+    },
+    "Low Power Mode holds this %@ to %lld fps.": {
+      "comment": "主机设置面板：帧率限制说明，插值为设备类型和帧率",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Low Power Mode holds this %1$@ to %2$lld fps."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "低电量模式将这台 %@ 的帧率限制为 %lld fps。"
+          }
+        }
+      }
+    },
+    "Lower latency when %@ is busy, at a softer picture.": {
+      "comment": "主机设置面板：编码速度说明，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 %@ 繁忙时降低延迟，但画面会更模糊。"
+          }
+        }
+      }
+    },
+    "Menus": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "菜单"
+          }
+        }
+      }
     },
-    "Done" : {
-      "comment" : "串流导览文案"
+    "Minimize": {
+      "comment": "窗口控制菜单：按钮名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最小化"
+          }
+        }
+      }
     },
-    "Down arrow" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
+    "Minimize window": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "最小化窗口"
+          }
+        }
+      }
     },
-    "Drag to move the pointer. Tap to click, two fingers to scroll." : {
-
+    "Mission Control": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mission Control"
+          }
+        }
+      }
     },
-    "Ends the tour. Take the Tour in Settings shows it again." : {
-      "comment" : "串流导览文案"
+    "Move left": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向左移动"
+          }
+        }
+      }
     },
-    "Enter Code Instead" : {
-      "comment" : "配对卡片：切换到手动输入按钮\n配对浮层：切换到手动输入按钮"
+    "Move right": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向右移动"
+          }
+        }
+      }
     },
-    "Enter the Code from %@" : {
-      "comment" : "配对浮层：输入配对码标题，插值为 Mac 名称"
+    "Mute": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "静音"
+          }
+        }
+      }
     },
-    "Escape" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
+    "Mute sound from %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将 %@ 的声音静音"
+          }
+        }
+      }
     },
-    "Forget %@" : {
-
+    "Name": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "名称"
+          }
+        }
+      }
     },
-    "Forgot %@. It still lists this %@ until you remove it in Sill’s Settings on the Mac." : {
-      "comment" : "连接页状态提示，插值为 Mac 名称和设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Forgot %1$@. It still lists this %2$@ until you remove it in Sill’s Settings on the Mac."
+    "Needs the free Sill app on your Mac.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要在 Mac 上安装免费的 Sill。"
           }
         }
       }
     },
-    "Frame Rate" : {
-      "comment" : "主机设置面板：串流参数行标题"
+    "New Group": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建分组"
+          }
+        }
+      }
     },
-    "Full Screen" : {
-      "comment" : "窗口控制菜单：按钮名称"
+    "New Group…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新建分组…"
+          }
+        }
+      }
     },
-    "Full screen" : {
-
+    "New:": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "新增："
+          }
+        }
+      }
     },
-    "Get it at %@" : {
-
+    "Next": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一步"
+          }
+        }
+      }
     },
-    "Group" : {
-      "comment" : "连接页菜单：未分组时的标题"
+    "No items": {
+      "comment": "Mac 菜单没有项目时的提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无项目"
+          }
+        }
+      }
     },
-    "Group: %@" : {
-      "comment" : "连接页菜单：当前分组，插值为用户设置的分组名"
+    "None": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无"
+          }
+        }
+      }
     },
-    "Held upright, a window’s picture takes the place of the window thumbnails and reaches down to where the keyboard comes up. The Desktop keeps the thumbnails. Switch windows with Apps: tap an open app again for its next window. To fill the taller picture with a window, set its text size with Aa. A change applies when you close Settings." : {
-      "comment" : "主机设置面板：更大画面开关的完整说明"
+    "Not connected.": {
+      "comment": "Mac 菜单在连接断开时的提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未连接。"
+          }
+        }
+      }
     },
-    "Hide the keyboard" : {
-      "comment" : "串流工具栏：无障碍操作标签"
+    "Not paired": {
+      "comment": "连接页或配对提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未配对"
+          }
+        }
+      }
     },
-    "Hold to Show\nWindow\nControls" : {
-      "comment" : "设置面板窄布局的完整长按标题；用换行分成三行"
+    "Not streaming": {
+      "comment": "主机设置面板：当前未串流的状态",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未串流"
+          }
+        }
+      }
     },
-    "Hold to Show Window Controls" : {
-      "comment" : "设置面板缩略图长按时长的标题"
+    "Not streaming%@": {
+      "comment": "主机设置面板：未串流的无障碍读出，插值为可选连接方式",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未串流%@"
+          }
+        }
+      }
     },
-    "Hold to show window controls" : {
-      "comment" : "设置面板长按时长的 VoiceOver 标题"
+    "Nothing answered at %@. Check the address, and that Sill is open on your Mac.": {
+      "comment": "配对卡片错误提示，插值为 Mac 地址",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 未响应。请检查地址，并确认 Mac 上已打开 Sill。"
+          }
+        }
+      }
     },
-    "Home" : {
-      "comment" : "连接页预设分组名称：家庭"
+    "Off": {
+      "comment": "文本大小滑杆：关闭自动调整",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭"
+          }
+        }
+      }
     },
-    "Home quality: %@ (a device at home is connected)" : {
-      "comment" : "画质设置或串流连接提示；插值为画质名称"
+    "On its side, Sill adds keys and a trackpad.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "横向握持时，Sill 会显示按键和触控板。"
+          }
+        }
+      }
     },
-    "How long to hold a window’s thumbnail before its close, minimize and full-screen controls appear, and before it can be dragged to another place." : {
-      "comment" : "设置面板长按时长的说明"
+    "On the virtual display": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在虚拟显示器上"
+          }
+        }
+      }
     },
-    "In Settings, the last button in the bar." : {
-      "comment" : "串流导览文案"
+    "On your Mac, choose Pair iPhone or iPad… in the Sill menu, then point this %@ at the code.": {
+      "comment": "添加 Mac 卡片：扫码说明，插值为设备类型",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Mac 的 Sill 菜单中选择“配对 iPhone 或 iPad…”，然后将这台 %@ 对准配对码。"
+          }
+        }
+      }
     },
-    "In Settings, the last button in the row under the picture." : {
-      "comment" : "串流导览文案"
+    "Only pair with a code your own Mac shows.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请只使用你自己的 Mac 显示的配对码配对。"
+          }
+        }
+      }
     },
-    "In the bar at the top, after Apps." : {
-      "comment" : "串流导览文案"
+    "Open Settings": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开设置"
+          }
+        }
+      }
     },
-    "In the bar below the picture, after Apps." : {
-      "comment" : "串流导览文案"
+    "Open Spotlight on the Mac": {
+      "comment": "键盘快捷键行：Spotlight 的无障碍操作标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 Mac 上打开 Spotlight"
+          }
+        }
+      }
     },
-    "Keyboard" : {
-      "comment" : "串流工具栏：按钮名称"
+    "Open now": {
+      "comment": "应用抽屉：已打开应用分组标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已打开"
+          }
+        }
+      }
     },
-    "Keys and Trackpad" : {
-      "comment" : "串流导览文案"
+    "Open the app list": {
+      "comment": "串流工具栏：无障碍操作标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开应用列表"
+          }
+        }
+      }
     },
-    "Larger Picture" : {
-
+    "Opens the App Store.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "打开 App Store。"
+          }
+        }
+      }
     },
-    "Left arrow" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
+    "Option": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Option"
+          }
+        }
+      }
     },
-    "Lets devices reach %@ without a shared Wi‑Fi network, the way AirDrop does. While it’s on, streaming over Wi‑Fi can stutter." : {
-      "comment" : "主机设置面板：直接无线连接说明，插值为 Mac 名称"
+    "Other": {
+      "comment": "连接页未分组 Mac 的分区标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "其他"
+          }
+        }
+      }
     },
-    "Lets devices reach %@ without a shared Wi‑Fi network, the way AirDrop does. While it’s on, streaming over Wi‑Fi can stutter. This %@ is connected directly: turning this off disconnects it." : {
-      "comment" : "主机设置面板：直接无线连接说明及断线提醒，插值为 Mac 名称和设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Lets devices reach %1$@ without a shared Wi‑Fi network, the way AirDrop does. While it’s on, streaming over Wi‑Fi can stutter. This %2$@ is connected directly: turning this off disconnects it."
+    "Pair": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对"
           }
         }
       }
-    },
-    "Loading settings…" : {
-
-    },
-    "Looking for Macs on this network" : {
-      "comment" : "连接页搜索或本地网络访问权限提示"
-    },
-    "Looking for Macs on this network and nearby" : {
-      "comment" : "连接页搜索或本地网络访问权限提示"
     },
-    "Low Power Mode holds this %@ to %lld fps." : {
-      "comment" : "主机设置面板：帧率限制说明，插值为设备类型和帧率",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Low Power Mode holds this %1$@ to %2$lld fps."
+    "Pair This %@…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对这台 %@…"
           }
         }
       }
-    },
-    "Lower latency when %@ is busy, at a softer picture." : {
-      "comment" : "主机设置面板：编码速度说明，插值为 Mac 名称"
-    },
-    "Menus" : {
-
-    },
-    "Minimize" : {
-      "comment" : "窗口控制菜单：按钮名称"
-    },
-    "Minimize window" : {
-
     },
-    "Mission Control" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
-    },
-    "Move left" : {
-
-    },
-    "Move right" : {
-
-    },
-    "Mute" : {
-
-    },
-    "Mute sound from %@" : {
-
-    },
-    "Name" : {
-
-    },
-    "Needs the free Sill app on your Mac." : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "需要在 Mac 上安装免费的 Sill。"
+    "Pair once to reach %@ through your VPN or the internet. %@ shows a code; scan it with this %@.": {
+      "comment": "主机设置面板：配对说明，插值为 Mac 名称和设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Pair once to reach %1$@ through your VPN or the internet. %2$@ shows a code; scan it with this %3$@."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只需配对一次，即可通过 VPN 或互联网连接 %@。%@ 会显示配对码，用这台 %@ 扫描即可。"
+          }
         }
       }
-    },
-    "New Group" : {
-
     },
-    "New Group…" : {
-
-    },
-    "New:" : {
-      "comment" : "串流导览文案"
-    },
-    "Next" : {
-      "comment" : "串流导览文案"
-    },
-    "No items" : {
-      "comment" : "Mac 菜单没有项目时的提示"
-    },
-    "None" : {
-
-    },
-    "Not connected." : {
-      "comment" : "Mac 菜单在连接断开时的提示"
-    },
-    "Not paired" : {
-      "comment" : "连接页或配对提示"
-    },
-    "Not streaming" : {
-      "comment" : "主机设置面板：当前未串流的状态"
+    "Pair once, and Sill reaches your Mac from anywhere, through your VPN or the internet.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "只需配对一次，Sill 就能通过 VPN 或互联网，让你随时随地连接 Mac。"
+          }
+        }
+      }
     },
-    "Not streaming%@" : {
-      "comment" : "主机设置面板：未串流的无障碍读出，插值为可选连接方式"
+    "Pair with %@": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与 %@ 配对"
+          }
+        }
+      }
     },
-    "Nothing answered at %@. Check the address, and that Sill is open on your Mac." : {
-      "comment" : "配对卡片错误提示，插值为 Mac 地址"
+    "Pair with %@ at %@?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Pair with %1$@ at %2$@?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要与地址为 %2$@ 的 %1$@ 配对吗？"
+          }
+        }
+      }
     },
-    "Off" : {
-      "comment" : "文本大小滑杆：关闭自动调整"
+    "Paired": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已配对"
+          }
+        }
+      }
     },
-    "On its side, Sill adds keys and a trackpad." : {
-      "comment" : "串流导览文案"
+    "Paired with %@ over the cable.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已通过线缆与 %@ 配对。"
+          }
+        }
+      }
     },
-    "On the virtual display" : {
-
+    "Paired with %@.": {
+      "comment": "配对成功的无障碍播报，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已与 %@ 配对。"
+          }
+        }
+      }
     },
-    "On your Mac, choose Pair iPhone or iPad… in the Sill menu, then point this %@ at the code." : {
-      "comment" : "添加 Mac 卡片：扫码说明，插值为设备类型"
+    "Pairing didn’t finish: %@ couldn’t show it knows the code.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对未完成：%@ 未能通过配对码验证。"
+          }
+        }
+      }
     },
-    "Only pair with a code your own Mac shows." : {
-
+    "Pairing didn’t finish: %@ couldn’t show it knows the code. Tap it to try again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对未完成：%@ 未能通过配对码验证。轻点它以重试。"
+          }
+        }
+      }
     },
-    "Open Settings" : {
-
+    "Pairing didn’t finish: the Mac at %@ couldn’t show it knows the code. Pair from the same network as your Mac, or scan the code instead.": {
+      "comment": "配对卡片错误提示，插值为 Mac 地址",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对未完成：地址为 %@ 的 Mac 未能通过配对码验证。请连接到与 Mac 相同的网络后配对，或改为扫描配对码。"
+          }
+        }
+      }
     },
-    "Open Spotlight on the Mac" : {
-      "comment" : "键盘快捷键行：Spotlight 的无障碍操作标签"
+    "Pairing with %@ over the cable…": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在通过线缆与 %@ 配对…"
+          }
+        }
+      }
     },
-    "Open now" : {
-      "comment" : "应用抽屉：已打开应用分组标题"
+    "Pairing with %@…": {
+      "comment": "连接页或配对提示；插值为Mac 名称\n连接页配对状态提示，插值为 Mac 名称\n连接页配对状态提示，插值为 Mac 名称或地址",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在与 %@ 配对…"
+          }
+        }
+      }
     },
-    "Open the app list" : {
-      "comment" : "串流工具栏：无障碍操作标签"
+    "Pairs over the USB cable, then connects.": {
+      "comment": "连接页或配对提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先通过 USB 线缆配对，再建立连接。"
+          }
+        }
+      }
     },
-    "Opens the App Store." : {
-
+    "Pairs this %@ with a Mac so you can reach it away from home.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "将这台 %@ 与 Mac 配对，以便你在外出时连接 Mac。"
+          }
+        }
+      }
     },
-    "Option" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
+    "Pairs with a code %@ shows, then connects.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "先使用 %@ 显示的配对码配对，再建立连接。"
+          }
+        }
+      }
     },
-    "Other" : {
-      "comment" : "连接页未分组 Mac 的分区标题"
+    "Personal": {
+      "comment": "连接页预设分组名称：个人",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "个人"
+          }
+        }
+      }
     },
-    "Pair" : {
-
+    "Pinch": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "捏合"
+          }
+        }
+      }
     },
-    "Pair This %@…" : {
-
+    "Point at the code on %@": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "对准 %@ 上的配对码"
+          }
+        }
+      }
     },
-    "Pair once to reach %@ through your VPN or the internet. %@ shows a code; scan it with this %@." : {
-      "comment" : "主机设置面板：配对说明，插值为 Mac 名称和设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Pair once to reach %1$@ through your VPN or the internet. %2$@ shows a code; scan it with this %3$@."
+    "Point at the code on your Mac": {
+      "comment": "配对扫码取景框下方的提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "对准 Mac 上的配对码"
           }
         }
       }
     },
-    "Pair once, and Sill reaches your Mac from anywhere, through your VPN or the internet." : {
-
+    "Prioritize Encoding Speed": {
+      "comment": "主机设置面板：优先编码速度行标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "优先编码速度"
+          }
+        }
+      }
     },
-    "Pair with %@" : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Privacy Policy": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐私政策"
+          }
+        }
+      }
     },
-    "Pair with %@ at %@?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Pair with %1$@ at %2$@?"
+    "Quality": {
+      "comment": "主机设置面板：串流参数行标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画质"
           }
         }
       }
     },
-    "Paired" : {
-
+    "Quality is per 60 fps; a 120 fps stream gets twice as much. %@": {
+      "comment": "主机设置面板：质量及连接要求说明，插值为质量策略说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画质以 60 fps 为基准；120 fps 串流的码率翻倍。%@"
+          }
+        }
+      }
     },
-    "Paired with %@ over the cable." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Reconnecting to %@ directly…": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在重新直连 %@…"
+          }
+        }
+      }
     },
-    "Paired with %@." : {
-      "comment" : "配对成功的无障碍播报，插值为 Mac 名称"
+    "Reconnecting to %@ remotely…": {
+      "comment": "连接页状态提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在重新远程连接 %@…"
+          }
+        }
+      }
     },
-    "Pairing didn’t finish: %@ couldn’t show it knows the code." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Reconnecting to %@…": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在重新连接 %@…"
+          }
+        }
+      }
     },
-    "Pairing didn’t finish: %@ couldn’t show it knows the code. Tap it to try again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Remote": {
+      "comment": "连接页中已保存 Mac 的远程连接方式",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "远程"
+          }
+        }
+      }
     },
-    "Pairing didn’t finish: the Mac at %@ couldn’t show it knows the code. Pair from the same network as your Mac, or scan the code instead." : {
-      "comment" : "配对卡片错误提示，插值为 Mac 地址"
+    "Remove Preview Picture": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "移除预览图片"
+          }
+        }
+      }
     },
-    "Pairing with %@ over the cable…" : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Remove the part after %: it only works on this network.": {
+      "comment": "添加 Mac 卡片提示删除仅适用于本地网络的地址范围",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请移除 % 后面的部分：该部分仅适用于当前网络。"
+          }
+        }
+      }
     },
-    "Pairing with %@…" : {
-      "comment" : "连接页或配对提示；插值为Mac 名称\n连接页配对状态提示，插值为 Mac 名称\n连接页配对状态提示，插值为 Mac 名称或地址"
+    "Resolution": {
+      "comment": "主机设置面板：串流参数行标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "分辨率"
+          }
+        }
+      }
     },
-    "Pairs over the USB cable, then connects." : {
-      "comment" : "连接页或配对提示"
+    "Retina": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Retina"
+          }
+        }
+      }
     },
-    "Pairs this %@ with a Mac so you can reach it away from home." : {
-
+    "Reverse Scrolling": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "反向滚动"
+          }
+        }
+      }
     },
-    "Pairs with a code %@ shows, then connects." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Right arrow": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向右箭头"
+          }
+        }
+      }
     },
-    "Personal" : {
-      "comment" : "连接页预设分组名称：个人"
+    "Scan Code Instead": {
+      "comment": "配对卡片：切换到扫码按钮\n配对浮层：切换到扫码按钮",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "改为扫描配对码"
+          }
+        }
+      }
     },
-    "Pinch" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
+    "Scan the Code on %@": {
+      "comment": "配对浮层：扫码标题，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "扫描 %@ 上的配对码"
+          }
+        }
+      }
     },
-    "Point at the code on %@" : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Search Nearby": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索附近"
+          }
+        }
+      }
     },
-    "Point at the code on your Mac" : {
-      "comment" : "配对扫码取景框下方的提示"
+    "Search apps on %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索 %@ 上的应用"
+          }
+        }
+      }
     },
-    "Prioritize Encoding Speed" : {
-      "comment" : "主机设置面板：优先编码速度行标题"
+    "Search apps on this Mac": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索这台 Mac 上的应用"
+          }
+        }
+      }
     },
-    "Privacy Policy" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "隐私政策"
+    "Send Audio": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送声音"
           }
         }
       }
     },
-    "Quality" : {
-      "comment" : "主机设置面板：串流参数行标题"
+    "Send Audio, beta": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发送声音，测试版"
+          }
+        }
+      }
     },
-    "Quality is per 60 fps; a 120 fps stream gets twice as much. %@" : {
-      "comment" : "主机设置面板：质量及连接要求说明，插值为质量策略说明"
+    "Settings": {
+      "comment": "串流导览文案\n串流工具栏：按钮名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "设置"
+          }
+        }
+      }
     },
-    "Reconnecting to %@ directly…" : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Settings for %@": {
+      "comment": "串流工具栏：打开设置的无障碍标签，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的设置"
+          }
+        }
+      }
     },
-    "Reconnecting to %@ remotely…" : {
-      "comment" : "连接页状态提示，插值为 Mac 名称"
+    "Shift": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shift"
+          }
+        }
+      }
     },
-    "Reconnecting to %@…" : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Show Desktop": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示桌面"
+          }
+        }
+      }
     },
-    "Remote" : {
-      "comment" : "连接页中已保存 Mac 的远程连接方式"
+    "Show as List": {
+      "comment": "连接页菜单：切换到列表",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以列表显示"
+          }
+        }
+      }
     },
-    "Remove Preview Picture" : {
-
+    "Show as Tiles": {
+      "comment": "连接页菜单：切换到卡片",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以卡片显示"
+          }
+        }
+      }
     },
-    "Remove the part after %: it only works on this network." : {
-      "comment" : "添加 Mac 卡片提示删除仅适用于本地网络的地址范围"
+    "Show as list": {
+      "comment": "连接页：切换到列表的无障碍标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以列表显示"
+          }
+        }
+      }
     },
-    "Resolution" : {
-      "comment" : "主机设置面板：串流参数行标题"
+    "Show as tiles": {
+      "comment": "连接页：切换到卡片的无障碍标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "以卡片显示"
+          }
+        }
+      }
     },
-    "Retina" : {
-
+    "Show the full Mac desktop": {
+      "comment": "串流工具栏：显示桌面的无障碍标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示完整的 Mac 桌面"
+          }
+        }
+      }
     },
-    "Reverse Scrolling" : {
-
+    "Show the keyboard": {
+      "comment": "串流工具栏：无障碍操作标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示键盘"
+          }
+        }
+      }
     },
-    "Right arrow" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
+    "Shows how to use Sill on this %@.": {
+      "comment": "串流导览文案；插值为设备类型",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "介绍如何在这台 %@ 上使用 Sill。"
+          }
+        }
+      }
     },
-    "Scan Code Instead" : {
-      "comment" : "配对卡片：切换到扫码按钮\n配对浮层：切换到扫码按钮"
+    "Sill can’t use the camera. Enter the code instead, or allow the camera in Settings.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 无法使用摄像头。请改为输入配对码，或在“设置”中允许使用摄像头。"
+          }
+        }
+      }
     },
-    "Scan the Code on %@" : {
-      "comment" : "配对浮层：扫码标题，插值为 Mac 名称"
+    "SillHost keeps these until it quits.": {
+      "comment": "主机设置面板：设置保留期限说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这些设置会保留到 SillHost 退出为止。"
+          }
+        }
+      }
     },
-    "Search Nearby" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "搜索附近"
+    "Skip": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "跳过"
           }
         }
       }
     },
-    "Search apps on %@" : {
-
+    "Something answered at %@, but it isn’t Sill, or its Sill is too old to pair.": {
+      "comment": "配对卡片错误提示，插值为 Mac 地址",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址 %@ 有响应，但响应的并非 Sill，或其 Sill 版本过旧，无法配对。"
+          }
+        }
+      }
     },
-    "Search apps on this Mac" : {
-
+    "Something answered at %@, but it isn’t Sill. Your home’s internet address may have changed.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 地址",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址 %@ 有响应，但响应的并非 Sill。你家中的互联网地址可能已更改。"
+          }
+        }
+      }
     },
-    "Send Audio" : {
-
+    "Sound": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "声音"
+          }
+        }
+      }
     },
-    "Send Audio, beta" : {
-
+    "Sound muted: headphones disconnected.": {
+      "comment": "耳机断开后静音的 VoiceOver 通知",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "耳机已断开连接，声音已静音。"
+          }
+        }
+      }
     },
-    "Settings" : {
-      "comment" : "串流导览文案\n串流工具栏：按钮名称"
+    "Space on the Left": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "左侧桌面空间"
+          }
+        }
+      }
     },
-    "Settings for %@" : {
-      "comment" : "串流工具栏：打开设置的无障碍标签，插值为 Mac 名称"
+    "Space on the Right": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "右侧桌面空间"
+          }
+        }
+      }
     },
-    "Shift" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
+    "Spaces": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "桌面空间"
+          }
+        }
+      }
     },
-    "Show Desktop" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
+    "Spread": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "张开"
+          }
+        }
+      }
     },
-    "Show as List" : {
-      "comment" : "连接页菜单：切换到列表"
+    "Standard": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "标准"
+          }
+        }
+      }
     },
-    "Show as Tiles" : {
-      "comment" : "连接页菜单：切换到卡片"
+    "Stopped trying to reach %@. Tap it to try again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称\n连接页状态提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已停止尝试连接 %@。轻点它以重试。"
+          }
+        }
+      }
     },
-    "Show as list" : {
-      "comment" : "连接页：切换到列表的无障碍标签"
+    "Streaming %lld by %lld, %lld frames per second, %lld megabits per second%@": {
+      "comment": "主机设置面板：串流的无障碍读出，插值为分辨率、帧率、码率和连接方式",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Streaming %1$lld by %2$lld, %3$lld frames per second, %4$lld megabits per second%5$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在串流，分辨率为 %lld 乘 %lld，每秒 %lld 帧，每秒 %lld 兆比特%@"
+          }
+        }
+      }
     },
-    "Show as tiles" : {
-      "comment" : "连接页：切换到卡片的无障碍标签"
+    "Streaming %lld by %lld, %lld frames per second, %lld megabits per second, on the virtual display%@": {
+      "comment": "主机设置面板：虚拟显示器串流的无障碍读出，插值为分辨率、帧率、码率和连接方式",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Streaming %1$lld by %2$lld, %3$lld frames per second, %4$lld megabits per second, on the virtual display%5$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在从虚拟显示器串流，分辨率为 %lld 乘 %lld，每秒 %lld 帧，每秒 %lld 兆比特%@"
+          }
+        }
+      }
     },
-    "Show the full Mac desktop" : {
-      "comment" : "串流工具栏：显示桌面的无障碍标签"
+    "Support": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支持"
+          }
+        }
+      }
     },
-    "Show the keyboard" : {
-      "comment" : "串流工具栏：无障碍操作标签"
+    "Swipe Down": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向下轻扫"
+          }
+        }
+      }
     },
-    "Shows how to use Sill on this %@." : {
-      "comment" : "串流导览文案；插值为设备类型"
+    "Swipe Left or Right": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向左或向右轻扫"
+          }
+        }
+      }
     },
-    "Sill can’t use the camera. Enter the code instead, or allow the camera in Settings." : {
-
+    "Swipe Up": {
+      "comment": "主机设置面板：三指手势名称或对应操作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向上轻扫"
+          }
+        }
+      }
     },
-    "SillHost keeps these until it quits." : {
-      "comment" : "主机设置面板：设置保留期限说明"
+    "Switching to Wi‑Fi…": {
+      "comment": "连接页切换到 Wi-Fi 的状态提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在切换到 Wi‑Fi…"
+          }
+        }
+      }
     },
-    "Skip" : {
-      "comment" : "串流导览文案"
+    "Tab": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tab"
+          }
+        }
+      }
     },
-    "Something answered at %@, but it isn’t Sill, or its Sill is too old to pair." : {
-      "comment" : "配对卡片错误提示，插值为 Mac 地址"
+    "Take the Tour": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用导览"
+          }
+        }
+      }
     },
-    "Something answered at %@, but it isn’t Sill. Your home’s internet address may have changed." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 地址"
+    "Tap the code to try again.": {
+      "comment": "扫码配对失败后手动重试的提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轻点配对码以重试。"
+          }
+        }
+      }
     },
-    "Sound" : {
-      "comment" : "串流导览文案"
+    "Tap, Hold, Drag and Pinch": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "轻点、按住、拖移和捏合"
+          }
+        }
+      }
     },
-    "Sound muted: headphones disconnected." : {
-      "comment" : "耳机断开后静音的 VoiceOver 通知"
+    "Text size": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "文字大小"
+          }
+        }
+      }
     },
-    "Space on the Left" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
+    "That code didn’t work. Check the code on your Mac. %lld tries left.": {
+      "comment": "配对代码错误提示，插值为剩余尝试次数",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对码不正确。请核对 Mac 上的配对码。还可以再试 %lld 次。"
+          }
+        }
+      }
     },
-    "Space on the Right" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
+    "That code didn’t work. Check the code on your Mac. 1 try left.": {
+      "comment": "配对代码错误提示，仅剩一次机会",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对码不正确。请核对 Mac 上的配对码。还可以再试 1 次。"
+          }
+        }
+      }
     },
-    "Spaces" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
+    "That code expired. Tap %@ for a new one.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对码已过期。轻点 %@ 以获取新配对码。"
+          }
+        }
+      }
     },
-    "Spread" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
+    "That code has a typo. Check it against your Mac.": {
+      "comment": "配对代码校验错误提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "配对码输入有误。请与 Mac 上的配对码核对。"
+          }
+        }
+      }
     },
-    "Standard" : {
-
+    "That code no longer works. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %@ again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此配对码已失效。请在 Mac 上的 Sill 菜单中选择“配对 iPhone 或 iPad…”，然后再次轻点 %@。"
+          }
+        }
+      }
     },
-    "Stopped trying to reach %@. Tap it to try again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称\n连接页状态提示，插值为 Mac 名称"
+    "That doesn’t look like an address. Try 100.101.102.103 or mac.example.net.": {
+      "comment": "添加 Mac 卡片的地址格式错误提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址格式似乎不正确。请尝试 100.101.102.103 或 mac.example.net。"
+          }
+        }
+      }
     },
-    "Streaming %lld by %lld, %lld frames per second, %lld megabits per second%@" : {
-      "comment" : "主机设置面板：串流的无障碍读出，插值为分辨率、帧率、码率和连接方式",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Streaming %1$lld by %2$lld, %3$lld frames per second, %4$lld megabits per second%5$@"
+    "That’s not a Sill code.": {
+      "comment": "扫描到非 Sill 配对代码的错误提示\n扫码内容不是 Sill 配对码时的提示\n扫码内容不是 Sill 配对码时的无障碍播报",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这不是 Sill 配对码。"
           }
         }
       }
     },
-    "Streaming %lld by %lld, %lld frames per second, %lld megabits per second, on the virtual display%@" : {
-      "comment" : "主机设置面板：虚拟显示器串流的无障碍读出，插值为分辨率、帧率、码率和连接方式",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Streaming %1$lld by %2$lld, %3$lld frames per second, %4$lld megabits per second, on the virtual display%5$@"
+    "The Mac at %@": {
+      "comment": "配对卡片中未知名称的 Mac 称呼，插值为 Mac 地址",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "地址为 %@ 的 Mac"
           }
         }
       }
     },
-    "Support" : {
-      "localizations" : {
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "支持"
+    "The Mac didn’t answer. Open the menu again.": {
+      "comment": "Mac 名称未知时的菜单请求超时提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 未响应。请重新打开菜单。"
           }
         }
       }
     },
-    "Swipe Down" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
-    },
-    "Swipe Left or Right" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
-    },
-    "Swipe Up" : {
-      "comment" : "主机设置面板：三指手势名称或对应操作"
-    },
-    "Switching to Wi‑Fi…" : {
-      "comment" : "连接页切换到 Wi-Fi 的状态提示"
-    },
-    "Tab" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
-    },
-    "Take the Tour" : {
-      "comment" : "串流导览文案"
-    },
-    "Tap the code to try again." : {
-      "comment" : "扫码配对失败后手动重试的提示"
-    },
-    "Tap, Hold, Drag and Pinch" : {
-      "comment" : "串流导览文案"
-    },
-    "Text size" : {
-
-    },
-    "That code didn’t work. Check the code on your Mac. %lld tries left." : {
-      "comment" : "配对代码错误提示，插值为剩余尝试次数"
-    },
-    "That code didn’t work. Check the code on your Mac. 1 try left." : {
-      "comment" : "配对代码错误提示，仅剩一次机会"
-    },
-    "That code expired. Tap %@ for a new one." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
-    },
-    "That code has a typo. Check it against your Mac." : {
-      "comment" : "配对代码校验错误提示"
-    },
-    "That code no longer works. On the Mac, choose Pair iPhone or iPad… in the Sill menu, then tap %@ again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
-    },
-    "That doesn’t look like an address. Try 100.101.102.103 or mac.example.net." : {
-      "comment" : "添加 Mac 卡片的地址格式错误提示"
-    },
-    "That’s not a Sill code." : {
-      "comment" : "扫描到非 Sill 配对代码的错误提示\n扫码内容不是 Sill 配对码时的提示\n扫码内容不是 Sill 配对码时的无障碍播报"
-    },
-    "The Mac at %@" : {
-      "comment" : "配对卡片中未知名称的 Mac 称呼，插值为 Mac 地址"
-    },
-    "The Mac didn’t answer. Open the menu again." : {
-      "comment" : "Mac 名称未知时的菜单请求超时提示"
-    },
-    "The Mac didn’t answer. Try again." : {
-      "comment" : "设置面板等待未知名称 Mac 响应超时的提示"
+    "The Mac didn’t answer. Try again.": {
+      "comment": "设置面板等待未知名称 Mac 响应超时的提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac 未响应。请重试。"
+          }
+        }
+      }
     },
-    "The app isn’t responding." : {
-      "comment" : "Mac 菜单所属应用名称未知时的无响应提示"
+    "The app isn’t responding.": {
+      "comment": "Mac 菜单所属应用名称未知时的无响应提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用未响应。"
+          }
+        }
+      }
     },
-    "The last button in the bar." : {
-      "comment" : "串流导览文案"
+    "The last button in the bar.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "工具栏中的最后一个按钮。"
+          }
+        }
+      }
     },
-    "The last button in the row under the picture." : {
-      "comment" : "串流导览文案"
+    "The last button in the row under the picture.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面下方一排按钮中的最后一个。"
+          }
+        }
+      }
     },
-    "The link can’t carry %@, which %@ keeps while a device at home is connected." : {
-      "comment" : "画质设置或串流连接提示；插值为当前画质名称、Mac 名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The link can’t carry %1$@, which %2$@ keeps while a device at home is connected."
+    "The link can’t carry %@, which %@ keeps while a device at home is connected.": {
+      "comment": "画质设置或串流连接提示；插值为当前画质名称、Mac 名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "The link can’t carry %1$@, which %2$@ keeps while a device at home is connected."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前连接无法支持 %@，但家中有设备连接时，%@ 会保持这一画质。"
+          }
         }
       }
     },
-    "The link can’t carry %@. %@ is recommended." : {
-      "comment" : "画质设置或串流连接提示；插值为当前画质名称、建议画质名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "The link can’t carry %1$@. %2$@ is recommended."
+    "The link can’t carry %@. %@ is recommended.": {
+      "comment": "画质设置或串流连接提示；插值为当前画质名称、建议画质名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "The link can’t carry %1$@. %2$@ is recommended."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前连接无法支持 %@。建议使用 %@。"
           }
         }
       }
     },
-    "The link can’t keep up with %@. Lower it in Settings." : {
-      "comment" : "画质设置或串流连接提示；插值为画质名称"
+    "The link can’t keep up with %@. Lower it in Settings.": {
+      "comment": "画质设置或串流连接提示；插值为画质名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "当前连接无法支持 %@。请在设置中降低画质。"
+          }
+        }
+      }
     },
-    "The link to %@ can’t keep up." : {
-      "comment" : "画质设置或串流连接提示；插值为 Mac 名称"
+    "The link to %@ can’t keep up.": {
+      "comment": "画质设置或串流连接提示；插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与 %@ 的连接速度不足。"
+          }
+        }
+      }
     },
-    "The link to %@ is too slow for a steady picture, even at Low." : {
-      "comment" : "画质设置或串流连接提示；插值为 Mac 名称"
+    "The link to %@ is too slow for a steady picture, even at Low.": {
+      "comment": "画质设置或串流连接提示；插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "与 %@ 的连接速度太慢，即使使用低画质，也无法保持画面稳定。"
+          }
+        }
+      }
     },
-    "The menus changed. Open the menu again." : {
-      "comment" : "Mac 菜单变化后要求重新打开菜单的提示"
+    "The menus changed. Open the menu again.": {
+      "comment": "Mac 菜单变化后要求重新打开菜单的提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "菜单已更改。请重新打开菜单。"
+          }
+        }
+      }
     },
-    "The picture is arriving slowly from %@. Choose Low quality or Standard resolution." : {
-      "comment" : "主机设置面板：连接缓慢提示，插值为 Mac 名称"
+    "The picture is arriving slowly from %@. Choose Low quality or Standard resolution.": {
+      "comment": "主机设置面板：连接缓慢提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "来自 %@ 的画面传输缓慢。请选择低画质或标准分辨率。"
+          }
+        }
+      }
     },
-    "The picture of %@ fills the screen below the bar." : {
-      "comment" : "串流导览文案；插值为Mac 名称"
+    "The picture of %@ fills the screen below the bar.": {
+      "comment": "串流导览文案；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的画面占满工具栏下方的屏幕。"
+          }
+        }
+      }
     },
-    "The picture of %@ fills the top half of the screen." : {
-      "comment" : "串流导览文案；插值为Mac 名称"
+    "The picture of %@ fills the top half of the screen.": {
+      "comment": "串流导览文案；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的画面占满屏幕的上半部分。"
+          }
+        }
+      }
     },
-    "The picture of %@ is at the top of the screen." : {
-      "comment" : "串流导览文案；插值为Mac 名称"
+    "The picture of %@ is at the top of the screen.": {
+      "comment": "串流导览文案；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 的画面位于屏幕顶部。"
+          }
+        }
+      }
     },
-    "The window you pick moves onto an invisible display on %@ while it streams, so it keeps updating when covered." : {
-      "comment" : "主机设置面板：虚拟显示器说明，插值为 Mac 名称"
+    "The window you pick moves onto an invisible display on %@ while it streams, so it keeps updating when covered.": {
+      "comment": "主机设置面板：虚拟显示器说明，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "串流时，你选择的窗口会移到 %@ 上的一个不可见显示器上，即使被遮挡也能持续更新。"
+          }
+        }
+      }
     },
-    "This %@" : {
-
+    "This %@": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 %@"
+          }
+        }
+      }
     },
-    "This %@ can’t look up %@." : {
-      "comment" : "连接页远程连接失败提示，插值为设备类型、Mac 地址",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "This %1$@ can’t look up %2$@."
+    "This %@ can’t look up %@.": {
+      "comment": "连接页远程连接失败提示，插值为设备类型、Mac 地址",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This %1$@ can’t look up %2$@."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 %@ 无法查询 %@ 的地址。"
+          }
         }
       }
     },
-    "This %@ can’t look up %@. Is Tailscale on?" : {
-      "comment" : "连接页远程连接失败提示，插值为设备类型、Mac 地址",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "This %1$@ can’t look up %2$@. Is Tailscale on?"
+    "This %@ can’t look up %@. Is Tailscale on?": {
+      "comment": "连接页远程连接失败提示，插值为设备类型、Mac 地址",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This %1$@ can’t look up %2$@. Is Tailscale on?"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 %@ 无法查询 %@ 的地址。Tailscale 是否已开启？"
           }
         }
       }
     },
-    "This %@ can’t look up its name." : {
-      "comment" : "远程连接名称查询失败且地址未知，插值为设备类型"
+    "This %@ can’t look up its name.": {
+      "comment": "远程连接名称查询失败且地址未知，插值为设备类型",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 %@ 无法查询它的名称。"
+          }
+        }
+      }
     },
-    "This %@ couldn’t make its key (%@)." : {
-      "comment" : "配对卡片创建密钥失败提示，插值为设备类型和错误原因",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "This %1$@ couldn’t make its key (%2$@)."
+    "This %@ couldn’t make its key (%@).": {
+      "comment": "配对卡片创建密钥失败提示，插值为设备类型和错误原因",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This %1$@ couldn’t make its key (%2$@)."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 %@ 无法创建密钥（%@）。"
           }
         }
       }
     },
-    "This %@ has no key for %@. Pair it again." : {
-      "comment" : "连接页状态提示，插值为 Mac 名称和设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "This %1$@ has no key for %2$@. Pair it again."
+    "This %@ has no key for %@. Pair it again.": {
+      "comment": "连接页状态提示，插值为 Mac 名称和设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This %1$@ has no key for %2$@. Pair it again."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 %@ 没有用于 %@ 的密钥。请重新配对。"
+          }
         }
       }
     },
-    "This %@ shows up to %lld fps." : {
-      "comment" : "主机设置面板：帧率限制说明，插值为设备类型和帧率",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "This %1$@ shows up to %2$lld fps."
+    "This %@ shows up to %lld fps.": {
+      "comment": "主机设置面板：帧率限制说明，插值为设备类型和帧率",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This %1$@ shows up to %2$lld fps."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 %@ 最高可显示 %lld fps。"
           }
         }
       }
     },
-    "This code expired. Choose Pair iPhone or iPad… on your Mac for a new one." : {
-      "comment" : "配对代码过期提示"
+    "This code expired. Choose Pair iPhone or iPad… on your Mac for a new one.": {
+      "comment": "配对代码过期提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此配对码已过期。请在 Mac 上选择“配对 iPhone 或 iPad…”以获取新配对码。"
+          }
+        }
+      }
     },
-    "This isn’t the %@ this %@ paired with. If Sill was set up again on it, forget it here and pair again." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "This isn’t the %1$@ this %2$@ paired with. If Sill was set up again on it, forget it here and pair again."
+    "This isn’t the %@ this %@ paired with. If Sill was set up again on it, forget it here and pair again.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "This isn’t the %1$@ this %2$@ paired with. If Sill was set up again on it, forget it here and pair again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这不是这台 %2$@ 配对过的 %1$@。如果在该 Mac 上重新设置过 Sill，请在这里忽略它，然后重新配对。"
           }
         }
       }
     },
-    "Three fingers on the trackpad or over the stream. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing." : {
-      "comment" : "主机设置面板：手势说明，插值为 Mac 名称"
+    "Three fingers on the trackpad or over the stream. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing.": {
+      "comment": "主机设置面板：手势说明，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在触控板或串流画面上使用三根手指。窗口串流时，手势会先显示桌面，反向手势则会关闭之前由手势打开的界面。%@ 通过自身的键盘快捷键执行这些操作：如果在其键盘设置中关闭了某个快捷键，对应手势就不会生效。"
+          }
+        }
+      }
     },
-    "Three fingers on the trackpad or over the stream. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing. Four-finger swipes and a Magic Keyboard trackpad’s gestures stay with iPadOS." : {
-      "comment" : "主机设置面板：iPad 的手势说明，插值为 Mac 名称"
+    "Three fingers on the trackpad or over the stream. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing. Four-finger swipes and a Magic Keyboard trackpad’s gestures stay with iPadOS.": {
+      "comment": "主机设置面板：iPad 的手势说明，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在触控板或串流画面上使用三根手指。窗口串流时，手势会先显示桌面，反向手势则会关闭之前由手势打开的界面。%@ 通过自身的键盘快捷键执行这些操作：如果在其键盘设置中关闭了某个快捷键，对应手势就不会生效。四指轻扫和 Magic Keyboard 触控板手势仍由 iPadOS 处理。"
+          }
+        }
+      }
     },
-    "Three-Finger Gestures" : {
-
+    "Three-Finger Gestures": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "三指手势"
+          }
+        }
+      }
     },
-    "Three-finger strokes do nothing while this is off." : {
-      "comment" : "主机设置面板：三指手势关闭时的说明"
+    "Three-finger strokes do nothing while this is off.": {
+      "comment": "主机设置面板：三指手势关闭时的说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭此设置时，三指轻扫不会执行任何操作。"
+          }
+        }
+      }
     },
-    "To find your Mac, allow Local Network for Sill in Settings." : {
-      "comment" : "连接页搜索或本地网络访问权限提示"
+    "To find your Mac, allow Local Network for Sill in Settings.": {
+      "comment": "连接页搜索或本地网络访问权限提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要查找你的 Mac，请在设置中允许 Sill 访问本地网络。"
+          }
+        }
+      }
     },
-    "To reach %@ away from home, turn on Remote Access in Sill’s Settings on the Mac." : {
-      "comment" : "主机设置面板：开启远程访问说明，插值为 Mac 名称"
+    "To reach %@ away from home, turn on Remote Access in Sill’s Settings on the Mac.": {
+      "comment": "主机设置面板：开启远程访问说明，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要在外出时连接 %@，请在该 Mac 上 Sill 的设置中开启远程访问。"
+          }
+        }
+      }
     },
-    "To reach %@, allow Local Network for Sill in Settings." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 地址\n配对卡片错误提示，插值为 Mac 地址"
+    "To reach %@, allow Local Network for Sill in Settings.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 地址\n配对卡片错误提示，插值为 Mac 地址",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "要连接 %@，请在设置中允许 Sill 访问本地网络。"
+          }
+        }
+      }
     },
-    "Turning this off disconnects this %@." : {
-      "comment" : "主机设置面板：设置不可用或断线提示，插值为 Mac 名称或设备类型"
+    "Turning this off disconnects this %@.": {
+      "comment": "主机设置面板：设置不可用或断线提示，插值为 Mac 名称或设备类型",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "关闭此设置会断开这台 %@ 的连接。"
+          }
+        }
+      }
     },
-    "Turns a finger’s drag and the trackpad’s two-finger scroll around." : {
-      "comment" : "主机设置面板：反向滚动说明"
+    "Turns a finger’s drag and the trackpad’s two-finger scroll around.": {
+      "comment": "主机设置面板：反向滚动说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "反转单指拖移和触控板双指滚动的方向。"
+          }
+        }
+      }
     },
-    "Turns a finger’s drag and the trackpad’s two-finger scroll around. A trackpad or mouse connected to the iPad follows its own Natural Scrolling setting." : {
-      "comment" : "主机设置面板：iPad 反向滚动说明"
+    "Turns a finger’s drag and the trackpad’s two-finger scroll around. A trackpad or mouse connected to the iPad follows its own Natural Scrolling setting.": {
+      "comment": "主机设置面板：iPad 反向滚动说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "反转单指拖移和触控板双指滚动的方向。连接到 iPad 的触控板或鼠标遵循各自的“自然滚动”设置。"
+          }
+        }
+      }
     },
-    "Type the address and code from your Mac." : {
-
+    "Type the address and code from your Mac.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入 Mac 上的地址和配对码。"
+          }
+        }
+      }
     },
-    "Type the address and code that Sill shows on your Mac." : {
-      "comment" : "添加 Mac 卡片：手动输入配对说明"
+    "Type the address and code that Sill shows on your Mac.": {
+      "comment": "添加 Mac 卡片：手动输入配对说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入 Sill 在 Mac 上显示的地址和配对码。"
+          }
+        }
+      }
     },
-    "Type the code %@ shows." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Type the code %@ shows.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "输入 %@ 显示的配对码。"
+          }
+        }
+      }
     },
-    "Under the buttons: the row of keys, then the trackpad." : {
-      "comment" : "串流导览文案"
+    "Under the buttons: the row of keys, then the trackpad.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "按钮下方是一排按键，再往下是触控板。"
+          }
+        }
+      }
     },
-    "Under the picture, in the row of buttons: Apps, Aa and Keyboard." : {
-      "comment" : "串流导览文案"
+    "Under the picture, in the row of buttons: Apps, Aa and Keyboard.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面下方的一排按钮包括：应用、Aa 和键盘。"
+          }
+        }
+      }
     },
-    "Under the picture, in the row of buttons: Apps, Menus, Aa and Keyboard." : {
-      "comment" : "串流导览文案"
+    "Under the picture, in the row of buttons: Apps, Menus, Aa and Keyboard.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面下方的一排按钮包括：应用、菜单、Aa 和键盘。"
+          }
+        }
+      }
     },
-    "Under the picture: Aa and Keyboard in the first row, the windows and Menus in the second." : {
-      "comment" : "串流导览文案"
+    "Under the picture: Aa and Keyboard in the first row, the windows and Menus in the second.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面下方，第一排是 Aa 和键盘，第二排是窗口和菜单。"
+          }
+        }
+      }
     },
-    "Under the picture: Aa and Keyboard in the first row, the windows in the second." : {
-      "comment" : "串流导览文案"
+    "Under the picture: Aa and Keyboard in the first row, the windows in the second.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "画面下方，第一排是 Aa 和键盘，第二排是窗口。"
+          }
+        }
+      }
     },
-    "Under the windows: the row of keys, then the trackpad." : {
-      "comment" : "串流导览文案"
+    "Under the windows: the row of keys, then the trackpad.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "窗口下方是一排按键，再往下是触控板。"
+          }
+        }
+      }
     },
-    "Unlock %@, then choose Pair This %@… again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Unlock %1$@, then choose Pair This %2$@… again."
+    "Unlock %@, then choose Pair This %@… again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Unlock %1$@, then choose Pair This %2$@… again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解锁 %@，然后再次选择“配对这台 %@…”。"
           }
         }
       }
     },
-    "Unlock %@, then tap it again." : {
-      "comment" : "连接页或配对提示；插值为Mac 名称"
+    "Unlock %@, then tap it again.": {
+      "comment": "连接页或配对提示；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "解锁 %@，然后再次轻点它。"
+          }
+        }
+      }
     },
-    "Up arrow" : {
-      "comment" : "键盘快捷键行：按键的无障碍名称"
+    "Up arrow": {
+      "comment": "键盘快捷键行：按键的无障碍名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "向上箭头"
+          }
+        }
+      }
     },
-    "Update Sill" : {
-      "comment" : "连接页或配对提示"
+    "Update Sill": {
+      "comment": "连接页或配对提示",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新 Sill"
+          }
+        }
+      }
     },
-    "Update Sill in the App Store" : {
-
+    "Update Sill in the App Store": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "在 App Store 中更新 Sill"
+          }
+        }
+      }
     },
-    "Update Sill on %@ to change these from here." : {
-
+    "Update Sill on %@ to change these from here.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新 %@ 上的 Sill，即可在此处更改这些设置。"
+          }
+        }
+      }
     },
-    "Update Sill on %@ to use these." : {
-      "comment" : "主机设置面板：手势需要更新的说明，插值为 Mac 名称"
+    "Update Sill on %@ to use these.": {
+      "comment": "主机设置面板：手势需要更新的说明，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新 %@ 上的 Sill，即可使用这些手势。"
+          }
+        }
+      }
     },
-    "Update Sill on %@ to use this." : {
-      "comment" : "主机设置面板：设置不可用或断线提示，插值为 Mac 名称或设备类型"
+    "Update Sill on %@ to use this.": {
+      "comment": "主机设置面板：设置不可用或断线提示，插值为 Mac 名称或设备类型",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新 %@ 上的 Sill，即可使用此功能。"
+          }
+        }
+      }
     },
-    "Update Sill on this %@ to keep using %@." : {
-      "comment" : "连接页升级提示；插值为设备类型和 Mac 名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Update Sill on this %1$@ to keep using %2$@."
+    "Update Sill on this %@ to keep using %@.": {
+      "comment": "连接页升级提示；插值为设备类型和 Mac 名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Update Sill on this %1$@ to keep using %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新这台 %@ 上的 Sill，才能继续使用 %@。"
           }
         }
       }
     },
-    "Update Sill on this %@ to keep using %@. It needs version %@ or later." : {
-      "comment" : "连接页升级提示；插值为设备类型、Mac 名称和最低版本",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Update Sill on this %1$@ to keep using %2$@. It needs version %3$@ or later."
+    "Update Sill on this %@ to keep using %@. It needs version %@ or later.": {
+      "comment": "连接页升级提示；插值为设备类型、Mac 名称和最低版本",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Update Sill on this %1$@ to keep using %2$@. It needs version %3$@ or later."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新这台 %@ 上的 Sill，才能继续使用 %@。需要 %@ 或更高版本。"
+          }
         }
       }
     },
-    "Upright, Sill adds keys and a trackpad." : {
-      "comment" : "串流导览文案"
+    "Upright, Sill adds keys and a trackpad.": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "竖屏时，Sill 会添加按键和触控板。"
+          }
+        }
+      }
     },
-    "Use %@" : {
-      "comment" : "画质设置或串流连接提示；插值为画质名称"
+    "Use %@": {
+      "comment": "画质设置或串流连接提示；插值为画质名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用 %@"
+          }
+        }
+      }
     },
-    "Virtual Display" : {
-      "comment" : "主机设置面板：虚拟显示器行标题"
+    "Virtual Display": {
+      "comment": "主机设置面板：虚拟显示器行标题",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "虚拟显示器"
+          }
+        }
+      }
     },
-    "VoiceOver keeps three-finger gestures for itself, so the rows above do them on %@ instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing." : {
-      "comment" : "主机设置面板：VoiceOver 手势说明，插值为 Mac 名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VoiceOver keeps three-finger gestures for itself, so the rows above do them on %1$@ instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %2$@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing."
+    "VoiceOver keeps three-finger gestures for itself, so the rows above do them on %@ instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing.": {
+      "comment": "主机设置面板：VoiceOver 手势说明，插值为 Mac 名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "VoiceOver keeps three-finger gestures for itself, so the rows above do them on %1$@ instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %2$@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing."
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VoiceOver 会占用三指手势，因此请通过上方各行在 %@ 上执行这些操作。窗口串流时，手势会先显示桌面，反向手势则会关闭之前由手势打开的界面。%@ 通过自身的键盘快捷键执行这些操作：如果在其键盘设置中关闭了某个快捷键，对应手势就不会生效。"
+          }
         }
       }
     },
-    "VoiceOver keeps three-finger gestures for itself, so the rows above do them on %@ instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing. Four-finger swipes and a Magic Keyboard trackpad’s gestures stay with iPadOS." : {
-      "comment" : "主机设置面板：iPad 的 VoiceOver 手势说明，插值为 Mac 名称",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "VoiceOver keeps three-finger gestures for itself, so the rows above do them on %1$@ instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %2$@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing. Four-finger swipes and a Magic Keyboard trackpad’s gestures stay with iPadOS."
+    "VoiceOver keeps three-finger gestures for itself, so the rows above do them on %@ instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing. Four-finger swipes and a Magic Keyboard trackpad’s gestures stay with iPadOS.": {
+      "comment": "主机设置面板：iPad 的 VoiceOver 手势说明，插值为 Mac 名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "VoiceOver keeps three-finger gestures for itself, so the rows above do them on %1$@ instead. While a window streams, a gesture shows the Desktop first, and the opposite gesture closes what one opened. %2$@ does these with its own keyboard shortcuts: one turned off in its Keyboard settings does nothing. Four-finger swipes and a Magic Keyboard trackpad’s gestures stay with iPadOS."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "VoiceOver 会占用三指手势，因此请通过上方各行在 %@ 上执行这些操作。窗口串流时，手势会先显示桌面，反向手势则会关闭之前由手势打开的界面。%@ 通过自身的键盘快捷键执行这些操作：如果在其键盘设置中关闭了某个快捷键，对应手势就不会生效。四指轻扫和 Magic Keyboard 触控板手势仍由 iPadOS 处理。"
           }
         }
       }
     },
-    "Waiting for %@…" : {
-      "comment" : "连接页状态提示，插值为 Mac 名称"
+    "Waiting for %@…": {
+      "comment": "连接页状态提示，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在等待 %@…"
+          }
+        }
+      }
     },
-    "What you do here happens on %@." : {
-      "comment" : "串流导览文案；插值为Mac 名称"
+    "What you do here happens on %@.": {
+      "comment": "串流导览文案；插值为Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你在此处的操作会在 %@ 上执行。"
+          }
+        }
+      }
     },
-    "Windows" : {
-      "comment" : "串流导览文案"
+    "Windows": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "窗口"
+          }
+        }
+      }
     },
-    "Windows and Menus" : {
-      "comment" : "串流导览文案"
+    "Windows and Menus": {
+      "comment": "串流导览文案",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "窗口和菜单"
+          }
+        }
+      }
     },
-    "Wired" : {
-      "comment" : "连接页和设置面板的有线连接名称"
+    "Wired": {
+      "comment": "连接页和设置面板的有线连接名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有线连接"
+          }
+        }
+      }
     },
-    "With **Share Clipboard**, text you copy on %@ is ready to paste on this %@." : {
-      "comment" : "串流导览文案；插值为Mac 名称、设备类型；双星号标出强调文字",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "With **Share Clipboard**, text you copy on %1$@ is ready to paste on this %2$@."
+    "With **Share Clipboard**, text you copy on %@ is ready to paste on this %@.": {
+      "comment": "串流导览文案；插值为Mac 名称、设备类型；双星号标出强调文字",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "With **Share Clipboard**, text you copy on %1$@ is ready to paste on this %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "开启**共享剪贴板**后，你在 %@ 上拷贝的文字即可在这台 %@ 上粘贴。"
           }
         }
       }
     },
-    "Wi‑Fi" : {
-      "comment" : "连接页和设置面板的无线连接名称；使用不换行连字符"
+    "Wi‑Fi": {
+      "comment": "连接页和设置面板的无线连接名称；使用不换行连字符",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi"
+          }
+        }
+      }
     },
-    "Work" : {
-      "comment" : "连接页预设分组名称：工作"
+    "Work": {
+      "comment": "连接页预设分组名称：工作",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "工作"
+          }
+        }
+      }
     },
-    "Your Mac has to be on the same Wi‑Fi network as this %@, or have Direct Wireless Connection turned on in Sill. Away from home, add it once with a code from your Mac." : {
-
+    "Your Mac has to be on the same Wi‑Fi network as this %@, or have Direct Wireless Connection turned on in Sill. Away from home, add it once with a code from your Mac.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的 Mac 必须与这台 %@ 接入同一 Wi‑Fi 网络，或在 Sill 中开启无线直连。外出时，使用 Mac 上的配对码添加一次即可。"
+          }
+        }
+      }
     },
-    "Your VPN looks off on this %@. Turn it on, then tap %@." : {
-      "comment" : "连接页远程连接失败提示，插值为Mac 名称、设备类型",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Your VPN looks off on this %1$@. Turn it on, then tap %2$@."
+    "Your VPN looks off on this %@. Turn it on, then tap %@.": {
+      "comment": "连接页远程连接失败提示，插值为Mac 名称、设备类型",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Your VPN looks off on this %1$@. Turn it on, then tap %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 %@ 上的 VPN 似乎未开启。请先开启，再轻点 %@。"
           }
         }
       }
     },
-    "by address" : {
-      "comment" : "指定地址的远程连接方式从句"
+    "by address": {
+      "comment": "指定地址的远程连接方式从句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过地址"
+          }
+        }
+      }
     },
-    "connected %@" : {
-      "comment" : "主机设置面板：远程连接的无障碍从句，插值为连接方式"
+    "connected %@": {
+      "comment": "主机设置面板：远程连接的无障碍从句，插值为连接方式",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接，方式为 %@"
+          }
+        }
+      }
     },
-    "connected %@, %lld millisecond round trip" : {
-      "comment" : "主机设置面板：远程连接及延迟的无障碍从句，插值为连接方式和毫秒数",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "connected %1$@, %2$lld millisecond round trip"
+    "connected %@, %lld millisecond round trip": {
+      "comment": "主机设置面板：远程连接及延迟的无障碍从句，插值为连接方式和毫秒数",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "connected %1$@, %2$lld millisecond round trip"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已连接，方式为 %@，往返延迟 %lld 毫秒"
+          }
         }
       }
     },
-    "connected by cable" : {
-      "comment" : "主机设置面板：无障碍连接方式从句"
+    "connected by cable": {
+      "comment": "主机设置面板：无障碍连接方式从句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已通过连接线连接"
+          }
+        }
+      }
     },
-    "connected directly" : {
-      "comment" : "主机设置面板：无障碍连接方式从句"
+    "connected directly": {
+      "comment": "主机设置面板：无障碍连接方式从句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已无线直连"
+          }
+        }
+      }
     },
-    "connected over Wi-Fi" : {
-      "comment" : "主机设置面板：无障碍连接方式从句"
+    "connected over Wi-Fi": {
+      "comment": "主机设置面板：无障碍连接方式从句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已通过 Wi‑Fi 连接"
+          }
+        }
+      }
     },
-    "its address" : {
-      "comment" : "远程连接失败提示中未知地址的替代称呼\n配对链接确认：缺少地址时的显示文字"
+    "its address": {
+      "comment": "远程连接失败提示中未知地址的替代称呼\n配对链接确认：缺少地址时的显示文字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "它的地址"
+          }
+        }
+      }
     },
-    "no key could be made (%@)" : {
-      "comment" : "配对失败提示中的密钥错误原因，插值为系统错误说明"
+    "no key could be made (%@)": {
+      "comment": "配对失败提示中的密钥错误原因，插值为系统错误说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法生成密钥（%@）"
+          }
+        }
+      }
     },
-    "no key could be made (no reason given)" : {
-      "comment" : "配对失败提示中的密钥错误原因：系统未提供原因"
+    "no key could be made (no reason given)": {
+      "comment": "配对失败提示中的密钥错误原因：系统未提供原因",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法生成密钥（未提供原因）"
+          }
+        }
+      }
     },
-    "over the internet" : {
-      "comment" : "互联网远程连接方式从句"
+    "over the internet": {
+      "comment": "互联网远程连接方式从句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过互联网"
+          }
+        }
+      }
     },
-    "over the internet (%@)" : {
-      "comment" : "主机设置面板：互联网访问方式从句，插值为主机地址"
+    "over the internet (%@)": {
+      "comment": "主机设置面板：互联网访问方式从句，插值为主机地址",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过互联网（%@）"
+          }
+        }
+      }
     },
-    "the Keychain didn’t answer: %d" : {
-      "comment" : "配对失败提示中的密钥错误原因，插值为钥匙串状态码"
+    "the Keychain didn’t answer: %d": {
+      "comment": "配对失败提示中的密钥错误原因，插值为钥匙串状态码",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "钥匙串未响应：%d"
+          }
+        }
+      }
     },
-    "the Keychain didn’t keep it" : {
-      "comment" : "配对失败提示中的密钥错误原因：钥匙串未保存密钥"
+    "the Keychain didn’t keep it": {
+      "comment": "配对失败提示中的密钥错误原因：钥匙串未保存密钥",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "钥匙串未保存密钥"
+          }
+        }
+      }
     },
-    "the Keychain didn’t keep it: %d" : {
-      "comment" : "配对失败提示中的密钥保存错误，插值为钥匙串状态码"
+    "the Keychain didn’t keep it: %d": {
+      "comment": "配对失败提示中的密钥保存错误，插值为钥匙串状态码",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "钥匙串未保存密钥：%d"
+          }
+        }
+      }
     },
-    "the Keychain gave back no key" : {
-      "comment" : "配对失败提示中的密钥错误原因：钥匙串没有返回密钥"
+    "the Keychain gave back no key": {
+      "comment": "配对失败提示中的密钥错误原因：钥匙串没有返回密钥",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "钥匙串未返回密钥"
+          }
+        }
+      }
     },
-    "the Mac" : {
-      "comment" : "串流工具栏：Mac 名称缺失时的称呼\n主机设置面板：Mac 名称缺失时的称呼\n剪贴板提示中 Mac 名称为空时的替代文字\n剪贴板提示中尚未取得名称的 Mac\n忘记 Mac 的提示中未知名称的替代称呼\n粘贴按钮无障碍提示中尚未取得名称的 Mac"
+    "the Mac": {
+      "comment": "串流工具栏：Mac 名称缺失时的称呼\n主机设置面板：Mac 名称缺失时的称呼\n剪贴板提示中 Mac 名称为空时的替代文字\n剪贴板提示中尚未取得名称的 Mac\n忘记 Mac 的提示中未知名称的替代称呼\n粘贴按钮无障碍提示中尚未取得名称的 Mac",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mac"
+          }
+        }
+      }
     },
-    "the key couldn’t make a certificate" : {
-      "comment" : "配对失败提示中的密钥错误原因：无法创建证书"
+    "the key couldn’t make a certificate": {
+      "comment": "配对失败提示中的密钥错误原因：无法创建证书",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "密钥无法创建证书"
+          }
+        }
+      }
     },
-    "through %@" : {
-      "comment" : "远程连接方式从句，插值为 VPN 名称"
+    "through %@": {
+      "comment": "远程连接方式从句，插值为 VPN 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过 %@"
+          }
+        }
+      }
     },
-    "through %@ (%@)" : {
-      "comment" : "主机设置面板：VPN 访问方式从句，插值为 VPN 名称和主机地址",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "through %1$@ (%2$@)"
+    "through %@ (%@)": {
+      "comment": "主机设置面板：VPN 访问方式从句，插值为 VPN 名称和主机地址",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "through %1$@ (%2$@)"
           }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过 %@（%@）"
+          }
         }
       }
     },
-    "through your VPN" : {
-      "comment" : "未命名 VPN 的远程连接方式从句"
+    "through your VPN": {
+      "comment": "未命名 VPN 的远程连接方式从句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过你的 VPN"
+          }
+        }
+      }
     },
-    "through your VPN or the internet" : {
-      "comment" : "主机设置面板：远程访问方式从句"
+    "through your VPN or the internet": {
+      "comment": "主机设置面板：远程访问方式从句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过你的 VPN 或互联网"
+          }
+        }
+      }
     },
-    "your Mac" : {
-      "comment" : "串流导览文案\n配对提示中 Mac 名称和地址均未知时的替代文字\n配对浮层：Mac 名称缺失时的称呼"
+    "your Mac": {
+      "comment": "串流导览文案\n配对提示中 Mac 名称和地址均未知时的替代文字\n配对浮层：Mac 名称缺失时的称呼",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的 Mac"
+          }
+        }
+      }
     },
-    "your VPN" : {
-      "comment" : "主机设置面板：未命名 VPN 的称呼"
+    "your VPN": {
+      "comment": "主机设置面板：未命名 VPN 的称呼",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你的 VPN"
+          }
+        }
+      }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }
