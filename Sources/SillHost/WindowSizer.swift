@@ -268,6 +268,17 @@ final class WindowSizer {
         return first
     }
 
+    /// 另一种顺序：先改大小，再挪位置，再改一次大小。给拒绝 `move` 那种顺序的 App 用（VirtualStage 的重试）。
+    @discardableResult
+    func resizeFirst(_ p: Placement, to frame: CGRect) -> AXError {
+        var first = AXError.success
+        func note(_ e: AXError) { if first == .success, e != .success { first = e } }
+        note(Self.set(p.element, size: frame.size))
+        note(Self.set(p.element, position: frame.origin))
+        note(Self.set(p.element, size: frame.size))
+        return first
+    }
+
     /// Puts the window back where `placement(for:)` found it. True when it is back, or there is
     /// nothing left to restore (window closed, app quit). Never leaves a live window off every
     /// real display: if its original display has gone meanwhile, it is nudged onto the main one.

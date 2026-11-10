@@ -269,6 +269,27 @@ final class VirtualStage {
 
     private static func ms(since t: Date) -> Int { Int(Date().timeIntervalSince(t) * 1000) }
 
+    /// 第一次移动后窗口的大小原封未动（`refused`）：用另一种顺序再改一次（WindowSizer.resizeFirst），
+    /// 最多等 0.6 秒看窗口列表里的大小有没有变，返回列表里的新位置；还是没变就照旧返回 `refused`，
+    /// 交给后面的流程（大于可用区域时加大虚拟显示器，否则按窗口自己的大小截取）。每次重试记一行日志。
+    private func resizeAgain(_ p: WindowSizer.Placement, to dest: CGRect, refused: CGRect) async -> CGRect {
+        let t0 = Date()
+        let err = sizer.resizeFirst(p, to: dest)
+        var now = refused
+        let deadline = Date().addingTimeInterval(0.6)
+        while Date() < deadline {
+            try? await Task.sleep(for: .milliseconds(30))
+            guard let f = WindowSizer.liveBounds(of: p.windowID) else { continue }
+            now = f
+            if !Self.sameSize(f.size, refused.size) { break }
+        }
+        let took = !Self.sameSize(now.size, refused.size)
+        print("\(p.appName) — \(p.title) kept its size at \(Self.fmt(refused)); asked again, size first (\(WindowSizer.axErrorName(err))): "
+              + (took ? "now \(Self.fmt(now)) after \(Self.ms(since: t0)) ms" : "still refused after \(Self.ms(since: t0)) ms"))
+        Stats.shared.bump(took ? "vd.resizedAgain" : "vd.refusedAgain")
+        return took ? now : refused
+    }
+
     // MARK: Staging
 
     /// Puts `window` on the virtual display at `wanted` points (creating or growing the display to
@@ -447,6 +468,11 @@ final class VirtualStage {
                 // virtual display, not at the home frame `placement` keeps for the way back.
                 print("Moved \(p.appName) — \(p.title) from \(before.map(Self.fmt) ?? "(unlisted)") to \(Self.fmt(live)) in \(Self.ms(since: t0)) ms (asked \(Self.fmt(dest)))"
                       + (settled ? "" : "; not settled by the deadline"))
+                // 改大小被整个拒绝（宽高都还是移动前的样子）：有的 App（2026-11-10 的 ChatGPT）拒绝
+                // "先挪位置再改大小"，手动拖却能缩窄。换个顺序再试一次：先改大小，等它处理，再挪位置。
+                if let before, Self.sameSize(live.size, before.size), !Self.sameSize(live.size, dest.size) {
+                    live = await resizeAgain(p, to: dest, refused: live)
+                }
             }
             let oversized = live.width > usable.width + 2 || live.height > usable.height + 2
             if oversized, attempt == 0 {
