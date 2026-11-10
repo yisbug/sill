@@ -236,11 +236,34 @@ final class StreamClient: ObservableObject {
     static let allowLocalNetwork = String(localized: "To find your Mac, allow Local Network for Sill in Settings.", comment: "连接页搜索或本地网络访问权限提示")
 
     // Switcher catalog, as the host sends it. Published on main.
-    @Published var macName = ""
-    @Published var windows: [WindowInfo] = []          // front to back, in the host's order
+    @Published var macName = "" {
+        didSet {
+            guard macName != oldValue else { return }
+            appSelection = nil
+            recencyActive = nil
+            awaitingMacActive = !macName.isEmpty
+            appRecency = macName.isEmpty ? AppRecency.Record() : AppRecency.load(from: .standard, mac: macName)
+            loadWindowOrder()
+        }
+    }
+    @Published var windows: [WindowInfo] = [] {       // 保持 Mac 报告的窗口顺序。
+        didSet {
+            if let selected = appSelection, !windows.contains(where: { $0.id == selected }) {
+                appSelection = nil
+            }
+            // active 可能先到，窗口列表后到；在首次能够找到该窗口时补记使用。
+            if !awaitingMacActive { recordActiveAppUse() }
+        }
+    }
     /// The device's own arrangement of the bar (press, hold and drag), persisted per Mac. Windows
     /// the user has not arranged follow in the host's order.
     @Published private(set) var windowOrder: [UInt32] = []
+    /// 每台 Mac 各自保存应用与窗口的最近使用时间。
+    @Published private(set) var appRecency = AppRecency.Record()
+    /// 设备刚选中的窗口立即高亮，直到 Mac 确认或切换了实际串流源。
+    @Published private(set) var appSelection: UInt32?
+    private var recencyActive: UInt32?
+    private var awaitingMacActive = false
     /// When the Desktop was last picked on the device's own initiative (see the window list).
     private var lastAutoDesktop: Date = .distantPast
     /// `choicesSent` right after that request: a pick, a launch or a pick made again after a move moves
@@ -264,6 +287,12 @@ final class StreamClient: ObservableObject {
     private var choicesSent = 0
     @Published var active: StreamSource = .none {
         didSet {
+            awaitingMacActive = false
+            if active != oldValue || active == appSelection.map(StreamSource.window) {
+                appSelection = nil
+            }
+            if active != oldValue { recencyActive = nil }
+            recordActiveAppUse()
             // The pointer sprite shows nothing while nothing streams.
             let streaming = active != .none
             if presence.streaming != streaming {
@@ -3654,6 +3683,12 @@ final class StreamClient: ObservableObject {
     /// answers with a fresh window list. It counts for the tour as something happening.
     func select(_ source: StreamSource) {
         noteAction()
+        if case .window(let id) = source {
+            appSelection = id
+            recordAppUse(id)
+        } else {
+            appSelection = nil
+        }
         request(source)
     }
 
@@ -3715,6 +3750,38 @@ final class StreamClient: ObservableObject {
     }
 
     // MARK: Bar order
+
+    /// 图标条使用设备待确认的选择；未点选时跟随 Mac 实际串流的窗口。
+    var appGroups: [AppRecency.Group] {
+        let activeID: UInt32?
+        if let selected = appSelection {
+            activeID = selected
+        } else if case .window(let id) = active {
+            activeID = id
+        } else {
+            activeID = nil
+        }
+        return AppRecency.groups(windows: windows.map {
+            AppRecency.Window(id: $0.id, bundleID: $0.bundleID, appName: $0.appName)
+        }, active: activeID, record: appRecency)
+    }
+
+    private func recordAppUse(_ id: UInt32) {
+        guard !macName.isEmpty, let window = windows.first(where: { $0.id == id }) else { return }
+        AppRecency.recordUse(window: AppRecency.Window(id: id, bundleID: window.bundleID, appName: window.appName),
+                             record: &appRecency, at: Date().timeIntervalSince1970)
+        AppRecency.save(appRecency, to: .standard, mac: macName)
+    }
+
+    private func recordActiveAppUse() {
+        guard case .window(let id) = active else {
+            recencyActive = nil
+            return
+        }
+        guard recencyActive != id, windows.contains(where: { $0.id == id }), !macName.isEmpty else { return }
+        recordAppUse(id)
+        recencyActive = id
+    }
 
     /// `windows` in the device's arrangement: arranged ones first, the rest in the host's order.
     var orderedWindows: [WindowInfo] {
@@ -4230,7 +4297,7 @@ final class StreamClient: ObservableObject {
                     if let test = UserDefaults.standard.string(forKey: "SillMoveHomeTest") { self.beginMoveHomeTest(test) }
                     #endif
                 }
-                if self.macName != list.macName { self.macName = list.macName; self.loadWindowOrder() }
+                if self.macName != list.macName { self.macName = list.macName }
                 let previous = self.active
                 self.windows = list.windows
                 self.active = list.active

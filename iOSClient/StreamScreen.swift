@@ -178,6 +178,15 @@ struct StreamScreen: View {
     @Environment(\.duoEnvironment) private var duoEnvironment
     /// This device's Larger Picture switch (the Settings panel's This iPhone; docs/larger-picture-plan.md).
     /// It acts only while a window streams (`largerPictureNow`).
+    @AppStorage("Sill.barThumbnails") private var storedBarThumbnails = false
+    private var barThumbnails: Bool {
+        #if DEBUG
+        if UserDefaults.standard.object(forKey: "SillBarThumbnails") != nil {
+            return UserDefaults.standard.bool(forKey: "SillBarThumbnails")
+        }
+        #endif
+        return storedBarThumbnails
+    }
     @AppStorage(StreamClient.largerPictureKey) private var largerPicture = false
     /// Larger Picture as it was in effect when the Settings panel opened (`largerPictureNow`), which
     /// the arrangement keeps until the panel closes; nil while it is closed. The panel hangs under row
@@ -287,11 +296,13 @@ struct StreamScreen: View {
                     // upright stand in the picture's whole room, the black under a short picture. The
                     // words follow what this Mac and this device have now (TourFeatures).
                     let features = tourFeatures(offersLarger: offersLarger)
+                    let tourThumbnails = layout == .landscape && !DuoLayout.phoneArrangement
+                        ? barThumbnails : largerKeyboard == nil
                     let copy = tourCopy(run, layout, keysOnItsSide: posture.onInnerDisplay,
-                                        thumbnails: largerKeyboard == nil, features: features)
+                                        thumbnails: tourThumbnails, features: features)
                     TourOverlay(run: run, copy: copy,
                                 layout: layout, targets: tourTargets,
-                                thumbnails: largerKeyboard == nil,
+                                thumbnails: tourThumbnails,
                                 room: largerKeyboard.map { PhonePortraitLayout(size: geo.size, keyboard: $0).picture },
                                 screen: geo.size, bottomInset: geo.safeAreaInsets.bottom,
                                 next: tourNext, skip: tourSkip)
@@ -341,7 +352,9 @@ struct StreamScreen: View {
                 WindowLightsMenu(anchor: anchor, window: window,
                                  command: { action in client.command(action, window: id); closeWindowMenu() },
                                  dismiss: closeWindowMenu,
-                                 alwaysBelow: DuoLayout.drawsPhone)
+                                 alwaysBelow: DuoLayout.drawsPhone,
+                                 windows: appMenuWindows(for: window),
+                                 select: { client.select(.window($0)); closeWindowMenu() })
             }
         }
         .animation(.spring(duration: 0.25, bounce: 0.2), value: windowMenu)
@@ -357,6 +370,7 @@ struct StreamScreen: View {
         // panel away. (Opening the panel closes them, the drawer and the keyboard.)
         .onChange(of: scaleOpen) { _, open in if open { setSettings(false) } }
         .onChange(of: windowMenu) { _, menu in if menu != nil { setSettings(false) } }
+        .onChange(of: barThumbnails) { _, _ in closeWindowMenu() }
         .ignoresSafeArea(edges: .bottom)
     }
 
@@ -1172,18 +1186,28 @@ struct StreamScreen: View {
         reduceMotion ? .opacity : .scale(scale: 0.94, anchor: anchor).combined(with: .opacity)
     }
 
+    private func appMenuWindows(for window: WindowInfo) -> [WindowInfo] {
+        guard tourLayout == .landscape, !DuoLayout.phoneArrangement, !barThumbnails else { return [] }
+        return client.windows.filter {
+            $0.bundleID == window.bundleID && (!window.bundleID.isEmpty || $0.appName == window.appName)
+        }
+    }
+
     private func landscape(bar plain: BarMetrics, width: CGFloat, fold: FoldInfo) -> some View {
+        let plain = barThumbnails || DuoLayout.phoneArrangement ? plain.withThumbnails : plain
         // The book pose (docs/iphone-duo-plan.md, (a)): nothing on the fold's band; elsewhere as before.
-        let (bar, stripWidth) = plain.clearing(fold, width: width)
+        let (bar, stripWidth) = plain.clearing(fold, width: width,
+                                              compactButtonWidth: plain.usesAppIcons
+                                                  ? BarMetrics.compact.buttonWidth : BarMetrics.compactThumbnails.buttonWidth)
         return VStack(spacing: 0) {
-            TopBar(client: client, metrics: bar, stripWidth: stripWidth, drawerOpen: $drawerOpen,
+            TopBar(client: client, metrics: bar, touches: touches, stripWidth: stripWidth, drawerOpen: $drawerOpen,
                    keyboardShown: $keyboardShown,
                    textScale: $textScale, scaleOpen: $scaleOpen, windowMenu: $windowMenu,
                    settingsOpen: settingsOpen,
                    // Apps, Menus, Aa, Keyboard, Desktop, Settings, and the strip. The Mac's sound has no
                    // button: Send Audio and Mute are the Settings panel's switches (Noah, 2026-10-27).
                    menusFit: MacMenuButton.fits(width: width - 2 * bar.padding, buttons: 6, buttonWidth: bar.buttonWidth,
-                                                gap: bar.gap, thumbWidth: bar.thumbWidth),
+                                                gap: bar.gap, thumbWidth: bar.usesAppIcons ? 44 : bar.thumbWidth),
                    toggleKeyboard: { overlay.toggleKeyboard() },
                    setSettings: { setSettings($0, restoreKeyboard: $1) },
                    menusOpened: menusOpened, menusClosed: menusClosed)
@@ -1382,11 +1406,7 @@ struct LockedMacShade: View {
 
 // MARK: - Top bar
 
-/// The landscape top bar's numbers. The inner display gets the Main board's roomy bar; the outer
-/// display gets the Laptop board's compact one, which is 8 pt shorter and tighter all round — on a
-/// 500 pt tall screen the bar is a sixth of everything there is, so every point it gives back is a
-/// point of Mac. Every bar carries the Aa control (Noah, 2026-09-22: both orientations); it takes
-/// one button's width and unfolds over its neighbours only while touched.
+/// 横屏顶栏：应用图标模式为 48/44 pt，缩略图与手机沿用 86/78 pt。
 struct BarMetrics {
     let height: CGFloat
     let padding: CGFloat
@@ -1404,13 +1424,42 @@ struct BarMetrics {
     /// The Settings panel hanging under this bar.
     let settingsWidth: CGFloat
 
-    static let regular = BarMetrics(height: 86, padding: 22, gap: 12,
+    var usesAppIcons: Bool { height <= 48 }
+    var withThumbnails: BarMetrics { height == 48 ? .regularThumbnails : .compactThumbnails }
+
+    /// 保留缩略图和手机在折叠屏上的 64 pt 按钮下限；图标模式使用 44 pt。
+    /// 原折叠屏适配器仍由竖屏等既有布局共用，这里只适配横屏的新旧两种尺寸。
+    func clearing(_ fold: FoldInfo, width: CGFloat, compactButtonWidth: CGFloat) -> (bar: BarMetrics, stripWidth: CGFloat?) {
+        let book = DuoPosture.bookBar(width: width, fold: fold, padding: padding, gap: gap, buttonWidth: buttonWidth,
+                                     compactButtonWidth: compactButtonWidth, buttons: 5, panelWidth: settingsWidth)
+        guard book.stripWidth != nil else { return (self, nil) }
+        let bar = BarMetrics(height: height, padding: padding, gap: book.gap,
+                             buttonWidth: book.buttonWidth, buttonHeight: buttonHeight, buttonSpacing: buttonSpacing,
+                             thumbWidth: thumbWidth, thumbHeight: thumbHeight, thumbRadius: thumbRadius,
+                             thumbSpacing: thumbSpacing, thumbPad: thumbPad, thumbFade: thumbFade,
+                             showsTextSize: showsTextSize, settingsWidth: book.panelWidth)
+        return (bar, book.stripWidth)
+    }
+
+    static let regular = BarMetrics(height: 48, padding: 22, gap: 12,
+                                    buttonWidth: 44, buttonHeight: 44, buttonSpacing: 0,
+                                    thumbWidth: 32, thumbHeight: 32, thumbRadius: 8,
+                                    thumbSpacing: 8, thumbPad: 2, thumbFade: 0.86,
+                                    showsTextSize: true, settingsWidth: 360)
+
+    static let compact = BarMetrics(height: 44, padding: 14, gap: 8,
+                                    buttonWidth: 44, buttonHeight: 44, buttonSpacing: 0,
+                                    thumbWidth: 32, thumbHeight: 32, thumbRadius: 8,
+                                    thumbSpacing: 8, thumbPad: 0, thumbFade: 0.88,
+                                    showsTextSize: true, settingsWidth: 340)
+
+    static let regularThumbnails = BarMetrics(height: 86, padding: 22, gap: 12,
                                     buttonWidth: 66, buttonHeight: 66, buttonSpacing: 4,
                                     thumbWidth: 104, thumbHeight: 66, thumbRadius: 10,
                                     thumbSpacing: 16, thumbPad: 10, thumbFade: 0.86,
                                     showsTextSize: true, settingsWidth: 360)
 
-    static let compact = BarMetrics(height: 78, padding: 14, gap: 12,
+    static let compactThumbnails = BarMetrics(height: 78, padding: 14, gap: 12,
                                     buttonWidth: 64, buttonHeight: 58, buttonSpacing: 3,
                                     thumbWidth: 92, thumbHeight: 58, thumbRadius: 9,
                                     thumbSpacing: 14, thumbPad: 10, thumbFade: 0.88,
@@ -1420,6 +1469,7 @@ struct BarMetrics {
 private struct TopBar: View {
     @ObservedObject var client: StreamClient
     let metrics: BarMetrics
+    let touches: TouchWatch
     /// The book pose: the strip's width, so that it ends short of the fold (BarMetrics.clearing);
     /// nil: it takes the room there is, as before.
     var stripWidth: CGFloat? = nil
@@ -1438,6 +1488,7 @@ private struct TopBar: View {
     /// The Menus pull-down opened and went (see `StreamScreen.menusOpened`).
     let menusOpened: () -> Void
     let menusClosed: () -> Void
+    @State private var menusOpen = false
 
     var body: some View {
         HStack(spacing: metrics.gap) {
@@ -1448,13 +1499,19 @@ private struct TopBar: View {
                        withAnimation(.easeOut(duration: 0.18)) { drawerOpen.toggle() }
                    })
 
-            WindowStrip(client: client, width: metrics.thumbWidth, height: metrics.thumbHeight,
-                        radius: metrics.thumbRadius, spacing: metrics.thumbSpacing,
-                        pad: metrics.thumbPad, fade: metrics.thumbFade, menuFor: $windowMenu)
-                .opacity(scaleOpen ? 0.2 : 1)      // the ruler is centred on Aa and reaches over the strip's end
-                .allowsHitTesting(!scaleOpen)
-                .frame(width: stripWidth)
-                .tourTarget(.strip, inset: WindowStrip.tourBand(pad: metrics.thumbPad))
+            Group {
+                if metrics.usesAppIcons {
+                    AppIconStrip(client: client, menuFor: $windowMenu, touches: touches)
+                } else {
+                    WindowStrip(client: client, width: metrics.thumbWidth, height: metrics.thumbHeight,
+                                radius: metrics.thumbRadius, spacing: metrics.thumbSpacing,
+                                pad: metrics.thumbPad, fade: metrics.thumbFade, menuFor: $windowMenu)
+                }
+            }
+            .opacity(scaleOpen ? 0.2 : 1)
+            .allowsHitTesting(!scaleOpen)
+            .frame(width: stripWidth)
+            .tourTarget(.strip, inset: metrics.usesAppIcons ? EdgeInsets() : WindowStrip.tourBand(pad: metrics.thumbPad))
             // The book pose: the fold's band, and nothing on it, between the strip and the buttons.
             if stripWidth != nil { Spacer(minLength: 0) }
 
@@ -1462,8 +1519,14 @@ private struct TopBar: View {
             // window's app's. Only while the Mac sent some, and where the bar holds it: with none the
             // strip takes its room back.
             if client.menus.hasMenus, menusFit {
-                MacMenuButton(client: client, width: metrics.buttonWidth, height: metrics.buttonHeight,
-                              spacing: metrics.buttonSpacing, onOpen: menusOpened, onClose: menusClosed)
+                Group {
+                    if metrics.usesAppIcons {
+                        iconMenusButton
+                    } else {
+                        MacMenuButton(client: client, width: metrics.buttonWidth, height: metrics.buttonHeight,
+                                      spacing: metrics.buttonSpacing, onOpen: menusOpened, onClose: menusClosed)
+                    }
+                }
                     .opacity(scaleOpen ? 0 : 1)    // under the Aa ruler, as the buttons after Aa
                     .allowsHitTesting(!scaleOpen)
                     .transition(.opacity)
@@ -1474,8 +1537,12 @@ private struct TopBar: View {
             // the right, over the two buttons after it, which fade while it is open.
             TextScaleControl(scale: $textScale, open: $scaleOpen,
                              width: metrics.buttonWidth, height: metrics.buttonHeight,
-                             pointsPerStep: metrics.buttonHeight >= 60 ? 44 : 40,
-                             offered: client.textScaleOffersOff, available: client.textScaleSelectable)
+                             pointsPerStep: metrics.height == BarMetrics.regular.height || metrics.buttonHeight >= 60 ? 44 : 40,
+                             offered: client.textScaleOffersOff, available: client.textScaleSelectable,
+                             showsValue: !metrics.usesAppIcons)
+                .accessibilityShowsLargeContentViewer {
+                    VStack { Text("Aa").font(.largeTitle); Text("Text size") }
+                }
                 .tourTarget(.textSize)
 
             button(open: keyboardShown, symbol: "keyboard", label: String(localized: "Keyboard", comment: "串流工具栏：按钮名称"),
@@ -1507,6 +1574,25 @@ private struct TopBar: View {
         .background(Palette.bar.ignoresSafeArea(edges: .top))
     }
 
+    private var iconMenusButton: some View {
+        BarButton(open: menusOpen, width: metrics.buttonWidth, height: metrics.buttonHeight,
+                  accessibilityLabel: "", action: {}) {
+            Image(systemName: MacMenuButton.symbol)
+                .font(.system(size: 22))
+                .foregroundStyle(menusOpen ? Palette.accent : Palette.text)
+        }
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+        .overlay {
+            MacMenuTrigger(client: client, open: $menusOpen, onOpen: menusOpened, onClose: menusClosed)
+                .frame(width: metrics.buttonWidth, height: metrics.buttonHeight)
+                .accessibilityShowsLargeContentViewer {
+                    Label("Menus", systemImage: MacMenuButton.symbol)
+                }
+        }
+        .tourTarget(.menus)
+    }
+
     private func button(open: Bool, symbol: String, label: String, accessibilityLabel: String,
                         action: @escaping () -> Void) -> some View {
         BarButton(open: open, width: metrics.buttonWidth, height: metrics.buttonHeight,
@@ -1515,11 +1601,14 @@ private struct TopBar: View {
                 Image(systemName: symbol)
                     .font(.system(size: 22))
                     .foregroundStyle(open ? Palette.accent : Palette.text)
-                Text(label)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(open ? Palette.accent : Palette.barLabel)
+                if !metrics.usesAppIcons {
+                    Text(label)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(open ? Palette.accent : Palette.barLabel)
+                }
             }
         }
+        .accessibilityShowsLargeContentViewer { Label(label, systemImage: symbol) }
     }
 }
 
@@ -1606,6 +1695,7 @@ struct TextScaleControl: View {
     /// dimmed, no ruler, a VoiceOver swipe changes nothing, and VoiceOver hears
     /// `TextScale.unavailableHint`; its value stays, for the next window.
     var available = true
+    var showsValue = true
 
     var steps: [Double] { TextScale.detents(offered: offered) }
     /// Padding either side of the visible ruler; two detents show each side of the thumb.
@@ -1628,17 +1718,19 @@ struct TextScaleControl: View {
         VStack(spacing: iconBox == nil ? 2 : iconSpacing) {
             if let iconBox {
                 Text("Aa")
-                    .font(.system(size: height >= 60 ? 19 : 17, weight: .semibold))
+                    .font(.system(size: showsValue ? (height >= 60 ? 19 : 17) : 22, weight: .semibold))
                     .foregroundStyle(Palette.text)
                     .frame(height: iconBox)
             } else {
                 Text("Aa")
-                    .font(.system(size: height >= 60 ? 19 : 17, weight: .semibold))
+                    .font(.system(size: showsValue ? (height >= 60 ? 19 : 17) : 22, weight: .semibold))
                     .foregroundStyle(Palette.text)
             }
-            Text(TextScale.title(at: position))
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(Palette.barLabel)
+            if showsValue {
+                Text(TextScale.title(at: position))
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(Palette.barLabel)
+            }
         }
         .opacity(available ? 1 : Self.unavailableOpacity)     // dimmed: Aa sizes a window, and none streams
         .frame(width: width, height: height)
@@ -1917,6 +2009,131 @@ struct WindowStrip: View {
     private func closeMenu() { menuFor = nil }
 }
 
+/// 应用只占一个固定点击区；使用后先高亮，等待一秒且顶栏触摸结束后重排。
+private struct AppIconStrip: View {
+    @ObservedObject var client: StreamClient
+    @Binding var menuFor: UInt32?
+    let touches: TouchWatch
+    @AppStorage(ThumbnailHold.key) private var storedHold = ThumbnailHold.standard
+    @State private var order: [String] = []
+    @State private var reorderTask: Task<Void, Never>?
+
+    private var groups: [AppRecency.Group] {
+        let current = client.appGroups
+        return order.compactMap { id in current.first { $0.id == id } }
+            + current.filter { !order.contains($0.id) }
+    }
+
+    private var selectedID: UInt32? {
+        if let id = client.appSelection { return id }
+        if case .window(let id) = client.active { return id }
+        return nil
+    }
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                ForEach(groups) { group in icon(group) }
+            }
+            .padding(.horizontal, 8)
+        }
+        .frame(height: 44)
+        .frame(maxWidth: .infinity)
+        .onAppear {
+            order = client.appGroups.map(\.id)
+            #if DEBUG
+            if UserDefaults.standard.bool(forKey: "SillWindowMenu"),
+               let group = groups.first { menuFor = menuWindow(group) }
+            #endif
+        }
+        .onChange(of: client.appGroups) { _, _ in scheduleReorder() }
+        .onChange(of: client.appRecency) { _, _ in scheduleReorder() }
+        .onChange(of: client.macName) { _, _ in
+            reorderTask?.cancel()
+            order = client.appGroups.map(\.id)
+            menuFor = nil
+        }
+        .onChange(of: client.windows) { _, windows in
+            if let id = menuFor, !windows.contains(where: { $0.id == id }) { menuFor = nil }
+        }
+        .onDisappear { reorderTask?.cancel() }
+    }
+
+    private func icon(_ group: AppRecency.Group) -> some View {
+        let active = selectedID.map { group.windowIDs.contains($0) } ?? false
+        return ZStack(alignment: .bottomTrailing) {
+            Group {
+                if let image = client.icons[group.bundleID] {
+                    Image(uiImage: image).resizable().scaledToFit()
+                } else {
+                    ZStack {
+                        Image(systemName: "app.dashed").font(.system(size: 32))
+                        Text(String(group.appName.prefix(1))).font(.system(size: 12, weight: .semibold))
+                    }
+                    .foregroundStyle(Palette.text)
+                }
+            }
+            .frame(width: 32, height: 32)
+            .frame(width: 44, height: 44)
+            .background(RoundedRectangle(cornerRadius: 10).fill(active ? Palette.controlOpen : .clear))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(active ? Palette.accent : .clear, lineWidth: 2))
+            if group.windowIDs.count > 1 {
+                Text(group.windowIDs.count.formatted())
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundStyle(Palette.text)
+                    .padding(.horizontal, 4)
+                    .frame(minWidth: 16, minHeight: 16)
+                    .background(Capsule().fill(Palette.control))
+                    .allowsHitTesting(false)
+            }
+        }
+        .frame(width: 44, height: 44)
+        .overlay {
+            HoldDragOverlay(minimumHold: hold,
+                            onTap: { menuFor = nil; client.select(.window(group.targetID)) },
+                            onHold: { openMenu(group) }, onMove: { _ in }, onEnd: {})
+        }
+        .anchorPreference(key: WindowMenuAnchorKey.self, value: .bounds) { anchor in
+            group.windowIDs.contains(menuFor ?? 0) ? anchor : nil
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(group.appName)
+        .accessibilityValue(active
+            ? String(localized: "\(group.windowIDs.count) windows, showing now", comment: "顶栏应用图标：当前应用的窗口数量")
+            : String(localized: "\(group.windowIDs.count) windows", comment: "顶栏应用图标：应用的窗口数量"))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { menuFor = nil; client.select(.window(group.targetID)) }
+        .accessibilityAction(named: "Window actions") { openMenu(group) }
+    }
+
+    private var hold: TimeInterval {
+        _ = storedHold
+        return ThumbnailHold.seconds(stored: UserDefaults.standard.object(forKey: ThumbnailHold.key))
+    }
+
+    private func menuWindow(_ group: AppRecency.Group) -> UInt32 {
+        if let id = selectedID, group.windowIDs.contains(id) { return id }
+        return group.targetID
+    }
+
+    private func openMenu(_ group: AppRecency.Group) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        menuFor = menuWindow(group)
+    }
+
+    private func scheduleReorder() {
+        reorderTask?.cancel()
+        reorderTask = Task { @MainActor in
+            do {
+                try await Task.sleep(for: .seconds(1))
+                // 复用根视图的被动触摸计数；触摸未结束时不移动图标，也不抢占滚动或长按。
+                while touches.down > 0 { try await Task.sleep(for: .milliseconds(50)) }
+            } catch { return }
+            withAnimation(.easeInOut(duration: 0.25)) { order = client.appGroups.map(\.id) }
+        }
+    }
+}
+
 /// A thumbnail's touch handling, in UIKit: a tap selects; a hold of `minimumHold` opens the
 /// submenu and keeps tracking the finger, so moving it afterwards drags. UIKit rather than SwiftUI
 /// gestures because a SwiftUI long press sequenced with a drag swallowed plain taps inside the
@@ -1994,6 +2211,8 @@ struct WindowLightsMenu: View {
     /// Whether a screen of this size always puts the lights below the thumbnail (the phone's
     /// arrangement); otherwise they go on the side of the screen's middle away from it.
     var alwaysBelow: (CGSize) -> Bool = { _ in false }
+    var windows: [WindowInfo] = []
+    var select: ((UInt32) -> Void)? = nil
 
     private static let size = CGSize(width: 214, height: 62)
     /// The Duo's hinge (iOS 27.1): the lights keep off its fold.
@@ -2002,22 +2221,51 @@ struct WindowLightsMenu: View {
     var body: some View {
         GeometryReader { proxy in
             let frame = proxy[anchor]
-            let w = Self.size.width, h = Self.size.height
+            let w = windows.isEmpty ? Self.size.width : max(Self.size.width, 280)
+            let listHeight = min(CGFloat(windows.count) * 44, 220)
+            let h = Self.size.height + listHeight
             // Off the Duo's fold (iOS 27.1): onto a page beside it, below the thumbnail when above it
             // would sit on it; elsewhere as before.
             let at = DuoPosture.lightsMenu(x: min(max(frame.midX, w / 2 + 8), proxy.size.width - w / 2 - 8),
                                            below: alwaysBelow(proxy.size) || frame.midY < proxy.size.height / 2,
-                                           thumbnail: frame, size: Self.size, gap: 8, screenWidth: proxy.size.width,
+                                           thumbnail: frame, size: CGSize(width: w, height: h), gap: 8, screenWidth: proxy.size.width,
                                            fold: DuoPosture.read(proxy, duoEnvironment).info(in: proxy.size))
             let below = at.below, x = at.x, y = at.y
             ZStack {
                 Color.clear.contentShape(Rectangle()).onTapGesture(perform: dismiss)
-                HStack(spacing: 6) {
-                    light(.close, Color(hex: 0xFF5F57), "xmark", String(localized: "Close", comment: "窗口控制菜单：按钮名称"))
-                    light(.minimize, Color(hex: 0xFEBC2E), "minus", String(localized: "Minimize", comment: "窗口控制菜单：按钮名称"))
-                    light(.fullScreen, Color(hex: 0x28C840), "arrow.up.left.and.arrow.down.right", String(localized: "Full Screen", comment: "窗口控制菜单：按钮名称"))
+                VStack(spacing: 0) {
+                    if !windows.isEmpty {
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                ForEach(windows, id: \.id) { item in
+                                    Button { select?(item.id) } label: {
+                                        HStack {
+                                            Text(item.title.isEmpty ? item.appName : item.title)
+                                                .lineLimit(1)
+                                            Spacer(minLength: 8)
+                                            if item.id == window.id { Image(systemName: "checkmark") }
+                                        }
+                                        .font(.system(size: 14))
+                                        .foregroundStyle(Palette.text)
+                                        .padding(.horizontal, 14)
+                                        .frame(maxWidth: .infinity, minHeight: 44)
+                                        .contentShape(Rectangle())
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                            }
+                        }
+                        .frame(height: listHeight)
+                        Divider()
+                    }
+                    HStack(spacing: 6) {
+                        light(.close, Color(hex: 0xFF5F57), "xmark", String(localized: "Close", comment: "窗口控制菜单：按钮名称"))
+                        light(.minimize, Color(hex: 0xFEBC2E), "minus", String(localized: "Minimize", comment: "窗口控制菜单：按钮名称"))
+                        light(.fullScreen, Color(hex: 0x28C840), "arrow.up.left.and.arrow.down.right", String(localized: "Full Screen", comment: "窗口控制菜单：按钮名称"))
+                    }
+                    .padding(.horizontal, 10)
+                    .frame(height: Self.size.height)
                 }
-                .padding(.horizontal, 10)
                 .frame(width: w, height: h)
                 .background(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)

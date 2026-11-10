@@ -57,6 +57,8 @@ struct HostSettingsPanel: View {
     /// This device's switch for Larger Picture (docs/larger-picture-plan.md): off unless turned on,
     /// read by the stream screen, never sent.
     @AppStorage(StreamClient.largerPictureKey) private var largerPicture = false
+    /// 横屏 iPad 顶栏是否恢复窗口缩略图；只影响本设备，不发送给 Mac。
+    @AppStorage("Sill.barThumbnails") private var barThumbnails = false
     /// Whether the switch is offered here, the stream screen's say (`largerPictureOffered`): only on an
     /// iPhone without a hinge whose picture it makes larger.
     @Environment(\.largerPictureOffered) private var offersLargerPicture
@@ -580,6 +582,14 @@ struct HostSettingsPanel: View {
             .padding(.bottom, 6)
             .accessibilityAddTraits(.isHeader)
             .id(Self.gesturesGroupID)
+        if device == "iPad" {
+            Rows {
+                Toggle(isOn: $barThumbnails) {
+                    Text("Show window thumbnails in the top bar").foregroundStyle(Palette.text)
+                }
+                .rowFrame()
+            }
+        }
         if offersLargerPicture {
             Rows {
                 Toggle(isOn: $largerPicture) {
