@@ -141,6 +141,13 @@ JSON
 fi
 cp "$icon_out"/compiled/* "$stage/Contents/Resources/" 2>/dev/null || true
 
+# 界面文字：Packaging/Localizable.xcstrings 编译成 en.lproj、zh-Hans.lproj 的 .strings 与 .stringsdict，
+# String(localized:) 和 SwiftUI 的 Text 从 Bundle.main（即 Sill.app）里取。目录由 Scripts/l10n-sync.sh 维护。
+if [ -f Packaging/Localizable.xcstrings ]; then
+    xcrun xcstringstool compile Packaging/Localizable.xcstrings --output-directory "$stage/Contents/Resources" \
+        || { echo "error: xcstringstool could not compile Packaging/Localizable.xcstrings" >&2; exit 1; }
+fi
+
 # SILL_SIGN_IDENTITY (a name, part of one, or a SHA-1 hash), else the first Apple Development
 # identity in the keychain, by its SHA-1 hash: codesign refuses a name that two valid
 # certificates share, as they do after an early renewal until the old one expires. Either of them

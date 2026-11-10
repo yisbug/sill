@@ -1,0 +1,174 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "": {},
+    " · ": {},
+    "%@ window": {},
+    "%@ window actions": {},
+    "%@, %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@, %2$@"
+          }
+        }
+      }
+    },
+    "120 fps": {},
+    "60 fps": {},
+    "Aa": {},
+    "Add": {},
+    "Add a Mac…": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "添加 Mac…"
+          }
+        }
+      }
+    },
+    "Also looking nearby": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "也在搜索附近"
+          }
+        }
+      }
+    },
+    "Also looks for a Mac with Direct Wireless Connection turned on, without a Wi‑Fi network.": {},
+    "Away from home": {},
+    "Beta": {},
+    "Cancel": {},
+    "Close window": {},
+    "Connect": {},
+    "Connect Remotely": {},
+    "Connected %@ · %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Connected %1$@ · %2$@"
+          }
+        }
+      }
+    },
+    "Disconnect": {},
+    "Disconnect from %@": {},
+    "Done": {},
+    "Drag to move the pointer. Tap to click, two fingers to scroll.": {},
+    "Enter Code Instead": {},
+    "Enter the Code from %@": {},
+    "Forget %@": {},
+    "Frame Rate": {},
+    "Full screen": {},
+    "Get it at %@": {},
+    "Group": {},
+    "Group: %@": {},
+    "Larger Picture": {},
+    "Loading settings…": {},
+    "Menus": {},
+    "Minimize window": {},
+    "Move left": {},
+    "Move right": {},
+    "Mute": {},
+    "Mute sound from %@": {},
+    "Name": {},
+    "Needs the free Sill app on your Mac.": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "需要在 Mac 上安装免费的 Sill。"
+          }
+        }
+      }
+    },
+    "New Group": {},
+    "New Group…": {},
+    "None": {},
+    "On the virtual display": {},
+    "On your Mac, choose Pair iPhone or iPad… in the Sill menu, then point this %@ at the code.": {},
+    "Only pair with a code your own Mac shows.": {},
+    "Open Settings": {},
+    "Opens the App Store.": {},
+    "Pair": {},
+    "Pair This %@…": {},
+    "Pair once, and Sill reaches your Mac from anywhere, through your VPN or the internet.": {},
+    "Pair with %@": {},
+    "Pair with %@ at %@?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Pair with %1$@ at %2$@?"
+          }
+        }
+      }
+    },
+    "Paired": {},
+    "Paired with %@.": {},
+    "Pairs this %@ with a Mac so you can reach it away from home.": {},
+    "Privacy Policy": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "隐私政策"
+          }
+        }
+      }
+    },
+    "Quality": {},
+    "Remove Preview Picture": {},
+    "Resolution": {},
+    "Retina": {},
+    "Reverse Scrolling": {},
+    "Scan Code Instead": {},
+    "Scan the Code on %@": {},
+    "Search Nearby": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "搜索附近"
+          }
+        }
+      }
+    },
+    "Search apps on %@": {},
+    "Search apps on this Mac": {},
+    "Send Audio": {},
+    "Send Audio, beta": {},
+    "Show as List": {},
+    "Show as Tiles": {},
+    "Show as list": {},
+    "Show as tiles": {},
+    "Sill can’t use the camera. Enter the code instead, or allow the camera in Settings.": {},
+    "Standard": {},
+    "Support": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "支持"
+          }
+        }
+      }
+    },
+    "Text size": {},
+    "This %@": {},
+    "Three-Finger Gestures": {},
+    "Turning this off disconnects this %@.": {},
+    "Type the address and code from your Mac.": {},
+    "Type the address and code that Sill shows on your Mac.": {},
+    "Update Sill in the App Store": {},
+    "Update Sill on %@ to change these from here.": {},
+    "Update Sill on %@ to use this.": {},
+    "Your Mac has to be on the same Wi‑Fi network as this %@, or have Direct Wireless Connection turned on in Sill. Away from home, add it once with a code from your Mac.": {}
+  },
+  "version": "1.0"
+}

@@ -1,0 +1,42 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "CFBundleDisplayName": {
+      "comment": "App 显示名",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill"
+          }
+        }
+      }
+    },
+    "NSLocalNetworkUsageDescription": {
+      "comment": "本地网络权限说明",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "用于在局域网中找到你的 Mac。"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription": {
+      "comment": "相机权限说明",
+      "extractionState": "manual",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 需要扫描 Mac 上的配对码来完成配对。"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}
