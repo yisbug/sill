@@ -227,8 +227,8 @@ struct TourOverlay: View {
     let copy: TourCopy
     let layout: TourLayout
     let targets: [TourTarget: CGRect]
-    /// False for a phone with Larger Picture in effect (a window streaming with the switch on), whose
-    /// thumbnails are hidden (TourPolicy.targets).
+    /// 横屏 iPad 关闭时用应用图标；手机更大画面关闭缩略图时改为照亮 Apps。
+    /// 目标始终取视图报告的实际坐标，因此顶栏高度切换后不沿用旧位置。
     var thumbnails = true
     /// With Larger Picture in effect, the picture's whole room, which the cards upright are placed
     /// against (TourPolicy.place); nil elsewhere.

@@ -383,7 +383,7 @@ struct Screen {
 /// reported as its thumbnails' band with their halo (5 pt) above and badge (6 pt) below. `menus`:
 /// the Mac sent menus, and the Menus button sits between the strip and Aa, one button and one gap
 /// taken from the strip (TopBar, the halves' window bar), where it reports itself.
-func model(_ w: CGFloat, _ h: CGFloat, menus: Bool = false) -> Screen {
+func model(_ w: CGFloat, _ h: CGFloat, menus: Bool = false, appIcons: Bool = false) -> Screen {
     let size = CGSize(width: w, height: h)
     if h > w && w < 600 || !(w > h) {
         let regular = !(h > w && w < 600)
@@ -410,22 +410,25 @@ func model(_ w: CGFloat, _ h: CGFloat, menus: Bool = false) -> Screen {
         return Screen(size: size, layout: P, stream: CGRect(x: 8, y: 8, width: w - 16, height: half - 16), targets: targets)
     }
     let compact = h < 560
-    let (barH, pad, bw, bh): (CGFloat, CGFloat, CGFloat, CGFloat) = compact ? (78, 14, 64, 58) : (86, 22, 66, 66)
+    let (barH, pad, bw, bh): (CGFloat, CGFloat, CGFloat, CGFloat) = appIcons
+        ? (compact ? (44, 14, 44, 44) : (48, 22, 44, 44))
+        : (compact ? (78, 14, 64, 58) : (86, 22, 66, 66))
+    let gap: CGFloat = appIcons && compact ? 8 : 12
     let settingsX = w - pad - bw
-    let keyboardX = settingsX - 2 * (12 + bw)
-    let aaX = keyboardX - 12 - bw
-    let menusX = aaX - 12 - bw
-    let stripX = pad + bw + 12
+    let keyboardX = settingsX - 2 * (gap + bw)
+    let aaX = keyboardX - gap - bw
+    let menusX = aaX - gap - bw
+    let stripX = pad + bw + gap
     let by = (barH - bh) / 2
     let stream = CGRect(x: 8, y: barH + 8, width: w - 16, height: h - barH - 16)
     var targets: [TourTarget: CGRect] = [
         .stream: stream,
-        .strip: CGRect(x: stripX, y: 5, width: (menus ? menusX : aaX) - 12 - stripX, height: barH - 9),
+        .strip: CGRect(x: stripX, y: appIcons ? by : 5, width: (menus ? menusX : aaX) - gap - stripX, height: appIcons ? bh : barH - 9),
         .textSize: CGRect(x: aaX, y: by, width: bw, height: bh),
         .keyboard: CGRect(x: keyboardX, y: by, width: bw, height: bh),
         .settings: CGRect(x: settingsX, y: by, width: bw, height: bh)]
     if menus { targets[.menus] = CGRect(x: menusX, y: by, width: bw, height: bh) }
-    return Screen(size: size, layout: L, stream: stream, targets: targets)
+    return Screen(size: size, layout: L, stream: stream, targets: targets, thumbnails: !appIcons)
 }
 // The model against the plan's table (§6.3).
 let duoInner = model(1000, 710), duoOuter = model(710, 500), duoUp = model(710, 1000), duoOuterUp = model(500, 710)
@@ -588,6 +591,25 @@ func pinned(_ s: Screen, _ topic: TourTopic, _ h: CGFloat, _ expected: CGRect, t
     check(p == TourPlacement(card: expected, tail: tail, coversTargets: covers),
           "\(s.size) \(topic) h \(h): \(p.card) tail \(String(describing: p.tail)) covers \(p.coversTargets), expected \(expected) \(String(describing: tail)) covers \(covers)", line: line)
     check(p == oracle(s, topic, height: h, width: w), "\(s.size) \(topic) h \(h) against the oracle", line: line)
+}
+// iPad 精简顶栏以实际图标条和 44 pt 按钮为目标；导览卡片随 48/44 pt 顶栏上移。
+for (width, height, expectedBar): (CGFloat, CGFloat, CGFloat) in [(1194, 834, 48), (800, 500, 44)] {
+    for menus in [true, false] {
+        let icons = model(width, height, menus: menus, appIcons: true)
+        let thumbnails = model(width, height, menus: menus)
+        check(icons.stream.minY == expectedBar + 8 && icons.targets[.strip]!.height == 44,
+              "精简顶栏的画面与图标条目标高度：\(width)×\(height)")
+        check(icons.targets[.textSize]!.width == 44 && icons.targets[.textSize]!.height == 44,
+              "精简顶栏保留 44×44 pt 按钮目标")
+        for cardHeight: CGFloat in [230, 400] {
+            let card = place(icons, .bar, height: cardHeight, width: 360)
+            check(card == oracle(icons, .bar, height: cardHeight, width: 360)
+                  && card.card.minY == icons.union(.bar)!.maxY + TourPolicy.gap,
+                  "图标导览使用新顶栏实际坐标，卡片紧随目标下方")
+            check(card.card.minY < place(thumbnails, .bar, height: cardHeight, width: 360).card.minY,
+                  "切回缩略图时导览卡片跟随旧顶栏下移")
+        }
+    }
 }
 // 1000×710, the Duo flat: 360 pt; the bar's card 12 pt under the strip's band (82), tail up.
 pinned(duoInner, .touch, 262, CGRect(x: 320, y: 267, width: 360, height: 262), tail: nil)
@@ -1183,8 +1205,32 @@ check([TourTopic.touch, .sharing, .settings].allSatisfy { words($0, F, device: "
       "Larger Picture's other cards as before")
 check(texts(words(.bar, F, mac: "Studio", device: "iPhone", thumbnails: false)).first == "Apps lists the apps on Studio: tap an open one again for its next window.",
       "the Mac's name in Apps' row")
-check([L, P].allSatisfy { layout in all.allSatisfy { words($0, layout, thumbnails: false) == words($0, layout) } },
-      "no thumbnails changes no words sideways or in the halves")
+check(all.allSatisfy { words($0, P, thumbnails: false) == words($0, P) }
+      && all.filter { $0 != .bar }.allSatisfy { words($0, L, thumbnails: false) == words($0, L) },
+      "应用图标只改变横屏顶栏卡片，竖屏文案保持不变")
+check(all.allSatisfy { words($0, L, device: "iPhone", thumbnails: false) == words($0, L, device: "iPhone") },
+      "手机横屏保留窗口缩略图导览")
+
+// 横屏 iPad 默认的应用图标保留同一实时目标，文案不再引导手动拖动。
+let barIcons = words(.bar, L, thumbnails: false)
+let iconRow = "Tap an app icon for its most recent window; tap the current app again for its next window. Touch and hold to choose a window, close, minimize or go full screen. The current app comes first, followed by recently used apps."
+let iconRowVO = "Each app icon switches to its most recent window. Choose the current app again for its next window. Actions list its windows and let you close, minimize or go full screen. The current app comes first, followed by recently used apps."
+check(barIcons.title == "Apps and Menus" && barIcons.subtitle == nil && barIcons.rows[0].symbol == "app",
+      "应用图标导览的标题与符号")
+check(texts(barIcons) == [iconRow, B2, B3on, B4, B5], "应用图标说明最近窗口、同应用轮换、长按和使用顺序")
+check(texts(words(.bar, L, voiceOver: true, thumbnails: false)) == [iconRowVO, B2, B3onVO, B4, B5],
+      "应用图标在 VoiceOver 下使用操作入口")
+check(barIcons.rows[0].spans.first == TourSpan(text: "Tap an app icon", strong: true)
+      && barIcons.hint == "In the bar at the top, after Apps.", "应用图标首行强调与顶栏位置")
+check(TourPolicy.targets(.bar, L, thumbnails: false) == [.strip, .menus, .textSize, .keyboard],
+      "应用图标模式照亮实时图标条、Menus、Aa 和键盘")
+for f in everyFeatures {
+    let icons = words(.bar, L, thumbnails: false, features: f)
+    check(icons.title == (f.menus ? "Apps and Menus" : "Apps") && icons.rows[0].text == iconRow,
+          "应用图标标题跟随 Menus，首行不受 Mac 能力影响：\(f)")
+    check(Array(icons.rows.dropFirst()) == Array(words(.bar, L, features: f).rows.dropFirst()),
+          "应用图标模式保留其它顶栏说明：\(f)")
+}
 
 // Under VoiceOver: no touch card, no trackpad rows, and no gesture VoiceOver cannot make.
 let barVO = words(.bar, L, voiceOver: true)

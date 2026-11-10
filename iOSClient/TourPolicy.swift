@@ -563,9 +563,9 @@ enum TourPolicy {
     /// or go (the trackpad's, Reverse Scrolling's and the thumbnail hold's: the trackpad is no
     /// accessibility element, and VoiceOver has no drag or hold of its own). `keysOnItsSide`: the
     /// iPhone Duo open (its inner display), which shows the keys and the trackpad with the device
-    /// turned on its side, so its words say so where an iPhone's say upright. `thumbnails`: false for
-    /// a phone with Larger Picture in effect (a window streaming with the switch on), whose bar card
-    /// is about Apps where the thumbnails were. `features`: what this Mac and this device have now;
+    /// turned on its side, so its words say so where an iPhone's say upright.
+    /// `thumbnails`：横屏 iPad 关闭时讲解应用图标；手机更大画面生效时讲解 Apps。
+    /// `features`: what this Mac and this device have now;
     /// a row about what they lack is left out or worded for that.
     ///
     /// Tour version 2 (0.6; Noah, 2026-10-31: "Mark the new features with 'New:' and make the tutorial
@@ -605,11 +605,17 @@ enum TourPolicy {
             }
             return TourCopy(title: String(localized: "Tap, Hold, Drag and Pinch", comment: "串流导览文案"), subtitle: String(localized: "What you do here happens on \(mac).", comment: "串流导览文案；插值为Mac 名称"), rows: rows, hint: hint)
         case .bar:
+            let appIcons = layout == .landscape && iPad && !thumbnails
             var rows: [TourRow]
             if voiceOver {
                 rows = [row("hand.point.up.left", spans(String(localized: "**Each window** has actions: close, minimize, full screen, and move left or right. Swipe up or down to hear them.", comment: "串流导览文案；双星号标出强调文字")))]
             } else {
                 rows = [row("hand.point.up.left", spans(String(localized: "**Touch and hold** a window to close, minimize or go full screen. Keep holding and drag to move it.", comment: "串流导览文案；双星号标出强调文字")))]
+            }
+            if appIcons {
+                rows[0] = voiceOver
+                    ? row("app", spans(String(localized: "**Each app icon** switches to its most recent window. Choose the current app again for its next window. Actions list its windows and let you close, minimize or go full screen. The current app comes first, followed by recently used apps.", comment: "横屏精简顶栏的 VoiceOver 导览；双星号标出应用图标")))
+                    : row("app", spans(String(localized: "**Tap an app icon** for its most recent window; tap the current app again for its next window. Touch and hold to choose a window, close, minimize or go full screen. The current app comes first, followed by recently used apps.", comment: "横屏精简顶栏导览；双星号标出应用图标点按操作")))
             }
             // A phone with Larger Picture has no thumbnails: windows come from Apps, which shows an
             // open app's next window when it is chosen again (AppDrawer).
@@ -651,7 +657,12 @@ enum TourPolicy {
             case .phone: hint = features.menus ? String(localized: "Under the picture: Aa and Keyboard in the first row, the windows and Menus in the second.", comment: "串流导览文案")
                                                : String(localized: "Under the picture: Aa and Keyboard in the first row, the windows in the second.", comment: "串流导览文案")
             }
-            let title = features.menus ? String(localized: "Windows and Menus", comment: "串流导览文案") : String(localized: "Windows", comment: "串流导览文案")
+            let title: String
+            if appIcons {
+                title = features.menus ? String(localized: "Apps and Menus", comment: "横屏精简顶栏导览标题") : String(localized: "Apps", comment: "横屏精简顶栏导览标题")
+            } else {
+                title = features.menus ? String(localized: "Windows and Menus", comment: "串流导览文案") : String(localized: "Windows", comment: "串流导览文案")
+            }
             return TourCopy(title: title, subtitle: nil, rows: rows, hint: hint)
         case .sharing:
             // The clipboard both ways (docs/clipboard-plan.md) and the Mac's sound (docs/audio-plan.md),
