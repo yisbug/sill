@@ -1456,8 +1456,10 @@ final class StreamServer {
             if self.clients[ObjectIdentifier(c)] === client { self.heard(ObjectIdentifier(c)) }
             // A header can announce up to 4 GiB and the read below would wait for all of it. No
             // client message comes near a megabyte, so a bigger one is a broken or hostile peer.
-            if header.payloadLength > StreamMessage.maxClientPayload {
-                print("Closing \(c.endpoint): it announced a \(header.payloadLength)-byte message (the limit is 1 MB).")
+            // 语音片段（kind 100）例外：音频至多 4 MiB，读到 VoicePolicy.maxReadPayload 为止，超过 4 MiB 的回 tooLarge。
+            let limit = header.kind == .voiceClip ? VoicePolicy.maxReadPayload : StreamMessage.maxClientPayload
+            if header.payloadLength > limit {
+                print("Closing \(c.endpoint): it announced a \(header.payloadLength)-byte message (the limit is \(limit == StreamMessage.maxClientPayload ? "1 MB" : "\(limit) bytes")).")
                 c.cancel()
                 return
             }

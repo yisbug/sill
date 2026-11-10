@@ -15,7 +15,18 @@ var config = HostConfig.standard
 
 // Optional. Streams the first window whose app name or title matches, before any client asks.
 // Normally left off: the client picks a window from its bar.
-let preselect = CommandLine.arguments.dropFirst().first { !$0.hasPrefix("--") }
+// `--voice-dir PATH` 的 PATH 不算。
+let preselect = CommandLine.arguments.dropFirst().enumerated().first { index, argument in
+    !argument.hasPrefix("--") && (index == 0 || CommandLine.arguments[index] != "--voice-dir")
+}?.element
+
+// `SillHost --voice-dir PATH`（或 `--voice-dir=PATH`）：语音输入找 meeppo-voice 的数据目录（其中的
+// local-api.json），默认 ~/Library/Application Support/TypefreeDemo（VoicePolicy.dataDirectory）。
+if let i = CommandLine.arguments.firstIndex(of: "--voice-dir"), i + 1 < CommandLine.arguments.count {
+    config.voiceDataDirectory = CommandLine.arguments[i + 1]
+} else if let flag = CommandLine.arguments.first(where: { $0.hasPrefix("--voice-dir=") }) {
+    config.voiceDataDirectory = String(flag.dropFirst("--voice-dir=".count))
+}
 
 // `SillHost --synthetic`: the Desktop source streams a moving test pattern instead of the screen,
 // so the encoder, its software fallback and the network can be checked without Screen Recording.

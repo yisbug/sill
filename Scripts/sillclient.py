@@ -39,6 +39,10 @@ usage: sillclient.py PORT [seconds] [desktop|none|window:ID] [flags...]
   --keyframe@T       send kind 44 (a keyframe request, empty: a device's picture was interrupted) T
                      seconds in: the host's encoder makes a keyframe, which every client gets (the
                      summary's "keyframes at"), at most one request a second per connection
+  --voice=FILE@T     send FILE as a voice clip (kind 100, format 1: m4a) T seconds in; clips are numbered 1, 2, 3…
+                     in the order sent. Each kind 101 (the clip's result) is printed: "voiceResult at …: clip=1 ok=1
+                     text='…'" or with reason= and message=; the window list prints voice= when the host says it
+  --voice-cancel=ID@T send kind 102 (cancel clip ID) T seconds in
   --gesture=NAME[,FINGERS]@T  send a trackpad gesture (kind 28) T seconds in: swipeUp, swipeDown,
                      swipeLeft, swipeRight, pinch or spread, and 3 or 4 fingers (3 when left out)
   --raw28=JSON@T     send this literal kind 28 payload T seconds in (split on the last @)
@@ -174,7 +178,8 @@ SET_KEYS = {"maxFPS", "bitrate", "captureScale", "prioritizeSpeed", "virtualDisp
 AWAY_KEYS = {"homeBitrate", "homeCaptureScale", "awayBitrate", "awayCaptureScale", "thisConnectionAway", "awayRunning"}
 EXPECT_KEYS = SET_KEYS | {"persistent", "virtualDisplayAvailable", "sessionPaired", "linkState", "clipboard"} | AWAY_KEYS
 TIMED = ("set", "raw17", "raw9", "pick", "fps-after", "stop-ping", "stop-read", "pairing-wanted", "keyframe", "fetch", "press", "raw25",
-         "raw27", "move", "tap", "key", "input", "gesture", "raw28", "copy", "copy-bytes", "raw32", "raw7", "raw15")
+         "raw27", "move", "tap", "key", "input", "gesture", "raw28", "copy", "copy-bytes", "raw32", "raw7", "raw15",
+         "voice", "voice-cancel")
 INPUT = ("move", "tap", "key", "input")
 # What --gesture may send: TrackpadGesture's six names (Gesture.swift). Anything else goes with --raw28.
 GESTURES = ("swipeUp", "swipeDown", "swipeLeft", "swipeRight", "pinch", "spread")
@@ -519,7 +524,9 @@ try:
                           else gesture(text) if name == "gesture"
                           else unescape(text) if name == "copy"
                           else "x" * number(text, "--copy-bytes") if name == "copy-bytes"
-                          else held_key(text) if name == "key" else text)
+                          else held_key(text) if name == "key"
+                          else open(text, "rb").read() if name == "voice"
+                          else number(text, "--voice-cancel") if name == "voice-cancel" else text)
             at_t = number(t, f"--{name}'s @T", float)
             if name == "key" and parsed[1] is not None:
                 # A held key: its down now and its up HOLD seconds later, pinging as a device meanwhile.
@@ -749,6 +756,7 @@ dump_log = open(os.path.join(dump_dir, "messages.tsv"), "w") if dump_dir is not 
 dump_index = open(os.path.join(dump_dir, "index.tsv"), "w") if dump_dir is not None else None
 dump_ps = 0; dump_keys = 0
 if dump_log is not None: dump_log.write(f"# t0 {t0:.6f}\n"); dump_log.flush()    # this run's start, epoch seconds
+voice_clip = 0
 token = 2 if "--menus" in flags else 1; last_state = None; settings_msgs = 0
 # The Mac's menus: the last top level (its version and titles), every title an answer listed by id,
 # and what each token asked for (a fetch's id, a press's id).
@@ -824,6 +832,13 @@ def fire(e, now):
                 global nextping; nextping = min(nextping, now + 0.25)   # a device's next ping is at most 0.25 s off
     elif name == "input":
         s.sendall(msg(8, text.encode())); print(f"  sent input {text} at {at}")
+    elif name == "voice":
+        global voice_clip
+        voice_clip += 1
+        s.sendall(msg(100, struct.pack(">IB", voice_clip, 1) + parsed))
+        print(f"  sent voice clip {voice_clip} ({len(parsed)} bytes of {text}) at {at}")
+    elif name == "voice-cancel":
+        s.sendall(msg(102, json.dumps({"clip": parsed}).encode())); print(f"  sent voice cancel {parsed} at {at}")
     elif name == "gesture":
         s.sendall(msg(28, json.dumps(parsed).encode())); print(f"  sent gesture {json.dumps(parsed)} at {at}")
     elif name == "raw28":
@@ -903,6 +918,7 @@ while time.time() - t0 < dur:
             d = json.loads(payload)
             print(f"  windowList: {len(d.get('windows', []))} windows, active={d.get('active')}"
                   + (f" clipboard={d['clipboard']}" if "clipboard" in d else "")
+                  + (f" voice={d['voice']}" if "voice" in d else "")
                   + (f" locked={1 if d['locked'] else 0}" if "locked" in d else "")
                   + (f" offConsole={1 if d['offConsole'] else 0}" if "offConsole" in d else ""))
         elif kind == 32:
@@ -914,6 +930,15 @@ while time.time() - t0 < dur:
             clipboards.append(t)
             shown = "no text" if t is None else f"{len(t.encode())} bytes {t[:60]!r}" + ("…" if len(t) > 60 else "")
             print(f"  clipboard at {time.time()-t0:.3f}s: {shown}" + (f" keys={sorted(d)}" if set(d) - {"text"} else ""))
+        elif kind == 101:
+            try:
+                d = json.loads(payload)
+            except ValueError:
+                print(f"  voiceResult at {time.time()-t0:.3f}s: undecodable {payload[:80]!r}"); continue
+            print(f"  voiceResult at {time.time()-t0:.3f}s: clip={d.get('clip')} ok={1 if d.get('ok') else 0}"
+                  + (f" text={d['text']!r}" if d.get("text") is not None else "")
+                  + (f" reason={d['reason']}" if d.get("reason") else "")
+                  + (f" message={d['message']!r}" if d.get("message") else ""))
         elif kind == 18:
             ok, i = verify_macinfo(payload, mac_pin)
             addrs = ",".join(f"{a['host']}{':' + str(a['port']) if a.get('port') else ''}/{a['kind']}/{a['via']}" for a in i.get("addresses", []))

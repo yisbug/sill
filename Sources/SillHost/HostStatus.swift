@@ -141,6 +141,8 @@ package struct HostStatusSnapshot: Equatable {
     /// Settings › General shows why with the Terminal command that unblocks Sill, and the menu says
     /// "Devices Can’t Connect".
     package var firewall: FirewallRule.Verdict?
+    /// 语音输入：这台 Mac 找到了可用的 meeppo-voice（VoiceBridge），Settings › General 的一行。
+    package var voiceService = false
 
     /// The Mac's sound as the menu's card and Settings show it.
     package struct Audio: Equatable {

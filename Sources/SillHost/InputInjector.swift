@@ -472,6 +472,8 @@ final class InputInjector {
         // after the held one, which stops repeating (KeyRepeat).
         post(keys.text(from: device))
         stopRepeating()
+        // TEST ONLY：测试输入日志里写出打的是什么（语音输入的端到端测试据此核对；真实主机从不打印）。
+        if testLog { print("Test input: text \(string.debugDescription)") }
         for character in string {
             switch character {
             case "\n": tap(virtualKey: 36)          // Return
