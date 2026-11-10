@@ -16,7 +16,7 @@ enum StatusGlyph {
     static let size = NSSize(width: 21, height: 18)
 
     static let symbolFallback: NSImage? = {
-        let image = NSImage(systemSymbolName: "macbook.and.ipad", accessibilityDescription: "Sill")
+        let image = NSImage(systemSymbolName: "macbook.and.ipad", accessibilityDescription: String(localized: "Sill", comment: "菜单栏图标：无障碍应用名称"))
         image?.isTemplate = true
         return image
     }()
@@ -28,7 +28,7 @@ enum StatusGlyph {
             return true
         }
         image.isTemplate = true
-        image.accessibilityDescription = "Sill"
+        image.accessibilityDescription = String(localized: "Sill", comment: "菜单栏图标：无障碍应用名称")
         return image
     }
 

@@ -24,6 +24,8 @@ final class AudioCapture: NSObject, AudioSource, SCStreamOutput, SCStreamDelegat
 
     struct Failure: AudioSourceFailure {
         let description: String
+        var localizedReason: String? = nil
+        var localizedDescription: String { localizedReason ?? description }
     }
 
     private let filter: SCContentFilter
@@ -104,7 +106,12 @@ final class AudioCapture: NSObject, AudioSource, SCStreamOutput, SCStreamDelegat
                 }
             }
             DispatchQueue.global().asyncAfter(deadline: .now() + seconds) {
-                if once.first() { c.resume(throwing: Failure(description: "the stream did not \(what) within \(Int(seconds)) s")) }
+                if once.first() {
+                    let localizedReason = what == "start"
+                        ? String(localized: "the stream did not start within \(String(Int(seconds))) s", comment: "音频状态：捕获流启动超时，插值为秒数")
+                        : String(localized: "the stream did not stop within \(String(Int(seconds))) s", comment: "音频状态：捕获流停止超时，插值为秒数")
+                    c.resume(throwing: Failure(description: "the stream did not \(what) within \(Int(seconds)) s", localizedReason: localizedReason))
+                }
             }
         }
     }

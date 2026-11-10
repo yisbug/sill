@@ -224,9 +224,9 @@ enum UpdatePolicy {
     // MARK: Words
 
     /// "Sill 0.4 Is Available…": the status menu's item.
-    static func menuTitle(_ offer: Offer) -> String { "Sill \(offer.version) Is Available…" }
+    static func menuTitle(_ offer: Offer) -> String { String(localized: "Sill \(offer.version.description) Is Available…", comment: "更新菜单：插值为可用版本号") }
     /// "You have 0.3; opens its download page".
-    static func menuSubtitle(running: SillVersion) -> String { "You have \(running); opens its download page" }
+    static func menuSubtitle(running: SillVersion) -> String { String(localized: "You have \(running.description); opens its download page", comment: "更新菜单副标题：插值为当前版本号") }
 
     /// The log's line for an outcome, nil for none (an automatic check that found nothing new).
     /// `running` as written ("0.3.0"); `retryIn` the retry's length, for a check with no answer.
@@ -267,18 +267,20 @@ enum UpdatePolicy {
     /// Settings › General's line after Check Now, and whether it is a failure (shown in orange).
     static func resultLine(_ outcome: Outcome, time: (Date) -> String) -> (text: String, failed: Bool) {
         switch outcome {
-        case .newer(let offer): return ("Sill \(offer.version) is available.", false)
-        case .upToDate: return ("Sill is up to date.", false)
-        case .noRelease: return ("Couldn’t check: GitHub has no release of Sill yet.", true)
+        case .newer(let offer): return (String(localized: "Sill \(offer.version.description) is available.", comment: "设置更新检查结果：插值为可用版本号"), false)
+        case .upToDate: return (String(localized: "Sill is up to date.", comment: "设置更新检查结果：已是最新版本"), false)
+        case .noRelease: return (String(localized: "Couldn’t check: GitHub has no release of Sill yet.", comment: "设置更新检查结果：尚无发布版本"), true)
         case .limited(_, let reset):
-            return ("Couldn’t check: GitHub is limiting requests from this network. "
-                    + (reset.map { "Try again after \(time($0))." } ?? "Try again in an hour."), true)
-        case .httpError(let status): return ("Couldn’t check: GitHub answered with an error (HTTP \(status)).", true)
-        case .notARelease: return ("Couldn’t check: GitHub’s answer wasn’t a release Sill understands.", true)
+            if let reset {
+                return (String(localized: "Couldn’t check: GitHub is limiting requests from this network. Try again after \(time(reset)).", comment: "设置更新检查限流提示：插值为可重试时间"), true)
+            }
+            return (String(localized: "Couldn’t check: GitHub is limiting requests from this network. Try again in an hour.", comment: "设置更新检查限流提示：未知重试时间"), true)
+        case .httpError(let status): return (String(localized: "Couldn’t check: GitHub answered with an error (HTTP \(String(status))).", comment: "设置更新检查错误：插值为 HTTP 状态码"), true)
+        case .notARelease: return (String(localized: "Couldn’t check: GitHub’s answer wasn’t a release Sill understands.", comment: "设置更新检查错误：无法识别发布信息"), true)
         case .noConnection(let code, let description):
-            return (tlsCodes.contains(code) ? "Couldn’t check: \(description)" : "Couldn’t check: this Mac isn’t connected to the internet.", true)
-        case .timeout: return ("Couldn’t check: GitHub didn’t answer within \(Int(requestTimeout)) seconds.", true)
-        case .failed(_, let description): return ("Couldn’t check: \(description)", true)
+            return (tlsCodes.contains(code) ? String(localized: "Couldn’t check: \(description)", comment: "设置更新检查连接错误：插值为系统错误说明") : String(localized: "Couldn’t check: this Mac isn’t connected to the internet.", comment: "设置更新检查连接错误：网络不可用"), true)
+        case .timeout: return (String(localized: "Couldn’t check: GitHub didn’t answer within \(String(Int(requestTimeout))) seconds.", comment: "设置更新检查超时：插值为等待秒数"), true)
+        case .failed(_, let description): return (String(localized: "Couldn’t check: \(description)", comment: "设置更新检查失败：插值为错误说明"), true)
         }
     }
 
@@ -296,9 +298,9 @@ enum UpdatePolicy {
         var resultID = 0
     }
 
-    static let notCheckedLine = "Not checked yet."
-    static let noVersionLine = "This build of Sill has no version number, so it can’t check."
-    static let testPatternLine = "Sill doesn’t check for updates in test pattern mode."
+    static let notCheckedLine = String(localized: "Not checked yet.", comment: "设置更新检查：尚未检查")
+    static let noVersionLine = String(localized: "This build of Sill has no version number, so it can’t check.", comment: "设置更新检查：构建没有版本号")
+    static let testPatternLine = String(localized: "Sill doesn’t check for updates in test pattern mode.", comment: "设置更新检查：测试图案模式说明")
 
     /// The pane's line, first match wins: a check running; this run's Check Now result (kept until
     /// GitHub answers an automatic check, UpdateChecker); why Sill cannot check (no version, test
@@ -308,7 +310,7 @@ enum UpdatePolicy {
         let canCheck = hasVersion && !testPatternOnly
         var p = Pane(line: notCheckedLine, releasePage: offer?.url, canCheck: canCheck && !checking, resultID: resultID)
         if checking {
-            p.line = "Checking…"
+            p.line = String(localized: "Checking…", comment: "设置更新检查：正在检查")
         } else if let result {
             (p.line, p.failed) = resultLine(result, time: time)
         } else if !hasVersion {
@@ -316,13 +318,13 @@ enum UpdatePolicy {
         } else if testPatternOnly {
             p.line = testPatternLine
         } else if let offer {
-            p.line = "Sill \(offer.version) is available."
+            p.line = String(localized: "Sill \(offer.version.description) is available.", comment: "设置更新检查：插值为可用版本号")
         } else if let lastCheck {
-            p.line = "Last checked \(date(lastCheck))."
+            p.line = String(localized: "Last checked \(date(lastCheck)).", comment: "设置更新检查：插值为上次检查日期")
         }
         return p
     }
 
     /// The pane's footer.
-    static let footnote = "Once a day, Sill asks GitHub whether a newer version is out. GitHub sees this Mac’s IP address and which version of Sill it has; nothing else is sent. Sill never downloads or installs anything by itself: a new version opens its page on GitHub, where you download it."
+    static let footnote = String(localized: "Once a day, Sill asks GitHub whether a newer version is out. GitHub sees this Mac’s IP address and which version of Sill it has; nothing else is sent. Sill never downloads or installs anything by itself: a new version opens its page on GitHub, where you download it.", comment: "设置更新检查：自动检查的隐私与下载方式说明")
 }

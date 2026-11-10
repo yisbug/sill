@@ -173,7 +173,7 @@ final class AppModel {
     private func makeRemoteAccess() -> RemoteAccess {
         let store = makeIdentityStore()
         let remote = RemoteAccess(store: store)
-        if let problem = remote.identityProblem { print("Remote access unavailable: \(problem)") }
+        if let problem = remote.identityLogProblem { print("Remote access unavailable: \(problem)") }
         remote.restoreSeen(settings.remoteDevicesSeen())
         remote.onSeen = { [weak self, weak remote] prefix, at, route in
             let keep = Set(remote?.pairedPrefixes ?? [])
@@ -373,7 +373,10 @@ final class AppModel {
             onPresentation?(next)
         }
         // One line per change of header or explanation; tests grep for "Status:".
-        let line = next.subtitle.map { "\(next.header) — \($0)" } ?? next.header
+        let line = StatusText.logLine(snapshot: coordinator?.status.snapshot ?? HostStatusSnapshot(),
+                                      permissions: PermissionState(screenRecording: permissions.screenRecording,
+                                                                   accessibility: permissions.accessibility),
+                                      startupError: startupError, hasCoordinator: coordinator != nil)
         if line != loggedStatus {
             loggedStatus = line
             print("Status: \(line)")

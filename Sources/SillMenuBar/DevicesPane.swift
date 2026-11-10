@@ -63,16 +63,16 @@ struct DevicesPane: View {
                 Toggle("Require pairing", isOn: $requirePairing)
                     .disabled(unavailable != nil)
                 if let problem = unavailable {
-                    Warning("Devices can’t connect: Sill couldn’t use its key in your keychain (\(withoutFullStop(problem))). Quit Sill and open it again, and choose Always Allow if the keychain asks.")
+                    Warning(String(localized: "Devices can’t connect: Sill couldn’t use its key in your keychain (\(withoutFullStop(problem))). Quit Sill and open it again, and choose Always Allow if the keychain asks.", comment: "设备面板连接不可用的警告；插值为钥匙串故障原因"))
                 } else if let p = requirePairingProblem {
                     let reason = withoutFullStop(p.reason)
                     Warning(p.wanted
-                            ? "Pairing is required until Sill quits: Sill couldn’t update the keychain (\(reason)). Try again."
-                            : "Pairing is still required: Sill couldn’t update the keychain (\(reason)). Try again.")
+                            ? String(localized: "Pairing is required until Sill quits: Sill couldn’t update the keychain (\(reason)). Try again.", comment: "设备配对要求保存失败；插值为钥匙串故障原因")
+                            : String(localized: "Pairing is still required: Sill couldn’t update the keychain (\(reason)). Try again.", comment: "设备配对要求保存失败；插值为钥匙串故障原因"))
                 }
             } footer: {
                 if requirePairing {
-                    Footnote("Each iPhone or iPad pairs once: over the USB cable by itself, or on Wi\u{2011}Fi with a code this Mac shows when the device asks. Everything devices send and receive is encrypted.")
+                    Footnote(String(localized: "Each iPhone or iPad pairs once: over the USB cable by itself, or on Wi\u{2011}Fi with a code this Mac shows when the device asks. Everything devices send and receive is encrypted.", comment: "设备面板中配对方式和加密的说明"))
                 } else {
                     Label("Any device on your network (or nearby, with Direct Wireless Connection on) and any app on this Mac can see and control it without pairing. Connections are still encrypted.",
                           systemImage: "exclamationmark.triangle.fill")
@@ -85,7 +85,7 @@ struct DevicesPane: View {
             Section {
                 Toggle("Show the pairing window to screen sharing", isOn: $showPairingWindowToScreenSharing)
             } footer: {
-                Footnote("Turn this on to pair while you use this Mac through Screen Sharing or another remote desktop app, as you would a Mac without a display. While it’s on, anyone who can see this Mac’s screen remotely can read the code. Devices streaming this Mac never show the window.")
+                Footnote(String(localized: "Turn this on to pair while you use this Mac through Screen Sharing or another remote desktop app, as you would a Mac without a display. While it’s on, anyone who can see this Mac’s screen remotely can read the code. Devices streaming this Mac never show the window.", comment: "设备面板中向屏幕共享显示配对窗口的说明"))
             }
             pairedDevices
         }
@@ -97,7 +97,7 @@ struct DevicesPane: View {
                 Text("\(removedName) can no longer connect. To use it again, pair it again.")
             }
             if let removeProblem {
-                Warning("\(removeProblem.name) is still paired: Sill couldn’t update the keychain (\(withoutFullStop(removeProblem.reason))). Try again.")
+                Warning(String(localized: "\(removeProblem.name) is still paired: Sill couldn’t update the keychain (\(withoutFullStop(removeProblem.reason))). Try again.", comment: "设备面板中移除配对失败的警告；插值为设备名和钥匙串故障原因"))
             }
             if unavailable != nil {
                 // The trust list lives with the key: unread, not empty.
@@ -125,7 +125,7 @@ struct DevicesPane: View {
         } header: {
             Text("Paired Devices")
         } footer: {
-            Footnote("A paired device can see and control this Mac on your network, nearby, and from afar while Remote Access is on. If one is lost, remove it here.")
+            Footnote(String(localized: "A paired device can see and control this Mac on your network, nearby, and from afar while Remote Access is on. If one is lost, remove it here.", comment: "设备面板页脚中配对权限的说明"))
         }
     }
 }
@@ -173,17 +173,31 @@ struct PairedDeviceRow: View {
     /// "Paired Sep 25 over the USB cable · last connected 2 minutes ago over Wi‑Fi", "Paired Sep 24
     /// with the QR code · last connected yesterday through Tailscale".
     static func detail(_ device: PairedDeviceSummary, now: Date) -> String {
-        var out = "Paired \(day(device.pairedAt, now: now))"
-        if let method = device.displayMethod { out += " \(method)" }
+        let pairedDay = day(device.pairedAt, now: now)
+        let method = device.displayMethod
         if let seen = device.lastSeen {
             let formatter = RelativeDateTimeFormatter()
             formatter.unitsStyle = .full
             formatter.dateTimeStyle = .named
-            let when = now.timeIntervalSince(seen) < 60 ? "just now" : formatter.localizedString(for: seen, relativeTo: now)
-            out += " · last connected \(when)"
-            if let route = device.lastRoute { out += " \(route)" }
+            let when = now.timeIntervalSince(seen) < 60
+                ? String(localized: "just now", comment: "配对设备最近连接的相对时间：刚刚")
+                : formatter.localizedString(for: seen, relativeTo: now)
+            let route = device.lastRoute.map { MacRouteText.display($0) }
+            switch (method, route) {
+            case (let method?, let route?):
+                return String(localized: "Paired \(pairedDay) \(method) · last connected \(when) \(route)", comment: "配对设备摘要；插值依次为配对日期、配对方式、最近连接时间、连接路径")
+            case (let method?, nil):
+                return String(localized: "Paired \(pairedDay) \(method) · last connected \(when)", comment: "配对设备摘要；插值依次为配对日期、配对方式、最近连接时间")
+            case (nil, let route?):
+                return String(localized: "Paired \(pairedDay) · last connected \(when) \(route)", comment: "配对设备摘要；插值依次为配对日期、最近连接时间、连接路径")
+            case (nil, nil):
+                return String(localized: "Paired \(pairedDay) · last connected \(when)", comment: "配对设备摘要；插值依次为配对日期、最近连接时间")
+            }
         }
-        return out
+        if let method {
+            return String(localized: "Paired \(pairedDay) \(method)", comment: "配对设备摘要；插值依次为配对日期和配对方式")
+        }
+        return String(localized: "Paired \(pairedDay)", comment: "配对设备摘要；插值为配对日期")
     }
 
     static func day(_ date: Date, now: Date) -> String {

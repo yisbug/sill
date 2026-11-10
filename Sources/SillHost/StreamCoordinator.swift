@@ -408,7 +408,7 @@ package final class StreamCoordinator {
             if let identity = remote.identity {
                 home = .tls(StreamServer.HomeTLS(identity: identity, trust: remote.trust))
             } else {
-                home = .closed("Sill couldn’t use its key \(remote.keyPlace) (\(remote.identityProblem ?? "no identity"))")
+                home = .closed("Sill couldn’t use its key \(remote.keyPlace) (\(remote.identityLogProblem ?? "no identity"))")
             }
         }
         // The test pattern is for test clients, not devices.
@@ -850,8 +850,9 @@ package final class StreamCoordinator {
         }
         stageLosses = 0
         stage.disabledReason = apiProblem
+        stage.localizedDisabledReason = apiProblem == nil ? nil : VirtualDisplay.checkPrivateAPI(localized: true).joined(separator: "; ")
         status.update {
-            $0.virtualDisplayProblem = apiProblem
+            $0.virtualDisplayProblem = stage.localizedDisabledReason
             $0.virtualDisplayAPIMissing = apiProblem != nil
         }
     }
@@ -1967,10 +1968,13 @@ package final class StreamCoordinator {
                     stage.release()
                     // For the menu: why this window streams in place, and whether the stage gave up
                     // for the run (it does after repeated display creation failures).
-                    let why = (error as? VirtualStage.Failure)?.summary ?? "\(error)"
+                    let why = (error as? VirtualStage.Failure).map { failure in
+                        if case .disabled = failure { return stage.localizedDisabledReason ?? failure.summary }
+                        return failure.summary
+                    } ?? "\(error)"
                     status.update {
                         $0.lastStageFailure = why
-                        if let off = stage.disabledReason { $0.virtualDisplayProblem = off }
+                        if let off = stage.localizedDisabledReason { $0.virtualDisplayProblem = off }
                     }
                 }
             }
@@ -2011,13 +2015,13 @@ package final class StreamCoordinator {
                 (width, height) = placeholderSize()
                 picture = .placeholder
                 describe = "a placeholder (this Mac is locked: nothing of it is captured)"
-                title = "Locked"; kind = .desktop
+                title = String(localized: "Locked", comment: "状态菜单：Mac 已锁定"); kind = .desktop
             } else if synthetic {
                 // A 1512×949-point test pattern: the same size as a typical streamed window, so the
                 // encoder and the fallback see realistic load without Screen Recording.
                 width = evenPixels(1512 * captureScale); height = evenPixels(949 * captureScale)
                 describe = "a synthetic test pattern\(useSoftwareEncoder ? " (software encoder)" : "")"
-                title = "Test Pattern"; kind = .testPattern
+                title = String(localized: "Test Pattern", comment: "状态菜单：测试画面标题"); kind = .testPattern
                 picture = .display
             } else {
                 // The display as the newest look has it, read after every await (`desktopCapture`).
@@ -2027,7 +2031,7 @@ package final class StreamCoordinator {
                 displayScale = plan.displayScale
                 width = plan.width; height = plan.height
                 describe = "the whole desktop\(useSoftwareEncoder ? " (software encoder)" : "")"
-                title = "Whole Desktop"; kind = .desktop
+                title = String(localized: "Whole Desktop", comment: "状态菜单：整个桌面标题"); kind = .desktop
                 picture = .display
             }
         }
@@ -2040,7 +2044,7 @@ package final class StreamCoordinator {
             (width, height) = placeholderSize()
             picture = .placeholder
             describe = "a placeholder (this Mac is locked: nothing of it is captured)"
-            title = "Locked"; kind = .desktop
+            title = String(localized: "Locked", comment: "状态菜单：Mac 已锁定"); kind = .desktop
         }
 
         do {
@@ -2051,7 +2055,7 @@ package final class StreamCoordinator {
             if virtualDisplay, stage.isStaged, let w = picked {
                 // The display filter failed to start: send the window home and stream it there.
                 print("Capture on the virtual display failed: \(error); retrying with the real window.")
-                status.update { $0.lastStageFailure = "capture on the display failed" }
+                status.update { $0.lastStageFailure = String(localized: "capture on the display failed", comment: "虚拟显示器设置：显示器捕获失败") }
                 stage.release()
                 if comeForward, !shuttingDown { activateAndRaise(window: w) }   // regular mode now: a pick comes forward
                 let fallback = "\(w.owningApplication?.applicationName ?? "?") — \(w.title ?? "")\(useSoftwareEncoder ? " (software encoder)" : "")"
@@ -2154,7 +2158,7 @@ package final class StreamCoordinator {
             try await startPipeline(source: .desktop, filter: plan.filter, sourceRect: nil, displayScale: plan.displayScale,
                                     width: plan.width, height: plan.height,
                                     describe: locked ? "a placeholder (this Mac is locked: nothing of it is captured)" : describe,
-                                    title: locked ? "Locked" : title, kind: kind, picture: locked ? .placeholder : .display)
+                                    title: locked ? String(localized: "Locked", comment: "状态菜单：Mac 已锁定") : title, kind: kind, picture: locked ? .placeholder : .display)
         } catch {
             print("Could not start streaming \(describe): \(error)")
             active = .none
@@ -2782,7 +2786,7 @@ package final class StreamCoordinator {
     private func audioFollow() {
         let (key, reason) = audioKey()
         audio.follow(key, reason: reason) { [weak self] key in
-            await self?.makeAudioSource(key) ?? .failed("the host is shutting down")
+            await self?.makeAudioSource(key) ?? .localizedFailure("the host is shutting down", String(localized: "the host is shutting down", comment: "音频状态：主机正在关闭"))
         }
     }
 
@@ -2792,11 +2796,11 @@ package final class StreamCoordinator {
     private func makeAudioSource(_ key: AudioKey) async -> AudioPipeline.Made {
         switch key {
         case .none:
-            return .failed("nothing to capture")
+            return .localizedFailure("nothing to capture", String(localized: "nothing to capture", comment: "音频状态：没有可捕获的内容"))
         case .test:
             return .source(SyntheticAudio(queue: audio.queue), line: "Audio: a test tone (440 Hz at -30 dBFS, a click at each second).")
         case .desktop:
-            guard let display = catalog.display else { return .failed("no display to capture from") }
+            guard let display = catalog.display else { return .localizedFailure("no display to capture from", String(localized: "no display to capture from", comment: "音频状态：没有可供捕获的显示器")) }
             let filter: SCContentFilter
             if let own = catalog.ownApplication {
                 filter = SCContentFilter(display: display, excludingApplications: [own], exceptingWindows: [])
@@ -2805,8 +2809,11 @@ package final class StreamCoordinator {
             }
             return .source(AudioCapture(filter: filter, queue: audio.queue), line: "Audio: capturing the whole Mac's sound (every app but Sill).")
         case .app(let pid, let name):
-            guard let display = catalog.display else { return .failed("no display to capture from") }
-            guard let app = await runningApplication(pid) else { return .failed("\(name) is not among the apps ScreenCaptureKit lists") }
+            guard let display = catalog.display else { return .localizedFailure("no display to capture from", String(localized: "no display to capture from", comment: "音频状态：没有可供捕获的显示器")) }
+            guard let app = await runningApplication(pid) else {
+                return .localizedFailure("\(name) is not among the apps ScreenCaptureKit lists",
+                                         String(localized: "\(name) is not among the apps ScreenCaptureKit lists", comment: "音频状态：系统未列出应用，插值为应用名称"))
+            }
             let filter = SCContentFilter(display: display, including: [app], exceptingWindows: [])
             return .source(AudioCapture(filter: filter, queue: audio.queue), line: "Audio: capturing \(name)'s sound (every window of it).")
         }
@@ -2840,7 +2847,8 @@ package final class StreamCoordinator {
         print("The system removed the virtual display; the window is back on a real display.")
         if stageLosses > 2 {
             stage.disabledReason = "the system removed the virtual display \(stageLosses) times"
-            status.update { $0.virtualDisplayProblem = stage.disabledReason }
+            stage.localizedDisabledReason = String(localized: "the system removed the virtual display \(String(stageLosses)) times", comment: "虚拟显示器设置：被系统重复移除，插值为次数")
+            status.update { $0.virtualDisplayProblem = stage.localizedDisabledReason }
         }
         if case .window = active { await select(active) }
     }
@@ -3441,11 +3449,11 @@ package final class StreamCoordinator {
     /// permission lines: permissions are polled, not event-driven, and a missing one still reaches
     /// the device as the fallback reason on the next pick.
     private func virtualDisplayNote(target t: HostConfig, snapshot s: HostStatusSnapshot) -> String? {
-        if !appKitLoop { return "Start SillHost with --virtual-display to use it." }
-        if s.virtualDisplayAPIMissing, let p = s.virtualDisplayProblem { return "Not available on this version of macOS: \(p)" }
+        if !appKitLoop { return String(localized: "Start SillHost with --virtual-display to use it.", comment: "设备设置：启动主机时启用虚拟显示器") }
+        if s.virtualDisplayAPIMissing, let p = s.virtualDisplayProblem { return String(localized: "Not available on this version of macOS: \(p)", comment: "设备设置：系统不支持虚拟显示器，插值为错误说明") }
         guard t.virtualDisplay else { return nil }
-        if let p = s.virtualDisplayProblem { return "Off for this session: \(p). Turn it off and on to try again." }
-        if let f = s.lastStageFailure { return "The last window streamed where it is: \(f)" }
+        if let p = s.virtualDisplayProblem { return String(localized: "Off for this session: \(p). Turn it off and on to try again.", comment: "设备设置：本次虚拟显示器已停用，插值为错误说明") }
+        if let f = s.lastStageFailure { return String(localized: "The last window streamed where it is: \(f)", comment: "设备设置：上次窗口原位串流，插值为失败说明") }
         return nil
     }
 

@@ -15,7 +15,13 @@ protocol AudioSource: AnyObject {
 
 /// A source's own failure, in its own words (AudioCapture's timeouts); any other error is the system's
 /// and is shown with its domain and code.
-protocol AudioSourceFailure: Error, CustomStringConvertible {}
+protocol AudioSourceFailure: Error, CustomStringConvertible {
+    var localizedDescription: String { get }
+}
+
+extension AudioSourceFailure {
+    var localizedDescription: String { description }
+}
 
 /// Seconds of the host clock: mach absolute time, the clock ScreenCaptureKit stamps its buffers with
 /// (CMClockGetHostTimeClock counts the same ticks).
@@ -77,6 +83,7 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
     enum Made {
         case source(AudioSource, line: String)
         case failed(String)
+        case localizedFailure(String, String)
     }
 
     // Main actor.
@@ -204,7 +211,11 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
         // and started. A request that comes meanwhile is decided once this start is done.
         let made = await make(key)
         guard case .source(let s, let line) = made else {
-            if case .failed(let why) = made { failed(key, why) }
+            switch made {
+            case .failed(let why): failed(key, why)
+            case .localizedFailure(let why, let localizedWhy): failed(key, why, localizedWhy: localizedWhy)
+            case .source: break
+            }
             return
         }
         let (formatSource, app) = Self.formatSource(key)
@@ -223,7 +234,7 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
             try await s.start()
         } catch {
             guard g == generation else { return }
-            failed(key, Self.describe(error))
+            failed(key, Self.describe(error), localizedWhy: (error as? AudioSourceFailure)?.localizedDescription)
             await stopSource()   // a new generation: what the source still delivers is inert
             return
         }
@@ -236,10 +247,10 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
     /// A source that could not start: one line, the problem shown, and the key kept (`.ended`), so the
     /// same source is tried again only after `AudioSourceRule.retryInterval`.
     @MainActor
-    private func failed(_ key: AudioKey, _ why: String) {
+    private func failed(_ key: AudioKey, _ why: String, localizedWhy: String? = nil) {
         phase = .ended
         print("Audio: could not capture \(Self.said(key)): \(why). The picture is unaffected.")
-        sourceStatus = Status(source: Self.shown(key), capturing: false, problem: "couldn’t capture \(Self.soundOf(key)): \(why)")
+        sourceStatus = Status(source: Self.shown(key), capturing: false, problem: Self.captureProblem(key, why: localizedWhy ?? why))
     }
 
     /// The source ended by itself (the permission revoked, the system stopping the stream).
@@ -249,7 +260,7 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
         phase = .ended
         source = nil
         print("Audio capture ended: \(why). The picture is unaffected.")
-        sourceStatus = Status(source: Self.shown(current), capturing: false, problem: "couldn’t capture \(Self.soundOf(current)): \(why)")
+        sourceStatus = Status(source: Self.shown(current), capturing: false, problem: Self.captureProblem(current, why: why))
         generation += 1
         let next = generation
         queue.async { self.live = next; self.packetizer = nil; self.encoder = nil }
@@ -268,8 +279,8 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
     static func shown(_ key: AudioKey) -> String {
         switch key {
         case .app(_, let name): return name
-        case .desktop: return "Whole Mac"
-        case .test: return "Test Tone"
+        case .desktop: return String(localized: "Whole Mac", comment: "音频状态：整个 Mac 的声音")
+        case .test: return String(localized: "Test Tone", comment: "音频状态：测试音")
         case .none: return ""
         }
     }
@@ -284,13 +295,12 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
         }
     }
 
-    /// The Mac's and the device's words: "the sound of Safari", "the sound of the whole Mac".
-    static func soundOf(_ key: AudioKey) -> String {
+    private static func captureProblem(_ key: AudioKey, why: String) -> String {
         switch key {
-        case .app(_, let name): return "the sound of \(name)"
-        case .desktop: return "the sound of the whole Mac"
-        case .test: return "the test tone"
-        case .none: return "no sound"
+        case .app(_, let name): return String(localized: "couldn’t capture the sound of \(name): \(why)", comment: "音频状态：无法捕获应用声音，插值为应用名称和错误说明")
+        case .desktop: return String(localized: "couldn’t capture the sound of the whole Mac: \(why)", comment: "音频状态：无法捕获 Mac 声音，插值为错误说明")
+        case .test: return String(localized: "couldn’t capture the test tone: \(why)", comment: "音频状态：无法捕获测试音，插值为错误说明")
+        case .none: return String(localized: "couldn’t capture no sound: \(why)", comment: "音频状态：没有可捕获的声音，插值为错误说明")
         }
     }
 
@@ -338,7 +348,10 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
                 formatRefused = true
                 let why = "the capture delivered \(Int(chunk.sampleRate)) Hz with \(chunk.channels) channel\(chunk.channels == 1 ? "" : "s"), and Sill encodes 48 kHz stereo only"
                 print("Audio: \(why).")
-                Task { @MainActor in self.formatProblem(why) }
+                let localizedWhy = chunk.channels == 1
+                    ? String(localized: "the capture delivered \(String(Int(chunk.sampleRate))) Hz with \(String(chunk.channels)) channel, and Sill encodes 48 kHz stereo only", comment: "音频状态：捕获格式不支持，插值为采样率和单声道数")
+                    : String(localized: "the capture delivered \(String(Int(chunk.sampleRate))) Hz with \(String(chunk.channels)) channels, and Sill encodes 48 kHz stereo only", comment: "音频状态：捕获格式不支持，插值为采样率和声道数")
+                Task { @MainActor in self.formatProblem(localizedWhy) }
             }
             return false
         }
@@ -349,7 +362,7 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
         } catch {
             encoderUnavailable = true
             print("Audio encoder: AAC-ELD unavailable: \(error)")
-            Task { @MainActor in self.encoderProblem("\(error)") }
+            Task { @MainActor in self.encoderProblem((error as? AudioEncoder.Failure)?.localizedDescription ?? "\(error)") }
             return false
         }
         epoch = (epoch + 1) & 0xFFFF
@@ -370,7 +383,7 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
 
     @MainActor
     private func encoderProblem(_ why: String) {
-        let problem = "couldn’t encode the sound: AAC-ELD is unavailable (\(why))"
+        let problem = String(localized: "couldn’t encode the sound: AAC-ELD is unavailable (\(why))", comment: "音频状态：编码器不可用，插值为错误说明")
         encoderGone = problem
         guard var s = sourceStatus else { return }
         s.capturing = false
@@ -382,7 +395,7 @@ final class AudioPipeline: @unchecked Sendable {   // main-actor state, and stat
     private func formatProblem(_ why: String) {
         guard var s = sourceStatus else { return }
         s.capturing = false
-        s.problem = "couldn’t use the sound: \(why)"
+        s.problem = String(localized: "couldn’t use the sound: \(why)", comment: "音频状态：声音格式不可用，插值为错误说明")
         sourceStatus = s
     }
 }

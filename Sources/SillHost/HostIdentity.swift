@@ -35,9 +35,9 @@ package struct PairedDevice: Codable, Hashable, Sendable {
     /// The words for a stored method (`displayMethod`; the pane's summaries use it too).
     package static func displayMethod(_ method: String) -> String? {
         switch method {
-        case PairRequest.qr: return "with the QR code"
-        case PairRequest.code: return "with a code"
-        case PairResult.cable: return "over the USB cable"
+        case PairRequest.qr: return String(localized: "with the QR code", comment: "设备列表：使用二维码配对")
+        case PairRequest.code: return String(localized: "with a code", comment: "设备列表：使用配对码配对")
+        case PairResult.cable: return String(localized: "over the USB cable", comment: "设备列表：使用 USB 连接线配对")
         default: return nil
         }
     }
@@ -46,6 +46,12 @@ package struct PairedDevice: Codable, Hashable, Sendable {
     package var displayName: String {
         guard let model, !model.isEmpty else { return name.isEmpty ? "a device" : name }
         return "\(name.isEmpty ? "Device" : name) (\(model))"
+    }
+
+    package var localizedDisplayName: String {
+        guard let model, !model.isEmpty else { return name.isEmpty ? String(localized: "a device", comment: "设备列表：没有名称的设备") : name }
+        if name.isEmpty { return String(localized: "Device (\(model))", comment: "设备列表：未命名设备，插值为设备型号") }
+        return "\(name) (\(model))"
     }
 
     /// The fingerprint's raw bytes; nil for a damaged record, which then trusts nothing.
@@ -130,7 +136,11 @@ package protocol IdentityStore: AnyObject {
 
 package struct IdentityStoreError: Error, CustomStringConvertible {
     package let description: String
-    package init(_ description: String) { self.description = description }
+    package let localizedDescription: String
+    package init(_ description: String, localizedDescription: String? = nil) {
+        self.description = description
+        self.localizedDescription = localizedDescription ?? description
+    }
 }
 
 /// SillHost --remote: a new identity and an empty trust list every run.
@@ -146,7 +156,10 @@ package final class MemoryIdentityStore: IdentityStore {
 
     package func loadOrCreateKey() throws -> SecKey {
         if let key { return key }
-        guard let k = RemoteKey.generate() else { throw IdentityStoreError("no P-256 key could be made") }
+        guard let k = RemoteKey.generate() else {
+            throw IdentityStoreError("no P-256 key could be made",
+                                     localizedDescription: String(localized: "no P-256 key could be made", comment: "设备设置错误：无法生成主机身份密钥"))
+        }
         key = k
         return k
     }
@@ -167,7 +180,10 @@ package final class MemoryIdentityStore: IdentityStore {
 
     static func randomBytes(_ n: Int) throws -> Data {
         var b = [UInt8](repeating: 0, count: n)
-        guard SecRandomCopyBytes(kSecRandomDefault, n, &b) == errSecSuccess else { throw IdentityStoreError("the random source failed") }
+        guard SecRandomCopyBytes(kSecRandomDefault, n, &b) == errSecSuccess else {
+            throw IdentityStoreError("the random source failed",
+                                     localizedDescription: String(localized: "the random source failed", comment: "设备设置错误：系统随机源失败"))
+        }
         return Data(b)
     }
 }
