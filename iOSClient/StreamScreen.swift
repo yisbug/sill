@@ -179,6 +179,10 @@ struct StreamScreen: View {
     /// This device's Larger Picture switch (the Settings panel's This iPhone; docs/larger-picture-plan.md).
     /// It acts only while a window streams (`largerPictureNow`).
     @AppStorage("Sill.barThumbnails") private var storedBarThumbnails = false
+    @AppStorage(BarCollapse.key) private var barCollapsed = false
+    @AppStorage(BarCollapse.handleKey) private var barHandle = BarCollapse.defaultFraction
+    /// 拖动中的浮动入口中心，与语音球的避让区域保持同步。
+    @State private var barHandleDragging: CGFloat? = nil
     private var barThumbnails: Bool {
         #if DEBUG
         if UserDefaults.standard.object(forKey: "SillBarThumbnails") != nil {
@@ -236,6 +240,10 @@ struct StreamScreen: View {
                 : (DuoLayout.drawsPhone(geo.size) ? .phone : .portrait)
             // The fold across this screen, in its own space (iOS 27.1 on the Duo; else as before).
             let posture = DuoPosture.read(geo, duoEnvironment)
+            let barHidden = BarCollapse.hidesBar(stored: barCollapsed, landscape: layout == .landscape, tourShown: tour != nil)
+            let chipAvoidsTop = shownLinkLine != nil || barHidden
+            let handleFold = posture.info(in: geo.size).verticalBand.map { $0.minX...$0.maxX }
+            let handleX = barHandleDragging ?? BarCollapse.centerX(fraction: barHandle, width: geo.size.width, fold: handleFold)
             // Larger Picture on a phone held upright: the software keyboard its rows are kept above;
             // none with the switch off, while the Desktop or nothing streams (`largerPictureNow`),
             // sideways, on an iPad, on the iPhone Duo (a hinge), and where the picture would be no
@@ -253,9 +261,9 @@ struct StreamScreen: View {
                 Group {
                     switch duo {
                     case .innerLandscape:
-                        landscape(bar: .regular, width: geo.size.width, fold: posture.info(in: geo.size))
+                        landscape(bar: .regular, width: geo.size.width, fold: posture.info(in: geo.size), barHidden: barHidden)
                     case .outerLandscape:
-                        landscape(bar: .compact, width: geo.size.width, fold: posture.info(in: geo.size))
+                        landscape(bar: .compact, width: geo.size.width, fold: posture.info(in: geo.size), barHidden: barHidden)
                     case .innerPortrait:
                         portrait(metrics: .regular)
                     case .outerPortrait:
@@ -280,7 +288,7 @@ struct StreamScreen: View {
                 // nothing else does (the frame around it is empty). Near the bar, off the link's line,
                 // inside the stream panel's corner; never while something is open over the stream.
                 if clipboardChipAllowed, client.clipboardChip || client.clipboardNote != nil, let panel = tourTargets[.stream] {
-                    let corner = ClipboardPolicy.chipCorner(landscape: layout == .landscape, linkLineShown: shownLinkLine != nil)
+                    let corner = ClipboardPolicy.chipCorner(landscape: layout == .landscape, linkLineShown: chipAvoidsTop)
                     ClipboardChip(client: client)
                         .frame(maxWidth: max(0, panel.width - 16), alignment: .trailing)
                         .padding(8)
@@ -295,10 +303,17 @@ struct StreamScreen: View {
                     let chip = clipboardChipAllowed && (client.clipboardChip || client.clipboardNote != nil)
                     VoiceInputLayer(client: client, area: panel,
                                     avoiding: VoiceInputLayer.avoiding(panel: panel,
-                                                                       chip: chip ? ClipboardPolicy.chipCorner(landscape: layout == .landscape, linkLineShown: shownLinkLine != nil) : nil,
-                                                                       linkLine: shownLinkLine != nil),
+                                                                       chip: chip ? ClipboardPolicy.chipCorner(landscape: layout == .landscape, linkLineShown: chipAvoidsTop) : nil,
+                                                                       linkLine: shownLinkLine != nil)
+                                        + (barHidden && !overlayShown ? [BarCollapse.handleRect(centerX: handleX, top: 0)] : []),
                                     landscape: layout == .landscape,
                                     covered: settingsOpen || drawerOpen || overlayShown || tour != nil)
+                }
+                // 作为后画的兄弟视图接收触摸，贴着屏幕顶边，不受串流 UIKit 输入视图遮挡。
+                if barHidden && !overlayShown {
+                    BarCollapseHandle(centerX: handleX, width: geo.size.width, fraction: $barHandle,
+                                      dragging: $barHandleDragging, show: showBar)
+                        .transition(.opacity)
                 }
                 // The tour: a sibling above the layouts, as the pairing overlay is, and under it: an
                 // outside link puts the tour aside until the overlay has closed.
@@ -853,6 +868,27 @@ struct StreamScreen: View {
         }
     }
 
+    /// 收起顶栏前关闭依附于它的控件，保留串流输入视图与键盘状态。
+    private func collapseBar() {
+        setSettings(false)
+        drawerOpen = false
+        closeWindowMenu()
+        scaleOpen = false
+        withAnimation(.easeOut(duration: 0.22)) { barCollapsed = true }
+        client.noteAction()
+        #if DEBUG
+        print("bar: collapsed")
+        #endif
+    }
+
+    private func showBar() {
+        withAnimation(.easeOut(duration: 0.22)) { barCollapsed = false }
+        client.noteAction()
+        #if DEBUG
+        print("bar: shown")
+        #endif
+    }
+
     /// The Menus pull-down opened: the drawer, a thumbnail's lights and the Settings panel go, one
     /// thing open at a time; the keyboard stays as it is (the plan's §7.5). The panel had taken it
     /// down, so it comes back, but only when the pull-down goes: raised now, the software keyboard
@@ -1205,24 +1241,28 @@ struct StreamScreen: View {
         }
     }
 
-    private func landscape(bar plain: BarMetrics, width: CGFloat, fold: FoldInfo) -> some View {
+    private func landscape(bar plain: BarMetrics, width: CGFloat, fold: FoldInfo, barHidden: Bool) -> some View {
         let plain = barThumbnails || DuoLayout.phoneArrangement ? plain.withThumbnails : plain
         // The book pose (docs/iphone-duo-plan.md, (a)): nothing on the fold's band; elsewhere as before.
         let (bar, stripWidth) = plain.clearing(fold, width: width,
                                               compactButtonWidth: plain.usesAppIcons
                                                   ? BarMetrics.compact.buttonWidth : BarMetrics.compactThumbnails.buttonWidth)
         return VStack(spacing: 0) {
-            TopBar(client: client, metrics: bar, touches: touches, stripWidth: stripWidth, drawerOpen: $drawerOpen,
-                   keyboardShown: $keyboardShown,
-                   textScale: $textScale, scaleOpen: $scaleOpen, windowMenu: $windowMenu,
-                   settingsOpen: settingsOpen,
-                   // Apps, Menus, Aa, Keyboard, Desktop, Settings, and the strip. The Mac's sound has no
-                   // button: Send Audio and Mute are the Settings panel's switches (Noah, 2026-10-27).
-                   menusFit: MacMenuButton.fits(width: width - 2 * bar.padding, buttons: 6, buttonWidth: bar.buttonWidth,
-                                                gap: bar.gap, thumbWidth: bar.usesAppIcons ? 44 : bar.thumbWidth),
-                   toggleKeyboard: { overlay.toggleKeyboard() },
-                   setSettings: { setSettings($0, restoreKeyboard: $1) },
-                   menusOpened: menusOpened, menusClosed: menusClosed)
+            if !barHidden {
+                TopBar(client: client, metrics: bar, touches: touches, stripWidth: stripWidth, drawerOpen: $drawerOpen,
+                       keyboardShown: $keyboardShown,
+                       textScale: $textScale, scaleOpen: $scaleOpen, windowMenu: $windowMenu,
+                       settingsOpen: settingsOpen,
+                       // 为末尾固定 44 pt 宽的折叠按钮及其间距预留空间。
+                       menusFit: MacMenuButton.fits(width: width - 2 * bar.padding - BarCollapse.buttonWidth - bar.gap,
+                                                    buttons: 6, buttonWidth: bar.buttonWidth,
+                                                    gap: bar.gap, thumbWidth: bar.usesAppIcons ? 44 : bar.thumbWidth),
+                       toggleKeyboard: { overlay.toggleKeyboard() },
+                       setSettings: { setSettings($0, restoreKeyboard: $1) },
+                       menusOpened: menusOpened, menusClosed: menusClosed, collapse: collapseBar)
+                    .transition(reduceMotion ? .opacity : .move(edge: .top).combined(with: .opacity))
+            }
+            // 保持固定的结构位置，避免折叠时重建作为键盘第一响应者的 InputOverlay。
             contentArea(bar: bar)
         }
     }
@@ -1443,7 +1483,7 @@ struct BarMetrics {
     /// 原折叠屏适配器仍由竖屏等既有布局共用，这里只适配横屏的新旧两种尺寸。
     func clearing(_ fold: FoldInfo, width: CGFloat, compactButtonWidth: CGFloat) -> (bar: BarMetrics, stripWidth: CGFloat?) {
         let book = DuoPosture.bookBar(width: width, fold: fold, padding: padding, gap: gap, buttonWidth: buttonWidth,
-                                     compactButtonWidth: compactButtonWidth, buttons: 5, panelWidth: settingsWidth)
+                                     compactButtonWidth: compactButtonWidth, buttons: 6, panelWidth: settingsWidth)
         guard book.stripWidth != nil else { return (self, nil) }
         let bar = BarMetrics(height: height, padding: padding, gap: book.gap,
                              buttonWidth: book.buttonWidth, buttonHeight: buttonHeight, buttonSpacing: buttonSpacing,
@@ -1478,6 +1518,50 @@ struct BarMetrics {
                                     showsTextSize: true, settingsWidth: 340)
 }
 
+/// 顶栏收起后的贴边入口；可点高度大于可见标签，拖动只改变横向位置。
+private struct BarCollapseHandle: View {
+    let centerX: CGFloat
+    let width: CGFloat
+    @Binding var fraction: Double
+    @Binding var dragging: CGFloat?
+    let show: () -> Void
+
+    var body: some View {
+        UnevenRoundedRectangle(bottomLeadingRadius: 13, bottomTrailingRadius: 13)
+            .fill(Palette.bar.opacity(0.35))
+            .overlay {
+                UnevenRoundedRectangle(bottomLeadingRadius: 13, bottomTrailingRadius: 13)
+                    .stroke(Color.white.opacity(0.12), lineWidth: 1)
+            }
+            .overlay {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Palette.text.opacity(0.75))
+            }
+            .frame(width: BarCollapse.handleSize.width, height: BarCollapse.handleSize.height)
+            .frame(height: BarCollapse.touchHeight, alignment: .top)
+            .contentShape(Rectangle())
+            .opacity(dragging == nil ? 0.65 : 0.9)
+            .onTapGesture(perform: show)
+            .gesture(
+                DragGesture(minimumDistance: 10, coordinateSpace: .named(TourSpace.name))
+                    .onChanged { dragging = BarCollapse.dragged(to: $0.location.x, width: width) }
+                    .onEnded { value in
+                        withAnimation(.spring(duration: 0.3, bounce: 0.2)) {
+                            fraction = BarCollapse.fraction(centerX: value.location.x, width: width)
+                            dragging = nil
+                        }
+                    }
+            )
+            .accessibilityElement(children: .ignore)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityLabel(String(localized: "Show the toolbar", comment: "串流界面：展开顶栏的浮动图标的无障碍标签"))
+            .accessibilityAction { show() }
+            .position(x: centerX, y: BarCollapse.touchHeight / 2)
+            .onDisappear { dragging = nil }
+    }
+}
+
 private struct TopBar: View {
     @ObservedObject var client: StreamClient
     let metrics: BarMetrics
@@ -1500,6 +1584,7 @@ private struct TopBar: View {
     /// The Menus pull-down opened and went (see `StreamScreen.menusOpened`).
     let menusOpened: () -> Void
     let menusClosed: () -> Void
+    let collapse: () -> Void
     @State private var menusOpen = false
 
     var body: some View {
@@ -1577,6 +1662,17 @@ private struct TopBar: View {
                 .opacity(scaleOpen ? 0 : 1)
                 .allowsHitTesting(!scaleOpen)
                 .tourTarget(.settings)
+
+            BarButton(open: false, width: BarCollapse.buttonWidth, height: metrics.buttonHeight,
+                      accessibilityLabel: String(localized: "Hide the toolbar", comment: "串流工具栏：折叠顶栏的无障碍标签"),
+                      action: collapse) {
+                Image(systemName: "chevron.up")
+                    .font(.system(size: 22))
+                    .foregroundStyle(Palette.text)
+            }
+            .accessibilityShowsLargeContentViewer { Label("Hide the toolbar", systemImage: "chevron.up") }
+            .opacity(scaleOpen ? 0 : 1)
+            .allowsHitTesting(!scaleOpen)
         }
         .animation(.easeOut(duration: 0.16), value: scaleOpen)
         .animation(.easeOut(duration: 0.18), value: client.menus.hasMenus)

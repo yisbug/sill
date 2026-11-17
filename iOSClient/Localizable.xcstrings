@@ -2671,6 +2671,17 @@
         }
       }
     },
+    "Hide the toolbar" : {
+      "comment" : "串流工具栏：折叠顶栏的无障碍标签",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "收起工具栏"
+          }
+        }
+      }
+    },
     "High" : {
       "comment" : "画质预设显示名称",
       "extractionState" : "stale",
@@ -4144,6 +4155,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "显示键盘"
+          }
+        }
+      }
+    },
+    "Show the toolbar" : {
+      "comment" : "串流界面：展开顶栏的浮动图标的无障碍标签",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示工具栏"
           }
         }
       }
