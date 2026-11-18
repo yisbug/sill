@@ -2336,6 +2336,17 @@
         }
       }
     },
+    "Couldn’t reconnect to %@. Choose a Mac to connect." : {
+      "comment" : "启动续连失败后连接界面的提示，插值为 Mac 名称",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "没能重新连上 %@，请选择要连接的 Mac。"
+          }
+        }
+      }
+    },
     "Custom — %@ Mbps" : {
       "comment" : "自定义画质选项标题，插值为每秒兆比特数",
       "extractionState" : "stale",
@@ -3559,6 +3570,17 @@
         }
       }
     },
+    "Paste" : {
+      "comment" : "语音悬浮球长按菜单：⌘V",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "粘贴"
+          }
+        }
+      }
+    },
     "Paste on %@" : {
       "comment" : "剪贴板芯片或设置行标题，插值为 Mac 名称",
       "extractionState" : "stale",
@@ -3837,6 +3859,17 @@
         }
       }
     },
+    "Redo" : {
+      "comment" : "语音悬浮球长按菜单：⇧⌘Z",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重做"
+          }
+        }
+      }
+    },
     "Remote" : {
       "comment" : "连接页中已保存 Mac 的远程连接方式",
       "localizations" : {
@@ -3886,6 +3919,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Retina"
+          }
+        }
+      }
+    },
+    "Return" : {
+      "comment" : "语音悬浮球长按菜单：按一下回车键（发送、换行）",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "回车"
           }
         }
       }
@@ -3959,6 +4003,50 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "搜索这台 Mac 上的应用"
+          }
+        }
+      }
+    },
+    "Select All" : {
+      "comment" : "语音悬浮球长按菜单：⌘A",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全选"
+          }
+        }
+      }
+    },
+    "Select All and Copy" : {
+      "comment" : "语音悬浮球长按菜单：⌘A 后 ⌘C",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全选并复制"
+          }
+        }
+      }
+    },
+    "Select All and Cut" : {
+      "comment" : "语音悬浮球长按菜单：⌘A 后 ⌘X",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全选并剪切"
+          }
+        }
+      }
+    },
+    "Select All and Delete" : {
+      "comment" : "语音悬浮球长按菜单：⌘A 后按删除",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "全选并删除"
           }
         }
       }
@@ -5414,6 +5502,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "窗口下方是一排按键，再往下是触控板。"
+          }
+        }
+      }
+    },
+    "Undo" : {
+      "comment" : "语音悬浮球长按菜单：⌘Z",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "撤销"
           }
         }
       }

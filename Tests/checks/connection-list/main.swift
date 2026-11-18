@@ -261,5 +261,21 @@ check(C.freshPicture(takesPreview: true, streaming: true, sinceLastAsk: nil, ask
       "every Mac is asked: a session's end that keeps a picture, something streaming, no recent ask")
 check(C.freshKeyframeWait == 0.3, "Disconnect waits 300 ms at most for the keyframe")
 
+// 启动续连（本 fork）：最近连上的、能自动拨的那台；超时或重连结束就回连接界面。
+let d0 = Date(timeIntervalSince1970: 1_000), d1 = Date(timeIntervalSince1970: 2_000), d2 = Date(timeIntervalSince1970: 3_000)
+check(C.resumeMacID([]) == nil, "resume: nothing saved, nothing resumed")
+check(C.resumeMacID([.init(macID: "A", lastConnectedAt: nil, usable: true)]) == nil, "resume: a Mac never connected is not resumed")
+check(C.resumeMacID([.init(macID: "A", lastConnectedAt: d0, usable: true), .init(macID: "B", lastConnectedAt: d1, usable: true)]) == "B",
+      "resume: the Mac connected last")
+check(C.resumeMacID([.init(macID: "A", lastConnectedAt: d0, usable: true), .init(macID: "B", lastConnectedAt: d2, usable: false)]) == "A",
+      "resume: a removed or re-keyed Mac is skipped")
+check(C.resumeState(connected: true, dialing: false, elapsed: 99) == .connected, "resume: connected wins")
+check(C.resumeState(connected: false, dialing: true, elapsed: 0) == .waiting, "resume: dialing, waits")
+check(C.resumeState(connected: false, dialing: true, elapsed: C.resumeWait - 0.01) == .waiting, "resume: just before the wait ends")
+check(C.resumeState(connected: false, dialing: true, elapsed: C.resumeWait) == .gaveUp, "resume: gives up when the wait ends")
+check(C.resumeState(connected: false, dialing: true, elapsed: .nan) == .gaveUp, "resume: a clock that is not a number gives up")
+check(C.resumeState(connected: false, dialing: false, elapsed: 1) == .gaveUp, "resume: the reconnect ended, gives up at once")
+check(C.resumeWait >= 10 && C.resumeWait <= 30, "resume: waits long enough for a remote dial, not for ever")
+
 print("\(checks) checks, \(failures) failed")
 exit(failures == 0 ? 0 : 1)

@@ -281,6 +281,88 @@ enum VoiceInputPolicy {
         }
     }
 
+    // MARK: 长按菜单：常用快捷操作
+
+    /// 长按语音球弹出的快捷操作：每项是发给 Mac 的一串按键（KeyChord.press 照键盘的样子按下、松开）。
+    enum QuickAction: CaseIterable, Equatable {
+        case selectAllDelete, selectAll, selectAllCopy, selectAllCut, paste, undo, redo, returnKey
+    }
+
+    /// 一次按键：HID 用法码，带不带 ⌘、⇧。
+    struct Stroke: Equatable {
+        let usage: UInt16
+        let command: Bool
+        let shift: Bool
+        init(_ usage: UInt16, command: Bool = true, shift: Bool = false) {
+            self.usage = usage; self.command = command; self.shift = shift
+        }
+    }
+
+    /// HID 用法码：A、C、V、X、Z、Delete（退格）、Return。
+    static let usageA: UInt16 = 0x04, usageC: UInt16 = 0x06, usageV: UInt16 = 0x19, usageX: UInt16 = 0x1B,
+               usageZ: UInt16 = 0x1D, usageDelete: UInt16 = 0x2A, usageReturn: UInt16 = 0x28
+
+    /// 每个操作按顺序发出的按键。
+    static func strokes(_ action: QuickAction) -> [Stroke] {
+        let all = Stroke(usageA)
+        switch action {
+        case .selectAllDelete: return [all, Stroke(usageDelete, command: false)]
+        case .selectAll: return [all]
+        case .selectAllCopy: return [all, Stroke(usageC)]
+        case .selectAllCut: return [all, Stroke(usageX)]
+        case .paste: return [Stroke(usageV)]
+        case .undo: return [Stroke(usageZ)]
+        case .redo: return [Stroke(usageZ, shift: true)]
+        case .returnKey: return [Stroke(usageReturn, command: false)]
+        }
+    }
+
+    /// 菜单只在空闲时（以及完成、失败的提示还在时）给；录音中与识别中长按不弹菜单。
+    static func offersQuickActions(_ phase: Phase) -> Bool {
+        switch phase {
+        case .idle, .done, .failed: return true
+        case .recording, .sending: return false
+        }
+    }
+
+    /// 菜单里的文字与图标（SF Symbols）。
+    static func title(_ action: QuickAction) -> String {
+        switch action {
+        case .selectAllDelete: return String(localized: "Select All and Delete", comment: "语音悬浮球长按菜单：⌘A 后按删除")
+        case .selectAll: return String(localized: "Select All", comment: "语音悬浮球长按菜单：⌘A")
+        case .selectAllCopy: return String(localized: "Select All and Copy", comment: "语音悬浮球长按菜单：⌘A 后 ⌘C")
+        case .selectAllCut: return String(localized: "Select All and Cut", comment: "语音悬浮球长按菜单：⌘A 后 ⌘X")
+        case .paste: return String(localized: "Paste", comment: "语音悬浮球长按菜单：⌘V")
+        case .undo: return String(localized: "Undo", comment: "语音悬浮球长按菜单：⌘Z")
+        case .redo: return String(localized: "Redo", comment: "语音悬浮球长按菜单：⇧⌘Z")
+        case .returnKey: return String(localized: "Return", comment: "语音悬浮球长按菜单：按一下回车键（发送、换行）")
+        }
+    }
+
+    static func symbol(_ action: QuickAction) -> String {
+        switch action {
+        case .selectAllDelete: return "delete.left"
+        case .selectAll: return "selection.pin.in.out"
+        case .selectAllCopy: return "doc.on.doc"
+        case .selectAllCut: return "scissors"
+        case .paste: return "doc.on.clipboard"
+        case .undo: return "arrow.uturn.backward"
+        case .redo: return "arrow.uturn.forward"
+        case .returnKey: return "return"
+        }
+    }
+
+    /// 菜单分组：选中与删除一组，剪贴板一组，撤销重做一组，回车单独一组。
+    static let quickActionGroups: [[QuickAction]] = [
+        [.selectAllDelete, .selectAll],
+        [.selectAllCopy, .selectAllCut, .paste],
+        [.undo, .redo],
+        [.returnKey],
+    ]
+
+    /// 空闲时球的底色不透明度（录音、失败时用实色）。
+    static let idleFillOpacity = 0.78
+
     /// VoiceOver 的提示：双击做什么。
     static func accessibilityHint(_ phase: Phase) -> String {
         switch phase {

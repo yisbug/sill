@@ -283,6 +283,35 @@ enum ConnectionList {
         }
     }
 
+    // MARK: 启动续连（本 fork）
+
+    /// 一台存着的 Mac 能不能被启动续连：它的 ID、上次连上的时间、还能不能自动拨（没被移除、没换钥匙）。
+    struct ResumeCandidate {
+        let macID: String
+        let lastConnectedAt: Date?
+        let usable: Bool
+    }
+
+    /// 启动时续连哪台：能自动拨、连上过的里头最近连上的那台；一台都没有就不续连，直接显示连接界面。
+    static func resumeMacID(_ candidates: [ResumeCandidate]) -> String? {
+        candidates.filter { $0.usable && $0.lastConnectedAt != nil }
+            .max { $0.lastConnectedAt! < $1.lastConnectedAt! }?.macID
+    }
+
+    /// 启动续连最多等这么久（秒）：网络上没列出这台 Mac 时 3 s 后会远程拨，几个地址轮流试也在这之内。
+    static let resumeWait = 20.0
+
+    /// 启动续连此刻的结论：连上了、继续等，或放弃（回到连接界面）。
+    enum ResumeState: Equatable { case connected, waiting, gaveUp }
+
+    /// `dialing`：自动重连还在（等网络列出、拨号中、远程拨号中）。超时或重连已经结束（Mac 移除了这台设备、
+    /// 要求重新配对等）就放弃。
+    static func resumeState(connected: Bool, dialing: Bool, elapsed: Double) -> ResumeState {
+        if connected { return .connected }
+        if !dialing || !(elapsed < resumeWait) { return .gaveUp }
+        return .waiting
+    }
+
     /// How many tile columns fit `width`: 2 columns at 340 pt and wider, 1 column on narrower
     /// screens or at accessibility text sizes.
     static func columns(forWidth width: CGFloat, accessibleText: Bool) -> Int {

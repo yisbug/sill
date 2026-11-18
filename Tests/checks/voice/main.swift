@@ -307,5 +307,24 @@ check("VoiceOver 标签", P.accessibilityLabel == "Voice input")
 check("录音中的值含时长", P.accessibilityValue(.recording(clip: 1, since: 0), now: 65).contains("1:05"))
 check("提示：录音中说提交，空闲说开始", P.accessibilityHint(.recording(clip: 1, since: 0)) != P.accessibilityHint(.idle) && !P.accessibilityHint(.idle).isEmpty)
 
+// MARK: - 长按菜单
+
+typealias S = P.Stroke
+check("全选并删除：⌘A 再退格", P.strokes(.selectAllDelete) == [S(0x04), S(0x2A, command: false)])
+check("全选：⌘A", P.strokes(.selectAll) == [S(0x04)])
+check("全选并复制：⌘A 再 ⌘C", P.strokes(.selectAllCopy) == [S(0x04), S(0x06)])
+check("全选并剪切：⌘A 再 ⌘X", P.strokes(.selectAllCut) == [S(0x04), S(0x1B)])
+check("粘贴：⌘V", P.strokes(.paste) == [S(0x19)])
+check("撤销：⌘Z", P.strokes(.undo) == [S(0x1D)])
+check("重做：⇧⌘Z", P.strokes(.redo) == [S(0x1D, shift: true)])
+check("回车：只按回车", P.strokes(.returnKey) == [S(0x28, command: false)])
+check("每个操作恰好在一组里", P.quickActionGroups.flatMap { $0 }.sorted { "\($0)" < "\($1)" } == P.QuickAction.allCases.sorted { "\($0)" < "\($1)" })
+check("用户点名的四项在第一、二组", P.quickActionGroups[0].contains(.selectAllDelete) && P.quickActionGroups[0].contains(.selectAll)
+      && P.quickActionGroups[1].contains(.selectAllCopy) && P.quickActionGroups[1].contains(.paste))
+check("空闲、完成、失败时给菜单", P.offersQuickActions(.idle) && P.offersQuickActions(.done(text: "x", until: 1)) && P.offersQuickActions(.failed(message: "x", until: 1)))
+check("录音中、识别中不给菜单", !P.offersQuickActions(.recording(clip: 1, since: 0)) && !P.offersQuickActions(.sending(clip: 1, since: 0)))
+check("每项都有文字和图标", P.QuickAction.allCases.allSatisfy { !P.title($0).isEmpty && !P.symbol($0).isEmpty })
+check("空闲底色略透明", P.idleFillOpacity > 0.5 && P.idleFillOpacity < 0.92)
+
 print("\(passes) checks, \(fails) failed")
 exit(fails == 0 ? 0 : 1)

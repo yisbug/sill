@@ -882,6 +882,16 @@ final class StreamClient: ObservableObject {
         var openKey: Data?
     }
     var reconnect: Reconnect?
+    /// 启动续连（本 fork）：App 打开时为最近连过的那台 Mac 起的自动重连，连接界面之上显示它上次的画面和「连接中」，
+    /// 连上就进串流，超时或重连结束就回连接界面（ConnectionList.resumeState）。
+    struct LaunchResume: Equatable {
+        let macID: String
+        let name: String
+        let startedAt: Double
+    }
+    @Published var launchResume: LaunchResume?
+    /// 启动续连每秒一次的检查。
+    var launchResumeTimer: Timer?
     /// The key the last session at home under each Bonjour name saw on an open door (`p=0`), in
     /// memory: DiscoveryPolicy.reconnectKey's `earlier`. A tap clears the reconnect and dials any
     /// key, so a tap whose dial ended before its handshake (one the reconnect's own words invite
@@ -1105,6 +1115,11 @@ final class StreamClient: ObservableObject {
         }
         NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
             self?.appInForeground = false
+        }
+        // 本 fork（启动续连）：离开前台之前留一张画面。要在还是活跃时解码：进了后台，VideoToolbox 不再解码
+        // （模拟器上实测：后台里解码的那张一直没写出来）。
+        NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
+            self?.keepPictureForLaunch()
         }
         // The clipboard's chip looks when Sill becomes active (StreamClient+Clipboard).
         observeClipboardActivation()
@@ -3447,6 +3462,25 @@ final class StreamClient: ObservableObject {
                        : "tiles: the keyframe came \(ms) ms after the ask; the picture from it")
         #endif
         finishDisconnect()
+    }
+
+    /// 本 fork（启动续连）：离开前台时也留一张当前画面，下次打开 App 续连时先显示它（App 在后台被系统或用户结束时
+    /// 不会走 `tearDown`，原来就只有断开时才留）。规则同 tearDown 的：只在磁贴样式下、这台 Mac 存着时。
+    private func keepPictureForLaunch() {
+        guard connected, videoSize != .zero, let macID = session?.macID,
+              ConnectionList.keepsDecodedPicture(style: connectionStyle, saved: savedMac(macID) != nil) else {
+            #if DEBUG
+            print("tiles: no picture kept leaving the foreground: connected \(connected), video \(videoSize), Mac \(session?.macID ?? "none"), \(connectionStyle)")
+            #endif
+            return
+        }
+        // 解码最多 ConnectionList.decodeBound，紧接着可能进后台，要一点后台时间写文件。
+        var task = UIBackgroundTaskIdentifier.invalid
+        task = UIApplication.shared.beginBackgroundTask(withName: "Sill picture") { UIApplication.shared.endBackgroundTask(task) }
+        takePreview(of: macID)
+        DispatchQueue.main.asyncAfter(deadline: .now() + ConnectionList.decodeBound + 1) {
+            if task != .invalid { UIApplication.shared.endBackgroundTask(task) }
+        }
     }
 
     /// The tile's picture of `macID`: the keyframe kept (`lastKeyframe`), decoded off the main thread

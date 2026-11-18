@@ -842,6 +842,83 @@ extension StreamClient {
         return false
     }
 
+    // MARK: 启动续连（本 fork）
+
+    /// App 打开时：最近连过、还能自动拨的那台 Mac（ConnectionList.resumeMacID）起一个自动重连，和断线后的重连
+    /// 走同一条路（先等网络列出它，3 s 不见就远程拨），界面显示它上次的画面和「连接中」。ContentView 在
+    /// startBrowsing、startRemote 之后调用。
+    func startLaunchResume() {
+        guard launchResume == nil, !connected, connection == nil, remoteDial == nil, reconnect == nil else { return }
+        #if DEBUG
+        // 调试参数自己拨号或配对时不续连。
+        let d = UserDefaults.standard
+        if ["SillConnect", "SillPairURL", "SillPairCode", "SillDialSaved", "SillTapRow"].contains(where: { d.object(forKey: $0) != nil }) { return }
+        #endif
+        let candidates = savedMacs.map {
+            ConnectionList.ResumeCandidate(macID: $0.macID, lastConnectedAt: $0.lastConnectedAt,
+                                           usable: $0.revoked != true && $0.newKey != true && $0.fingerprintData != nil)
+        }
+        guard let id = ConnectionList.resumeMacID(candidates), let mac = savedMac(id) else { return }
+        let name = displayName(id)
+        let now = ProcessInfo.processInfo.systemUptime
+        reconnect = Reconnect(macID: id, bonjourName: mac.bonjourName, name: name, lostAt: now, pathAtLoss: pathSignature,
+                              remoteAllowed: true,
+                              rememberedDirect: mac.bonjourName.map { directWirelessMacs.contains($0) } ?? false)
+        launchResume = LaunchResume(macID: id, name: name, startedAt: now)
+        status = String(localized: "Connecting to \(name)…", comment: "启动续连：连接中的提示，插值为 Mac 名称")
+        #if DEBUG
+        print("resume: reconnecting to \(name) (\(id)) at launch, \(macPreviews[id] == nil ? "no picture" : "its last picture shown")")
+        #endif
+        reconnectIfListed()
+        let timer = Timer(timeInterval: 0.5, repeats: true) { [weak self] _ in self?.checkLaunchResume() }
+        RunLoop.main.add(timer, forMode: .common)
+        launchResumeTimer = timer
+    }
+
+    /// 每半秒：连上了就收起「连接中」；超时，或自动重连已经结束（Mac 移除了这台设备等），就放弃回到连接界面。
+    func checkLaunchResume() {
+        guard let resume = launchResume else { stopLaunchResumeTimer(); return }
+        let dialing = reconnect != nil || remoteDial != nil || connection != nil
+        switch ConnectionList.resumeState(connected: connected, dialing: dialing,
+                                          elapsed: ProcessInfo.processInfo.systemUptime - resume.startedAt) {
+        case .connected:
+            launchResume = nil
+            stopLaunchResumeTimer()
+            #if DEBUG
+            print("resume: connected to \(resume.name)")
+            #endif
+        case .waiting:
+            break
+        case .gaveUp:
+            endLaunchResume(gaveUp: true)
+        }
+    }
+
+    /// 放弃启动续连（超时、重连结束，或「连接中」上的取消）：停掉自动重连与拨号，回到连接界面。
+    func endLaunchResume(gaveUp: Bool) {
+        guard let resume = launchResume else { return }
+        launchResume = nil
+        stopLaunchResumeTimer()
+        guard !connected else { return }
+        reconnect = nil
+        reconnectCheck?.cancel()
+        reconnectCheck = nil
+        cancelRemoteDial()
+        let line = gaveUp
+            ? String(localized: "Couldn’t reconnect to \(resume.name). Choose a Mac to connect.", comment: "启动续连失败后连接界面的提示，插值为 Mac 名称")
+            : ""
+        if let c = connection { connection = nil; c.cancel(); tearDown(status: line, restartSearch: false) }
+        status = line
+        #if DEBUG
+        print("resume: \(gaveUp ? "gave up on" : "cancelled") \(resume.name)")
+        #endif
+    }
+
+    private func stopLaunchResumeTimer() {
+        launchResumeTimer?.invalidate()
+        launchResumeTimer = nil
+    }
+
     /// A tap on a saved Mac's network row menu: Connect Remotely, a remote dial at home, to test
     /// the VPN path.
     func connectRemotely(_ macID: String) {

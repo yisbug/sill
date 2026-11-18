@@ -38,7 +38,14 @@ struct ContentView: View {
             } else {
                 ConnectScreen(client: client)
             }
+            // 启动续连（本 fork）：连接界面之上铺上次串流的画面和「连接中」，连上就是串流界面，放弃就露出连接界面。
+            if let resume = client.launchResume, !client.connected {
+                LaunchResumeView(name: resume.name, picture: client.macPreviews[resume.macID],
+                                 cancel: { client.endLaunchResume(gaveUp: false) })
+                    .transition(.opacity)
+            }
         }
+        .animation(.easeOut(duration: 0.25), value: client.launchResume)
         .preferredColorScheme(.dark)
         // Tells MacMenuHub which window shows this session: the iPad's menu bar shows its menus while
         // it is the app's one window.
@@ -49,6 +56,7 @@ struct ContentView: View {
             #endif
             client.startBrowsing()
             client.startRemote()                 // saved Macs without a key are cleared; DEBUG pairing arguments
+            client.startLaunchResume()           // 本 fork：最近连过的 Mac 自动重连，先显示它上次的画面
             #if DEBUG
             client.connectFromLaunchArgument()   // -SillConnect host:port, for the off-Bonjour test hosts
             Self.orientFromLaunchArgument()      // -SillOrientation landscape|portrait
@@ -72,6 +80,45 @@ struct ContentView: View {
         }
     }
     #endif
+}
+
+/// 启动续连时盖在连接界面上的一层（本 fork）：上次串流的画面（磁贴样式留下的那张，没有就是黑底），中间是转圈和
+/// 「正在连接 ‹Mac›…」，下面一个取消（回到连接界面）。
+struct LaunchResumeView: View {
+    let name: String
+    let picture: UIImage?
+    let cancel: () -> Void
+
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            if let picture {
+                Image(uiImage: picture)
+                    .resizable()
+                    .scaledToFit()
+                    .ignoresSafeArea()
+                    .opacity(0.55)
+                    .accessibilityHidden(true)
+            }
+            VStack(spacing: 14) {
+                ProgressView().controlSize(.large).tint(.white)
+                Text("Connecting to \(name)…", comment: "启动续连：连接中的提示，插值为 Mac 名称")
+                    .font(.headline)
+                    .foregroundStyle(.white)
+                    .multilineTextAlignment(.center)
+                Button(role: .cancel, action: cancel) {
+                    Text("Cancel", comment: "启动续连：放弃重连，回到连接界面")
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 8)
+                }
+                .buttonStyle(.bordered)
+                .tint(.white)
+            }
+            .padding(24)
+            .background(.ultraThinMaterial.opacity(0.8), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .accessibilityElement(children: .contain)
+        }
+    }
 }
 
 #if DEBUG

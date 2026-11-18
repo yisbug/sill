@@ -263,12 +263,41 @@ struct VoiceInputLayer: View {
         return side == .trailing ? -shift : shift
     }
 
+    /// 长按菜单的一项：先让输入视图送出还在组合的、忘掉已打的上下文（同语音结果），再照键盘的样子把按键发给 Mac。
+    private func perform(_ action: VoiceInputPolicy.QuickAction) {
+        client.onCaretMayMove?()
+        for stroke in VoiceInputPolicy.strokes(action) {
+            var modifiers: KeyModifiers = []
+            if stroke.command { modifiers.insert(.command) }
+            if stroke.shift { modifiers.insert(.shift) }
+            KeyChord.press(stroke.usage, with: modifiers).forEach(client.sendFromKeyRow)
+        }
+        #if DEBUG
+        print("voice: quick action \(action)")
+        #endif
+    }
+
     private var ball: some View {
         let d = VoiceInputPolicy.diameter
         return VoiceBall(phase: voice.phase)
             .frame(width: d, height: d)
+            .contentShape(.contextMenuPreview, Circle())
             .contentShape(Circle())
             .onTapGesture { voice.tap() }
+            // 长按：常用快捷操作的系统菜单，紧挨着球弹出（录音中、识别中不弹）。
+            .contextMenu {
+                if VoiceInputPolicy.offersQuickActions(voice.phase) {
+                    ForEach(Array(VoiceInputPolicy.quickActionGroups.enumerated()), id: \.offset) { _, group in
+                        Section {
+                            ForEach(group, id: \.self) { action in
+                                Button { perform(action) } label: {
+                                    Label(VoiceInputPolicy.title(action), systemImage: VoiceInputPolicy.symbol(action))
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             .gesture(
                 DragGesture(minimumDistance: 10, coordinateSpace: .named(TourSpace.name))
                     .onChanged { dragging = $0.location }
@@ -307,7 +336,7 @@ private struct VoiceBall: View {
         switch phase {
         case .recording: return Color.red
         case .failed: return Color.orange
-        default: return Color(white: 0.16).opacity(0.92)
+        default: return Color(white: 0.16).opacity(VoiceInputPolicy.idleFillOpacity)
         }
     }
 
