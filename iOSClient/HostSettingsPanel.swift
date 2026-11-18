@@ -688,13 +688,18 @@ struct HostSettingsPanel: View {
                 ForEach(Self.gestureRows, id: \.gesture) { row in
                     RowDivider()
                     GestureRow(symbol: row.symbol, gesture: row.gesture, action: row.action, does: row.does) {
-                        _ = client.sendGesture($0, fingers: 3)
+                        _ = client.sendGesture($0, fingers: 3, switchesApps: false)
                     }
                 }
             }
         }
-        Footnote(text: gesturesFooter)
+        Footnote(text: gesturesOn && macTakesGestures && !voiceOver
+                 ? String(localized: "\(gesturesFooter) \(Self.appSwitchNote)", comment: "两句之间的连接；中文译为不带空格")
+                 : gesturesFooter)
     }
+
+    /// 本 fork：串流窗口时三指左右滑切换应用（StreamClient.switchApp）。VoiceOver 下手指手势到不了 Sill，不提。
+    static let appSwitchNote = String(localized: "While a window streams, three fingers left or right switch to the next or previous app in the Dock instead.", comment: "主机设置面板：三指左右滑在串流窗口时切换应用的说明")
 
     /// Under Send Audio's switch and the Mute row below it (docs/audio-plan.md §7.7): on, that every
     /// device hears it and that Mute silences this one alone; off, what turning it on does, and Mute

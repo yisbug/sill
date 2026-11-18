@@ -860,5 +860,25 @@ check("5,000 random strokes (\(tallies.sorted { $0.key < $1.key }.map { "\($0.ke
 check("the random strokes reach every gesture, with three fingers and with four", G.Gesture.allCases.allSatisfy { g in tallies["\(g.rawValue)3"] != nil }
       && tallies.keys.contains { $0.hasSuffix("4") })
 
+// 三指左右滑切换应用（本 fork）
+check("app switch: three fingers left or right while a window streams", G.switchesApp(.swipeLeft, fingers: 3, switchOn: true, connected: true, windowStreams: true)
+      && G.switchesApp(.swipeRight, fingers: 3, switchOn: true, connected: true, windowStreams: true))
+check("app switch: not over the Desktop (the Mac's Spaces as before)", !G.switchesApp(.swipeLeft, fingers: 3, switchOn: true, connected: true, windowStreams: false))
+check("app switch: not with four fingers, not up, down, pinch or spread", !G.switchesApp(.swipeLeft, fingers: 4, switchOn: true, connected: true, windowStreams: true)
+      && [G.Gesture.swipeUp, .swipeDown, .pinch, .spread].allSatisfy { !G.switchesApp($0, fingers: 3, switchOn: true, connected: true, windowStreams: true) })
+check("app switch: not with the switch off or no session", !G.switchesApp(.swipeLeft, fingers: 3, switchOn: false, connected: true, windowStreams: true)
+      && !G.switchesApp(.swipeLeft, fingers: 3, switchOn: true, connected: false, windowStreams: true))
+let dock: [UInt32] = [10, 20, 30]
+check("app switch: right is the next in the Dock", G.appSwitchTarget(order: dock, current: 10, gesture: .swipeRight) == 20)
+check("app switch: left is the previous", G.appSwitchTarget(order: dock, current: 20, gesture: .swipeLeft) == 10)
+check("app switch: no wrap at either end", G.appSwitchTarget(order: dock, current: 30, gesture: .swipeRight) == nil
+      && G.appSwitchTarget(order: dock, current: 10, gesture: .swipeLeft) == nil)
+check("app switch: current gone, right the first and left the last", G.appSwitchTarget(order: dock, current: 99, gesture: .swipeRight) == 10
+      && G.appSwitchTarget(order: dock, current: nil, gesture: .swipeLeft) == 30)
+check("app switch: nothing to switch to", G.appSwitchTarget(order: [], current: nil, gesture: .swipeRight) == nil
+      && G.appSwitchTarget(order: [10], current: 10, gesture: .swipeRight) == nil)
+check("app switch: up and down pick nothing", G.appSwitchTarget(order: dock, current: 10, gesture: .swipeUp) == nil)
+check("app switch: the order is kept a short while", G.appSwitchKeepsOrder > 0.5 && G.appSwitchKeepsOrder <= 3)
+
 print("\(passes + fails) checks, \(fails) failed")
 exit(fails == 0 ? 0 : 1)

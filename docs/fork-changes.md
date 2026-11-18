@@ -246,14 +246,15 @@ has .github/workflows/ci.yml :: , phone-stream,
 has Tests/checks/README.md :: | `phone-stream` |
 ```
 
-### F15 串流界面：画面铺满、浮动入口更醒目、语音球长按菜单、启动续连
+### F15 串流界面：画面铺满、浮动入口更醒目、语音球长按菜单、启动续连、三指切换应用
 
 - 是什么：
   - 横屏串流画面去掉 8 pt 黑框和圆角，左右伸进安全区（刘海、灵动岛一侧），顶栏底色也铺到两侧；剪贴板芯片和语音球只放在画面落在安全区里的部分（`StreamScreen.safePanel`）。剩下的黑边只来自画面与 Mac 窗口比例不同（Aa 为 Off，或串流桌面）。
   - 顶栏收起后的浮动入口不透明度调高（底色 0.85、整体 0.92，加阴影）。
   - 语音球空闲时底色略透明（`VoiceInputPolicy.idleFillOpacity` 0.78）；长按弹出系统菜单，紧挨着球：全选并删除、全选、全选并复制、全选并剪切、粘贴、撤销、重做、回车，按键经 `KeyChord.press` 发给 Mac（规则 `VoiceInputPolicy.QuickAction`、`strokes`，检查在 `voice`）。
   - 启动续连：App 打开时为最近连过、还能自动拨的那台 Mac 起一个自动重连（和断线重连同一条路），连接界面之上铺它上次的画面和「正在连接…」与取消；连上进串流，20 s 没连上或重连结束就回连接界面并提示（规则 `ConnectionList.resumeMacID`、`resumeState`，检查在 `connection-list`；状态 `StreamClient.launchResume`，界面 `LaunchResumeView`）。上次的画面在离开前台时（`willResignActive`）也留一张，只在磁贴样式下。
-- 提交：待填。
+  - 三指左右滑：串流窗口时不发给 Mac，换到顶栏 Dock 里相邻的应用（图标模式按应用，缩略图模式按窗口；往右下一个、往左上一个，到头不绕回；1.5 s 内连续滑沿用上次顺序），串流桌面时照旧切换 Mac 的桌面空间（规则 `TrackpadGestures.switchesApp`、`appSwitchTarget`，检查在 `gestures`；执行 `StreamClient.switchApp`；设置面板手势说明后加一句 `appSwitchNote`，代做手势的行传 `switchesApps: false`）。
+- 提交：`08401296`，三指切换应用在其后一个提交。
 - 合并时注意：`contentArea` 里原来的 `.padding(8)`、`clipShape(streamShape)` 与描边已去掉，上游若改这段要保留铺满；`ContentView.app` 的 `onAppear` 多一行 `startLaunchResume()`，ZStack 多一层 `LaunchResumeView`。
 
 ```fork-check
@@ -267,6 +268,9 @@ has iOSClient/ContentView.swift :: client.startLaunchResume()
 has iOSClient/StreamClient+Remote.swift :: func startLaunchResume()
 has iOSClient/StreamClient.swift :: keepPictureForLaunch()
 has iOSClient/ConnectionList.swift :: static func resumeMacID
+has iOSClient/TrackpadGestures.swift :: static func switchesApp
+has iOSClient/StreamClient.swift :: private func switchApp
+has iOSClient/HostSettingsPanel.swift :: switchesApps: false
 ```
 
 ### F13 文档

@@ -262,6 +262,9 @@ final class StreamClient: ObservableObject {
     @Published private(set) var appRecency = AppRecency.Record()
     /// 设备刚选中的窗口立即高亮，直到 Mac 确认或切换了实际串流源。
     @Published private(set) var appSelection: UInt32?
+    /// 三指左右滑切换应用时沿用的 Dock 顺序与上次切换的时间（`switchApp`）。
+    private var appSwitchOrder: [[UInt32]] = []
+    private var appSwitchAt = -Double.infinity
     private var recencyActive: UInt32?
     private var awaitingMacActive = false
     /// When the Desktop was last picked on the device's own initiative (see the window list).
@@ -3954,9 +3957,15 @@ final class StreamClient: ObservableObject {
     /// still waiting goes before the gesture, as before any input but a move. Nothing else: no
     /// pointer, no scroll, and a latched modifier stays latched. Main thread. True when it went.
     @discardableResult
-    func sendGesture(_ gesture: TrackpadGestures.Gesture, fingers: Int) -> Bool {
+    /// `switchesApps`：本 fork 的三指左右滑切换应用；设置面板里代做手势的行（VoiceOver 用）传 false，照旧发给 Mac。
+    func sendGesture(_ gesture: TrackpadGestures.Gesture, fingers: Int, switchesApps: Bool = true) -> Bool {
         var windowStreams = false
         if case .window = active { windowStreams = true }
+        // 本 fork：串流窗口时三指左右滑换 Dock 里相邻的应用，不发给 Mac（串流桌面时照旧切换桌面空间）。
+        if switchesApps, TrackpadGestures.switchesApp(gesture, fingers: fingers, switchOn: Self.gesturesOn, connected: connected,
+                                        windowStreams: windowStreams) {
+            return switchApp(gesture)
+        }
         let plan = TrackpadGestures.sending(switchOn: Self.gesturesOn, connected: connected, hostGestures: hostGestures,
                                             generation: TrackpadGesture.generation, windowStreams: windowStreams)
         guard plan.send else { return false }
@@ -3968,6 +3977,41 @@ final class StreamClient: ObservableObject {
             self.flushPendingMove()
             self.send(.gesture, payload)
         }
+        return true
+    }
+
+    /// 三指左右滑的切换：Dock 的顺序（图标模式每个应用一项，取它的目标窗口；缩略图模式每个窗口一项），
+    /// 连续滑动时沿用上一次的顺序（TrackpadGestures.appSwitchKeepsOrder）。换了就轻震一下，到头不动并给提示震动。
+    private func switchApp(_ gesture: TrackpadGestures.Gesture) -> Bool {
+        let now = ProcessInfo.processInfo.systemUptime
+        var thumbnails = UserDefaults.standard.bool(forKey: "Sill.barThumbnails")
+        #if DEBUG
+        if UserDefaults.standard.object(forKey: "SillBarThumbnails") != nil { thumbnails = UserDefaults.standard.bool(forKey: "SillBarThumbnails") }
+        #endif
+        let groups: [[UInt32]] = thumbnails ? orderedWindows.map { [$0.id] } : appGroups.map { [$0.targetID] + $0.windowIDs }
+        let live = Set(groups.flatMap { $0 })
+        var current = appSelection
+        if current == nil, case .window(let id) = active { current = id }
+        // 沿用上次的顺序：时间还没过、而且上次那些窗口都还在。
+        if now - appSwitchAt > TrackpadGestures.appSwitchKeepsOrder || !appSwitchOrder.allSatisfy({ $0.allSatisfy(live.contains) })
+            || appSwitchOrder.isEmpty {
+            appSwitchOrder = groups
+        }
+        appSwitchAt = now
+        let order = appSwitchOrder.compactMap(\.first)
+        let mine = current.flatMap { id in appSwitchOrder.first(where: { $0.contains(id) })?.first }
+        guard let target = TrackpadGestures.appSwitchTarget(order: order, current: mine, gesture: gesture) else {
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            #if DEBUG
+            print("app switch: \(gesture.rawValue): nothing further that way")
+            #endif
+            return true
+        }
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        #if DEBUG
+        print("app switch: \(gesture.rawValue) → window \(target) (\(order.firstIndex(of: target).map { $0 + 1 } ?? 0) of \(order.count))")
+        #endif
+        select(.window(target))
         return true
     }
 

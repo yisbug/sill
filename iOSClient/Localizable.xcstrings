@@ -5789,6 +5789,17 @@
         }
       }
     },
+    "While a window streams, three fingers left or right switch to the next or previous app in the Dock instead." : {
+      "comment" : "主机设置面板：三指左右滑在串流窗口时切换应用的说明",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "串流窗口时，三指左右滑改为切换到 Dock 里的下一个或上一个应用。"
+          }
+        }
+      }
+    },
     "Window actions" : {
       "localizations" : {
         "zh-Hans" : {

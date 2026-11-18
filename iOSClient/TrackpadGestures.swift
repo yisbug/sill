@@ -281,4 +281,28 @@ struct TrackpadGestures {
         guard switchOn, connected, let takes = hostGestures, takes >= generation else { return (false, false) }
         return (true, windowStreams)
     }
+
+    // MARK: 三指左右滑切换应用（本 fork）
+
+    /// 三指左右滑在串流窗口时不发给 Mac，而是在顶栏 Dock 里换到相邻的应用（图标模式按应用，缩略图模式按窗口）。
+    /// 串流桌面时照旧是 Mac 的切换桌面空间。只认三指的左右滑；四指与其他方向照旧。
+    static func switchesApp(_ gesture: Gesture, fingers: Int, switchOn: Bool, connected: Bool, windowStreams: Bool) -> Bool {
+        switchOn && connected && windowStreams && fingers == 3 && (gesture == .swipeLeft || gesture == .swipeRight)
+    }
+
+    /// 连续切换时沿用的顺序：上一次切换后这么久之内再滑，用当时的顺序（图标按最近使用排序，切换后会把新应用排到
+    /// 最前；沿用旧顺序，连续往右滑才能一路往后走，和 iPhone 底部横条的左右滑一样）。
+    static let appSwitchKeepsOrder = 1.5
+
+    /// 切换的目标：在 `order`（Dock 从左到右）里，`current` 往右滑是下一个、往左滑是上一个，到头不绕回；
+    /// `current` 不在列表里（刚关掉）时往右是第一个、往左是最后一个。没有别的可切就是 nil。
+    static func appSwitchTarget(order: [UInt32], current: UInt32?, gesture: Gesture) -> UInt32? {
+        guard !order.isEmpty, gesture == .swipeLeft || gesture == .swipeRight else { return nil }
+        let forward = gesture == .swipeRight
+        guard let current, let i = order.firstIndex(of: current) else {
+            return forward ? order.first : order.last
+        }
+        let j = forward ? i + 1 : i - 1
+        return order.indices.contains(j) ? order[j] : nil
+    }
 }
