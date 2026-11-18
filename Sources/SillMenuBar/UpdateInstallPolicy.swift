@@ -114,7 +114,7 @@ enum UpdateInstallPolicy {
     /// text"). `name` is `name(version:build:)`'s. None after an update Sill installed by itself, whose words are
     /// the automatic update's own.
     static func installedLine(_ name: String, automatic: Bool) -> String? {
-        automatic ? nil : "\(name) was installed successfully."
+        automatic ? nil : String(localized: "\(name) was installed successfully.", comment: "设置更新区：更新装好后新版 Sill 显示的绿色提示，插值为版本名称")
     }
 
     /// The watcher's token (a UUID's text, AppUpdater): the only kind whose started note Sill makes or looks for,
@@ -307,9 +307,14 @@ enum UpdateInstallPolicy {
         return (note.count > 3 && note[3] == UpdateManifest.nightlyTag) == nightly
     }
 
-    /// How an offer is named: "Sill 0.6.2", or "Sill nightly 0.6.2 (1471)".
+    /// How an offer is named: "Sill 0.6.2", or "Sill nightly 0.6.2 (1471)". The English name, for the log.
     static func name(version: SillVersion, build: Int?) -> String {
         build.map { "Sill nightly \(version) (\($0))" } ?? "Sill \(version)"
+    }
+
+    /// `name` for the screen: a nightly's name follows the interface language, a release is still "Sill 0.6.2".
+    static func displayName(version: SillVersion, build: Int?) -> String {
+        build.map { String(localized: "Sill nightly \(version.description) (\(String($0)))", comment: "每夜构建版的名称，插值为版本号和构建号") } ?? "Sill \(version)"
     }
 
     static func strictTag(_ tag: String) -> SillVersion? { UpdateManifest.strictTag(tag) }
@@ -405,6 +410,29 @@ enum UpdateInstallPolicy {
 
     /// The refusal's words, under the offer in Settings › General.
     static func words(_ r: Refusal) -> String {
+        switch r {
+        case .notRelease: return String(localized: "This copy of Sill isn’t a notarized release, so it can’t update itself.", comment: "设置更新区：此副本不是经过公证的正式版，无法自行更新")
+        case .testFeed: return String(localized: "This run checks a test feed, so it doesn’t update itself.", comment: "设置更新区：本次运行使用测试更新源，不会自行更新")
+        case .translocated:
+            return String(localized: "macOS is running Sill from a temporary copy. Move Sill to your Applications folder, open it from there, then update.", comment: "设置更新区：macOS 从临时副本运行 Sill（App 路径随机化），需先移到应用程序文件夹")
+        case .diskImage:
+            return String(localized: "Sill is running from a disk image. Copy it to your Applications folder, open it from there, then update.", comment: "设置更新区：Sill 正从磁盘映像运行，需先拷到应用程序文件夹")
+        case .readOnlyVolume(let v): return String(localized: "Sill is on a disk this Mac can’t change (\(v)).", comment: "设置更新区：Sill 所在磁盘只读，插值为磁盘名称")
+        case .networkVolume(let v): return String(localized: "Sill is on a network disk (\(v)), so it doesn’t update itself there.", comment: "设置更新区：Sill 在网络磁盘上，插值为磁盘名称")
+        case .link(let path): return String(localized: "Sill runs through a link (\(path)), so it can’t replace itself there.", comment: "设置更新区：Sill 通过链接运行，插值为路径")
+        case .notWritable(let folder): return String(localized: "Sill is in a folder this account can’t change (\(folder)).", comment: "设置更新区：当前账户无权修改 Sill 所在文件夹，插值为文件夹路径")
+        case .otherOwner(let name): return String(localized: "Sill belongs to another account on this Mac (\(name)). Update it from that account.", comment: "设置更新区：Sill 属于这台 Mac 上的另一个账户，插值为账户名称")
+        case .changedSinceStart(let path): return String(localized: "Sill at \(path) changed since it started. Quit Sill and open it again.", comment: "设置更新区：Sill 自启动后文件已变化，插值为路径")
+        case .otherAccount(let name):
+            return String(localized: "Sill is open in another account on this Mac (\(name)). Quit it there first, then update.", comment: "设置更新区：另一个账户也在运行 Sill，插值为账户名称")
+        case .otherInstance: return String(localized: "Another copy of Sill is running. Quit it first, then update.", comment: "设置更新区：还有另一个 Sill 副本在运行")
+        case .finishingUpdate: return String(localized: "Sill was just updated. Update Now is ready again in half a minute.", comment: "设置更新区：刚更新完，半分钟后才可再次立即更新")
+        case .lowSpace(let v, let mb): return String(localized: "Not enough free space on \(v): about \(mb) MB are needed.", comment: "设置更新区：磁盘空间不足，插值为磁盘名称和所需 MB 数")
+        }
+    }
+
+    /// The same sentences in English, for the log only (the log stays English); word for word `words`.
+    static func logWords(_ r: Refusal) -> String {
         switch r {
         case .notRelease: return "This copy of Sill isn’t a notarized release, so it can’t update itself."
         case .testFeed: return "This run checks a test feed, so it doesn’t update itself."
@@ -650,23 +678,24 @@ enum UpdateInstallPolicy {
         return .success(Checked(version: version, build: build, cdhashes: f.cdhashes))
     }
 
-    /// The bundle's words: what Settings says after "Couldn’t update: ".
-    static func words(_ p: BundleProblem) -> String {
+    /// Settings' line for a bundle that failed the checks, whole: "Couldn’t update: …. Sill 0.3 is unchanged."
+    /// (`unchanged` is that last sentence, already made).
+    static func bundleLine(_ p: BundleProblem, unchanged: String) -> String {
         switch p {
-        case .notABundle: return "the download isn’t a Sill app"
-        case .invalidSignature: return "the downloaded app’s code signature isn’t valid"
-        case .wrongSigner: return "the downloaded app isn’t signed with the Developer ID of Sill’s developer"
-        case .notNotarized, .noStapledTicket: return "Apple hasn’t notarized the downloaded app"
-        case .wouldLosePermissions: return "the downloaded app wouldn’t keep Sill’s permissions"
-        case .wrongIdentity: return "the downloaded app isn’t Sill"
-        case .noHardenedRuntime, .debuggable: return "the downloaded app isn’t built as Sill’s releases are"
-        case .entitlement: return "the downloaded app wouldn’t keep Sill’s paired devices"
-        case .info: return "the downloaded app’s information isn’t Sill’s"
-        case .notNewer(let v): return "the downloaded app is version \(v), not newer than this one"
-        case .notManifest: return "the downloaded app isn’t the one signed with Sill’s update key"
-        case .needsNewerMacOS(let v): return "the new version needs macOS \(v) or later"
-        case .noSliceForThisMac: return "the new version doesn’t run on this Mac"
-        case .codeChanged: return "the app changed while Sill was installing it"
+        case .notABundle: return String(localized: "Couldn’t update: the download isn’t a Sill app. \(unchanged)", comment: "设置更新区：下载的内容不是 Sill 应用；插值为“当前版本保持不变”一句")
+        case .invalidSignature: return String(localized: "Couldn’t update: the downloaded app’s code signature isn’t valid. \(unchanged)", comment: "设置更新区：下载的应用代码签名无效；插值为“当前版本保持不变”一句")
+        case .wrongSigner: return String(localized: "Couldn’t update: the downloaded app isn’t signed with the Developer ID of Sill’s developer. \(unchanged)", comment: "设置更新区：下载的应用不是用 Sill 开发者的 Developer ID 签名的；插值为“当前版本保持不变”一句")
+        case .notNotarized, .noStapledTicket: return String(localized: "Couldn’t update: Apple hasn’t notarized the downloaded app. \(unchanged)", comment: "设置更新区：下载的应用未经 Apple 公证；插值为“当前版本保持不变”一句")
+        case .wouldLosePermissions: return String(localized: "Couldn’t update: the downloaded app wouldn’t keep Sill’s permissions. \(unchanged)", comment: "设置更新区：下载的应用无法沿用 Sill 现有的系统权限；插值为“当前版本保持不变”一句")
+        case .wrongIdentity: return String(localized: "Couldn’t update: the downloaded app isn’t Sill. \(unchanged)", comment: "设置更新区：下载的应用不是 Sill；插值为“当前版本保持不变”一句")
+        case .noHardenedRuntime, .debuggable: return String(localized: "Couldn’t update: the downloaded app isn’t built as Sill’s releases are. \(unchanged)", comment: "设置更新区：下载的应用构建方式与 Sill 正式版不同；插值为“当前版本保持不变”一句")
+        case .entitlement: return String(localized: "Couldn’t update: the downloaded app wouldn’t keep Sill’s paired devices. \(unchanged)", comment: "设置更新区：下载的应用无法保留已配对设备；插值为“当前版本保持不变”一句")
+        case .info: return String(localized: "Couldn’t update: the downloaded app’s information isn’t Sill’s. \(unchanged)", comment: "设置更新区：下载的应用的信息与 Sill 不符；插值为“当前版本保持不变”一句")
+        case .notNewer(let v): return String(localized: "Couldn’t update: the downloaded app is version \(v), not newer than this one. \(unchanged)", comment: "设置更新区：下载的应用并不比当前版本新；插值为下载版本号和“当前版本保持不变”一句")
+        case .notManifest: return String(localized: "Couldn’t update: the downloaded app isn’t the one signed with Sill’s update key. \(unchanged)", comment: "设置更新区：下载的应用不是用 Sill 更新密钥签名的那个；插值为“当前版本保持不变”一句")
+        case .needsNewerMacOS(let v): return String(localized: "Couldn’t update: the new version needs macOS \(v) or later. \(unchanged)", comment: "设置更新区：新版本需要更新的 macOS；插值为最低 macOS 版本和“当前版本保持不变”一句")
+        case .noSliceForThisMac: return String(localized: "Couldn’t update: the new version doesn’t run on this Mac. \(unchanged)", comment: "设置更新区：新版本不能在这台 Mac 上运行；插值为“当前版本保持不变”一句")
+        case .codeChanged: return String(localized: "Couldn’t update: the app changed while Sill was installing it. \(unchanged)", comment: "设置更新区：安装过程中应用被改动；插值为“当前版本保持不变”一句")
         }
     }
 
@@ -744,66 +773,73 @@ enum UpdateInstallPolicy {
     /// it can have its version ("Sill 0.6.2 didn’t start, so Sill nightly 0.6.2 (1597) is back.").
     static func line(_ f: Failure, running: SillVersion, offered: SillVersion, keptAt: String?, offeredBuild: Int? = nil,
                      runningBuild: Int? = nil) -> String {
-        let have = name(version: running, build: runningBuild)
-        let unchanged = "\(have) is unchanged."
-        func couldNot(_ why: String) -> String { "Couldn’t update: \(why). \(unchanged)" }
+        let have = displayName(version: running, build: runningBuild)
+        let unchanged = String(localized: "\(have) is unchanged.", comment: "设置更新区：当前版本保持不变；插值为当前版本名称")
         if let build = offeredBuild {
-            let nightly = name(version: offered, build: build)
+            let nightly = displayName(version: offered, build: build)
             switch f {
-            case .releaseChanged: return "GitHub’s newest nightly is no longer \(nightly). Check again."
-            case .releaseNotNewer: return couldNot("the nightly isn’t newer than this Sill")
-            case .releaseUnreadable: return couldNot("GitHub’s answer wasn’t a nightly Sill can install")
-            case .notSigned: return "\(nightly) isn’t signed with Sill’s nightly key yet, so it can’t be installed from here. Try again later."
-            case .manifest(let p): return couldNot(updateKeyWords(p, nightly: true))
-            case .manifestMismatch: return couldNot("the nightly on GitHub isn’t the one signed with Sill’s nightly key")
-            case .bundle(.notManifest): return couldNot("the downloaded app isn’t the one signed with Sill’s nightly key")
-            case .didNotStart(_, true): return "\(nightly) didn’t start, so \(have) is back."
+            case .releaseChanged: return String(localized: "GitHub’s newest nightly is no longer \(nightly). Check again.", comment: "设置更新区：GitHub 上最新的每夜构建版已不是所提供的那个；插值为版本名称")
+            case .releaseNotNewer: return String(localized: "Couldn’t update: the nightly isn’t newer than this Sill. \(unchanged)", comment: "设置更新区：每夜构建版并不比当前版本新；插值为“当前版本保持不变”一句")
+            case .releaseUnreadable: return String(localized: "Couldn’t update: GitHub’s answer wasn’t a nightly Sill can install. \(unchanged)", comment: "设置更新区：GitHub 的回复不是 Sill 能安装的每夜构建版；插值为“当前版本保持不变”一句")
+            case .notSigned: return String(localized: "\(nightly) isn’t signed with Sill’s nightly key yet, so it can’t be installed from here. Try again later.", comment: "设置更新区：每夜构建版尚未用每夜密钥签名；插值为版本名称")
+            case .manifest(let p): return keyLine(p, unchanged: unchanged, nightly: true)
+            case .manifestMismatch: return String(localized: "Couldn’t update: the nightly on GitHub isn’t the one signed with Sill’s nightly key. \(unchanged)", comment: "设置更新区：GitHub 上的每夜构建版不是用每夜密钥签名的那个；插值为“当前版本保持不变”一句")
+            case .bundle(.notManifest): return String(localized: "Couldn’t update: the downloaded app isn’t the one signed with Sill’s nightly key. \(unchanged)", comment: "设置更新区：下载的应用不是用每夜密钥签名的那个；插值为“当前版本保持不变”一句")
+            case .didNotStart(_, true): return String(localized: "\(nightly) didn’t start, so \(have) is back.", comment: "设置更新区：新的每夜构建版没能启动，已退回旧版；插值为新版名称和旧版名称")
             default: break
             }
         }
         switch f {
         case .unavailable(let r): return words(r)
-        case .releaseChanged: return "GitHub’s latest release is no longer Sill \(offered). Check again."
-        case .releaseNotNewer: return couldNot("the release isn’t newer than this Sill")
-        case .releaseUnreadable: return couldNot("GitHub’s answer wasn’t a release Sill can install")
-        case .notSigned: return "Sill \(offered) isn’t signed with Sill’s update key yet, so it can’t be installed from here. Try again later, or open its release page."
-        case .noConnection: return couldNot("this Mac couldn’t reach GitHub")
-        case .github(let status): return couldNot("GitHub answered with an error (HTTP \(status))")
-        case .manifest(let p): return couldNot(updateKeyWords(p))
-        case .manifestMismatch: return couldNot("the release on GitHub isn’t the one signed with Sill’s update key")
-        case .redirectRefused: return couldNot("GitHub sent the download somewhere Sill doesn’t download from")
-        case .download: return couldNot("the download stopped")
-        case .sizeMismatch, .tooLarge, .hashMismatch: return couldNot("the download didn’t match the release")
-        case .lowSpace(let mb): return couldNot("there isn’t enough free space (about \(mb) MB are needed)")
-        case .disk: return couldNot("Sill couldn’t write the update")
-        case .archive: return couldNot("the download isn’t an archive Sill can install")
-        case .bundle(let p): return couldNot(words(p))
-        case .changedSinceStart: return "Sill changed on disk since it started. Quit Sill and open it again, then update."
-        case .swapFailed: return couldNot("macOS didn’t let Sill replace itself")
+        case .releaseChanged: return String(localized: "GitHub’s latest release is no longer Sill \(offered.description). Check again.", comment: "设置更新区：GitHub 上最新的正式版已不是所提供的那个；插值为版本号")
+        case .releaseNotNewer: return String(localized: "Couldn’t update: the release isn’t newer than this Sill. \(unchanged)", comment: "设置更新区：正式版并不比当前版本新；插值为“当前版本保持不变”一句")
+        case .releaseUnreadable: return String(localized: "Couldn’t update: GitHub’s answer wasn’t a release Sill can install. \(unchanged)", comment: "设置更新区：GitHub 的回复不是 Sill 能安装的正式版；插值为“当前版本保持不变”一句")
+        case .notSigned: return String(localized: "Sill \(offered.description) isn’t signed with Sill’s update key yet, so it can’t be installed from here. Try again later, or open its release page.", comment: "设置更新区：正式版尚未用更新密钥签名；插值为版本号")
+        case .noConnection: return String(localized: "Couldn’t update: this Mac couldn’t reach GitHub. \(unchanged)", comment: "设置更新区：这台 Mac 连不上 GitHub；插值为“当前版本保持不变”一句")
+        case .github(let status): return String(localized: "Couldn’t update: GitHub answered with an error (HTTP \(String(status))). \(unchanged)", comment: "设置更新区：GitHub 返回错误；插值为 HTTP 状态码和“当前版本保持不变”一句")
+        case .manifest(let p): return keyLine(p, unchanged: unchanged, nightly: false)
+        case .manifestMismatch: return String(localized: "Couldn’t update: the release on GitHub isn’t the one signed with Sill’s update key. \(unchanged)", comment: "设置更新区：GitHub 上的正式版不是用更新密钥签名的那个；插值为“当前版本保持不变”一句")
+        case .redirectRefused: return String(localized: "Couldn’t update: GitHub sent the download somewhere Sill doesn’t download from. \(unchanged)", comment: "设置更新区：GitHub 把下载指向了 Sill 不会下载的地址；插值为“当前版本保持不变”一句")
+        case .download: return String(localized: "Couldn’t update: the download stopped. \(unchanged)", comment: "设置更新区：下载中断；插值为“当前版本保持不变”一句")
+        case .sizeMismatch, .tooLarge, .hashMismatch: return String(localized: "Couldn’t update: the download didn’t match the release. \(unchanged)", comment: "设置更新区：下载内容与正式版不符；插值为“当前版本保持不变”一句")
+        case .lowSpace(let mb): return String(localized: "Couldn’t update: there isn’t enough free space (about \(mb) MB are needed). \(unchanged)", comment: "设置更新区：可用空间不足；插值为所需 MB 数和“当前版本保持不变”一句")
+        case .disk: return String(localized: "Couldn’t update: Sill couldn’t write the update. \(unchanged)", comment: "设置更新区：Sill 无法写入更新；插值为“当前版本保持不变”一句")
+        case .archive: return String(localized: "Couldn’t update: the download isn’t an archive Sill can install. \(unchanged)", comment: "设置更新区：下载的不是 Sill 能安装的压缩包；插值为“当前版本保持不变”一句")
+        case .bundle(let p): return bundleLine(p, unchanged: unchanged)
+        case .changedSinceStart: return String(localized: "Sill changed on disk since it started. Quit Sill and open it again, then update.", comment: "设置更新区：Sill 自启动后磁盘上的文件已变化")
+        case .swapFailed: return String(localized: "Couldn’t update: macOS didn’t let Sill replace itself. \(unchanged)", comment: "设置更新区：macOS 不允许 Sill 替换自身；插值为“当前版本保持不变”一句")
         case .checkAfterSwap(let p, let putBack):
-            return putBack ? couldNot(words(p)) : lost(running: running, keptAt: keptAt)
+            return putBack ? bundleLine(p, unchanged: unchanged) : lost(running: running, keptAt: keptAt)
         case .didNotStart(_, let putBack):
-            return putBack ? "Sill \(offered) didn’t start, so \(have) is back." : lost(running: running, keptAt: keptAt)
+            return putBack ? String(localized: "Sill \(offered.description) didn’t start, so \(have) is back.", comment: "设置更新区：新版本没能启动，已退回旧版；插值为新版本号和旧版名称") : lost(running: running, keptAt: keptAt)
         case .noWholeSillLeft:
-            return "An update of Sill didn’t finish: the new version didn’t start the first time, and Sill’s watcher couldn’t leave a whole copy of Sill in its place. If this copy misbehaves, download Sill again from getsill.app."
+            return String(localized: "An update of Sill didn’t finish: the new version didn’t start the first time, and Sill’s watcher couldn’t leave a whole copy of Sill in its place. If this copy misbehaves, download Sill again from getsill.app.", comment: "设置更新区：更新没有完成，新版没能启动，守护进程也没能留下完整的 Sill")
         case .keptUnstarted:
-            return "Sill \(running) didn’t start the first time, and the copy it replaced failed its last check, so Sill \(running) stayed. If it misbehaves, download Sill again from getsill.app."
-        case .stopped: return "Sill’s developer stopped Sill \(offered) with a stop signed with Sill’s update key, so it isn’t installed. \(unchanged)"
-        case .stopUnreadable: return couldNot("the release carries a stop that isn’t signed with Sill’s update key")
-        case .notAutomatic(let why): return "Sill didn’t install \(offered) by itself: \(why). Update Now still can."
-        case .cancelled: return "Update cancelled. \(unchanged)"
+            return String(localized: "Sill \(running.description) didn’t start the first time, and the copy it replaced failed its last check, so Sill \(running.description) stayed. If it misbehaves, download Sill again from getsill.app.", comment: "设置更新区：新版没能启动，旧副本又没通过最后检查，所以保留了当前版本；插值为当前版本号（两处）")
+        case .stopped: return String(localized: "Sill’s developer stopped Sill \(offered.description) with a stop signed with Sill’s update key, so it isn’t installed. \(unchanged)", comment: "设置更新区：开发者用更新密钥签名的停用通知停掉了该版本；插值为版本号和“当前版本保持不变”一句")
+        case .stopUnreadable: return String(localized: "Couldn’t update: the release carries a stop that isn’t signed with Sill’s update key. \(unchanged)", comment: "设置更新区：正式版带有一个未用更新密钥签名的停用通知；插值为“当前版本保持不变”一句")
+        case .notAutomatic(let why): return String(localized: "Sill didn’t install \(offered.description) by itself: \(UpdateAutoPolicy.refuseWords(why)). Update Now still can.", comment: "设置更新区：Sill 没有自动安装该版本；插值为版本号和原因（一个短语）")
+        case .cancelled: return String(localized: "Update cancelled. \(unchanged)", comment: "设置更新区：更新已取消；插值为“当前版本保持不变”一句")
         }
     }
 
-    /// Why the release's signature with Sill's update key didn't hold, in Settings' words: kept apart from
-    /// Apple's signature and notarization (BundleProblem), which the download is checked against too.
-    static func updateKeyWords(_ p: UpdateManifest.Problem, nightly: Bool = false) -> String {
-        let (what, key) = nightly ? ("nightly", "nightly key") : ("release", "update key")
+    /// Settings' line for a release's (or a nightly's) signature with Sill's update key (or nightly key) that didn't
+    /// hold, kept apart from Apple's signature and notarization (BundleProblem), which the download is checked
+    /// against too.
+    static func keyLine(_ p: UpdateManifest.Problem, unchanged: String, nightly: Bool) -> String {
+        if nightly {
+            switch p {
+            case .noKey, .badKey: return String(localized: "Couldn’t update: this Sill has no usable nightly key. \(unchanged)", comment: "设置更新区：此 Sill 没有可用的每夜密钥；插值为“当前版本保持不变”一句")
+            case .unknownKey: return String(localized: "Couldn’t update: the nightly is signed with a nightly key this Sill doesn’t know. \(unchanged)", comment: "设置更新区：每夜构建版用了此 Sill 不认识的每夜密钥签名；插值为“当前版本保持不变”一句")
+            case .badSignature: return String(localized: "Couldn’t update: the nightly’s signature with Sill’s nightly key isn’t valid. \(unchanged)", comment: "设置更新区：每夜构建版的每夜密钥签名无效；插值为“当前版本保持不变”一句")
+            default: return String(localized: "Couldn’t update: the nightly’s signature with Sill’s nightly key can’t be read. \(unchanged)", comment: "设置更新区：每夜构建版的每夜密钥签名无法读取；插值为“当前版本保持不变”一句")
+            }
+        }
         switch p {
-        case .noKey, .badKey: return "this Sill has no usable \(key)"
-        case .unknownKey: return "the \(what) is signed with \(key == "update key" ? "an update key" : "a nightly key") this Sill doesn’t know"
-        case .badSignature: return "the \(what)’s signature with Sill’s \(key) isn’t valid"
-        default: return "the \(what)’s signature with Sill’s \(key) can’t be read"
+        case .noKey, .badKey: return String(localized: "Couldn’t update: this Sill has no usable update key. \(unchanged)", comment: "设置更新区：此 Sill 没有可用的更新密钥；插值为“当前版本保持不变”一句")
+        case .unknownKey: return String(localized: "Couldn’t update: the release is signed with an update key this Sill doesn’t know. \(unchanged)", comment: "设置更新区：正式版用了此 Sill 不认识的更新密钥签名；插值为“当前版本保持不变”一句")
+        case .badSignature: return String(localized: "Couldn’t update: the release’s signature with Sill’s update key isn’t valid. \(unchanged)", comment: "设置更新区：正式版的更新密钥签名无效；插值为“当前版本保持不变”一句")
+        default: return String(localized: "Couldn’t update: the release’s signature with Sill’s update key can’t be read. \(unchanged)", comment: "设置更新区：正式版的更新密钥签名无法读取；插值为“当前版本保持不变”一句")
         }
     }
 
@@ -811,15 +847,15 @@ enum UpdateInstallPolicy {
     /// whole, any more) the download.
     private static func lost(running: SillVersion, keptAt: String?) -> String {
         guard let keptAt else {
-            return "Sill couldn’t put \(running) back in place. Download Sill again from getsill.app and put it in your Applications folder."
+            return String(localized: "Sill couldn’t put \(running.description) back in place. Download Sill again from getsill.app and put it in your Applications folder.", comment: "设置更新区：Sill 没能把旧版放回原处，也没有完整的旧副本；插值为旧版本号")
         }
-        return "Sill couldn’t put \(running) back in place. It is at \(keptAt): quit Sill and move it to your Applications folder soon, as macOS empties that folder after a few days."
+        return String(localized: "Sill couldn’t put \(running.description) back in place. It is at \(keptAt): quit Sill and move it to your Applications folder soon, as macOS empties that folder after a few days.", comment: "设置更新区：Sill 没能把旧版放回原处，旧副本在临时位置；插值为旧版本号和旧副本所在路径")
     }
 
     /// The log's words for a failure, with what Settings leaves out.
     static func logText(_ f: Failure) -> String {
         switch f {
-        case .unavailable(let r): return words(r)
+        case .unavailable(let r): return logWords(r)
         case .releaseChanged(let tag): return "the latest release is now \(tag)"
         case .releaseNotNewer: return "the latest release is not newer"
         case .releaseUnreadable(let why): return "the release is not one to install (\(why))"
@@ -1047,7 +1083,7 @@ enum UpdateInstallPolicy {
         var spinning = false
         var updateNow = false
         var updateNowEnabled = false
-        var updateNowTitle = "Update Now"
+        var updateNowTitle = String(localized: "Update Now", comment: "设置更新区按钮：立即更新")
         var cancel = false
         /// The question before a disconnect, with its button's title.
         var question: String?
@@ -1087,58 +1123,58 @@ enum UpdateInstallPolicy {
                      ownLine: Bool = false, runningBuild: Int? = nil) -> Pane {
         var p = Pane()
         guard available, let running else { return p }
-        let target = offered.map { name(version: $0, build: offeredBuild) } ?? "the update"
+        let target = offered.map { displayName(version: $0, build: offeredBuild) } ?? String(localized: "the update", comment: "设置更新区：版本不明时对“这次更新”的称呼，用在“正在从 GitHub 获取……”等句子里")
         switch s.phase {
         case .idle:
             guard offered != nil else {
                 p.note = automatic.updated
                 return p
             }
-            if ownLine { p.line = "\(target) is available." }
+            if ownLine { p.line = String(localized: "\(target) is available.", comment: "设置更新区：有可用更新；插值为版本名称") }
             p.updateNow = true
             p.updateNowEnabled = refusal == nil
             p.note = refusal.map(words) ?? (automatic.on ? automatic.offerNote : nil)
         case .confirming(let devices):
             p.updateNow = false
-            p.question = "Updating restarts Sill and disconnects \(names(devices.map(\.name)))."
-            p.confirmTitle = "Update and Disconnect"
+            p.question = String(localized: "Updating restarts Sill and disconnects \(names(devices.map(\.name))).", comment: "设置更新区：更新会重启 Sill 并断开设备；插值为设备名称列表")
+            p.confirmTitle = String(localized: "Update and Disconnect", comment: "设置更新区按钮：更新并断开设备")
             p.cancel = true
         case .fetching:
-            p.line = "Getting \(target) from GitHub…"
+            p.line = String(localized: "Getting \(target) from GitHub…", comment: "设置更新区：正在从 GitHub 获取更新；插值为版本名称")
             p.spinning = true
             p.cancel = true
         case .downloading(let received, let total):
-            p.line = "Downloading \(target)…"
-            p.detail = total > 0 ? "\(megabytes(received)) of \(megabytes(total)) MB" : nil
+            p.line = String(localized: "Downloading \(target)…", comment: "设置更新区：正在下载更新；插值为版本名称")
+            p.detail = total > 0 ? String(localized: "\(megabytes(received)) of \(megabytes(total)) MB", comment: "设置更新区：下载进度，插值为已下载和总大小（MB）") : nil
             p.progress = total > 0 ? min(1, Double(received) / Double(total)) : nil
             p.spinning = total == 0
             p.cancel = true
         case .unpacking, .checking:
-            p.line = "Checking \(target)…"
+            p.line = String(localized: "Checking \(target)…", comment: "设置更新区：正在检查下载的更新；插值为版本名称")
             p.spinning = true
             p.cancel = true
         case .lookingAgain:
-            p.line = "Checking \(target) with GitHub again…"
+            p.line = String(localized: "Checking \(target) with GitHub again…", comment: "设置更新区：安装前再向 GitHub 确认一次；插值为版本名称")
             p.spinning = true
             p.cancel = true
         case .ready(let devices):
-            p.line = "\(target) is ready."
-            p.question = "Installing it restarts Sill and disconnects \(names(devices.map(\.name)))."
-            p.confirmTitle = "Install and Disconnect"
+            p.line = String(localized: "\(target) is ready.", comment: "设置更新区：更新已就绪；插值为版本名称")
+            p.question = String(localized: "Installing it restarts Sill and disconnects \(names(devices.map(\.name))).", comment: "设置更新区：安装会重启 Sill 并断开设备；插值为设备名称列表")
+            p.confirmTitle = String(localized: "Install and Disconnect", comment: "设置更新区按钮：安装并断开设备")
             p.cancel = true
         case .waiting:
-            p.line = "\(target) is ready."
+            p.line = String(localized: "\(target) is ready.", comment: "设置更新区：更新已就绪；插值为版本名称")
             p.note = refusal.map(words)
-                ?? "Sill installs it by itself once no device has been connected for \(automatic.quietMinutes) minutes, then restarts."
+                ?? String(localized: "Sill installs it by itself once no device has been connected for \(minutesWords(automatic.quietMinutes)), then restarts.", comment: "设置更新区：无设备连接一段时间后自动安装并重启；插值为时长（如“5 分钟”）")
             p.updateNow = true
             p.updateNowEnabled = refusal == nil
-            p.updateNowTitle = "Install Now"
+            p.updateNowTitle = String(localized: "Install Now", comment: "设置更新区按钮：立即安装")
             p.cancel = true
         case .installing:
-            p.line = "Installing \(target)…"
+            p.line = String(localized: "Installing \(target)…", comment: "设置更新区：正在安装更新；插值为版本名称")
             p.spinning = true
         case .restarting:
-            p.line = "Restarting Sill…"
+            p.line = String(localized: "Restarting Sill…", comment: "设置更新区：正在重启 Sill")
             p.spinning = true
         case .failed(let f):
             p.line = line(f, running: running, offered: offered ?? running, keptAt: keptAt, offeredBuild: offeredBuild,
@@ -1146,7 +1182,7 @@ enum UpdateInstallPolicy {
             p.failed = true
             p.updateNow = offered != nil
             p.updateNowEnabled = refusal == nil && f.cleanUp
-            p.updateNowTitle = "Try Again"
+            p.updateNowTitle = String(localized: "Try Again", comment: "设置更新区按钮：重试更新")
             p.note = refusal.map(words) ?? (s.mode == .automatic ? automatic.afterFailure : nil)
         }
         p.busy = s.phase.busy
@@ -1157,16 +1193,21 @@ enum UpdateInstallPolicy {
     /// "iPad", "iPad and iPhone", "iPad, iPhone and 2 more".
     static func names(_ devices: [String]) -> String {
         switch devices.count {
-        case 0: return "no device"
+        case 0: return String(localized: "no device", comment: "设置更新区：没有设备（用在“会断开……”之后）")
         case 1: return devices[0]
-        case 2: return "\(devices[0]) and \(devices[1])"
-        default: return "\(devices[0]), \(devices[1]) and \(devices.count - 2) more"
+        case 2: return String(localized: "\(devices[0]) and \(devices[1])", comment: "设置更新区：两台设备的名称列表")
+        default: return String(localized: "\(devices[0]), \(devices[1]) and \(devices.count - 2) more", comment: "设置更新区：三台及以上设备的名称列表，插值为前两台设备名和其余台数")
         }
+    }
+
+    /// "5 minutes": a length in whole minutes, singular or plural by the language's rules.
+    static func minutesWords(_ n: Int) -> String {
+        String(localized: "\(n) minutes", comment: "设置更新区：以分钟计的时长（复数变体）；插值为分钟数")
     }
 
     /// Megabytes with one decimal ("5.9").
     static func megabytes(_ bytes: Int64) -> String {
-        String(format: "%.1f", Double(bytes) / 1_000_000)
+        (Double(bytes) / 1_000_000).formatted(.number.precision(.fractionLength(1)).grouping(.never))
     }
 
     /// The status menu's update item: its title and subtitle, and whether it opens Settings › General
@@ -1174,38 +1215,47 @@ enum UpdateInstallPolicy {
     /// ("You have nightly 0.6.2 (1597)": the release offered to it can have its version).
     static func menuItem(_ phase: Phase, offered: SillVersion, running: SillVersion, available: Bool, refusal: Refusal?,
                          offeredBuild: Int? = nil, runningBuild: Int? = nil) -> (title: String, subtitle: String, opensSettings: Bool) {
-        let n = name(version: offered, build: offeredBuild)
-        let have = runningBuild.map { "nightly \(running) (\($0))" } ?? "\(running)"
+        let n = displayName(version: offered, build: offeredBuild)
+        let have = runningBuild.map { String(localized: "nightly \(running.description) (\(String($0)))", comment: "状态菜单：当前运行的是每夜构建版，插值为版本号和构建号") } ?? "\(running)"
         if case .waiting = phase {
-            return ("\(n) Is Ready to Install…", "Installs by itself while no device is connected", true)
+            return (String(localized: "\(n) Is Ready to Install…", comment: "状态菜单：更新已就绪、待安装；插值为版本名称"),
+                    String(localized: "Installs by itself while no device is connected", comment: "状态菜单副标题：没有设备连接时自动安装"), true)
         }
         if phase.busy {
             let step: String
             switch phase {
-            case .downloading(let received, let total) where total > 0: step = "Downloading, \(Int(min(1, Double(received) / Double(total)) * 100))%"
-            case .fetching, .downloading: step = "Downloading"
-            case .unpacking, .checking, .lookingAgain: step = "Checking"
-            case .installing: step = "Installing"
-            default: step = "Restarting"
+            case .downloading(let received, let total) where total > 0:
+                step = String(localized: "Downloading, \(Int(min(1, Double(received) / Double(total)) * 100))%", comment: "状态菜单副标题：正在下载，插值为百分比数字")
+            case .fetching, .downloading: step = String(localized: "Downloading", comment: "状态菜单副标题：正在下载")
+            case .unpacking, .checking, .lookingAgain: step = String(localized: "Checking", comment: "状态菜单副标题：正在检查")
+            case .installing: step = String(localized: "Installing", comment: "状态菜单副标题：正在安装")
+            default: step = String(localized: "Restarting", comment: "状态菜单副标题：正在重启")
             }
-            return ("Updating to \(n)…", step, true)
+            return (String(localized: "Updating to \(n)…", comment: "状态菜单：正在更新到某版本；插值为版本名称"), step, true)
         }
         if available, refusal == nil {
-            return ("\(n) Is Available…", "You have \(have); update it in Settings", true)
+            return (String(localized: "\(n) Is Available…", comment: "状态菜单：有可用更新；插值为版本名称"),
+                    String(localized: "You have \(have); update it in Settings", comment: "状态菜单副标题：当前版本，可在设置中更新；插值为当前版本名称"), true)
         }
-        return ("\(n) Is Available…", "You have \(have); opens its download page", false)
+        return (String(localized: "\(n) Is Available…", comment: "状态菜单：有可用更新；插值为版本名称"),
+                String(localized: "You have \(have); opens its download page", comment: "状态菜单副标题：当前版本，点按打开下载页面；插值为当前版本名称"), false)
     }
 
     /// Under "Use nightly builds" while it is on (plan §16.5): what a nightly trusts, said plainly (the third security
     /// pass's NB1: GitHub builds it and signs it, so its two signatures are one job's, with nobody in between), and
     /// that Update Now alone installs one (Noah's decision of 2026-11-12, option 4: "Automatic for releases only.
     /// Nightlies take one click on Update Now each.").
-    static let nightlyNote = "Nightly builds are built and signed by GitHub from Sill’s newest code; nobody looks at them first. They are less tested than releases and may break. Sill tells you when one is out, and Update Now installs it; a nightly never installs by itself, even with Automatically update Sill on. Turning this off doesn’t go back to the last release: Sill keeps the nightly you have until a release that is at least as new."
+    static let nightlyNote = String(localized: "Nightly builds are built and signed by GitHub from Sill’s newest code; nobody looks at them first. They are less tested than releases and may break. Sill tells you when one is out, and Update Now installs it; a nightly never installs by itself, even with Automatically update Sill on. Turning this off doesn’t go back to the last release: Sill keeps the nightly you have until a release that is at least as new.", comment: "设置更新区：“使用每夜构建版”开启时的说明（信任、风险和只能点“立即更新”安装）")
 
     /// Under the switch while it is off and this Sill is a nightly: no downgrade. The next release it gets is one
     /// built from its commit or a later one, its own version's included (`isNewer`, `chooseOffer`).
     static func nightlyOffNote(version: SillVersion, build: Int) -> String {
-        "You have a nightly build, \(version) (\(build)). Sill updates to the next release that is at least as new."
+        String(localized: "You have a nightly build, \(version.description) (\(String(build))). Sill updates to the next release that is at least as new.", comment: "设置更新区：关闭每夜构建版后的说明（不会降级）；插值为当前每夜构建版的版本号和构建号")
+    }
+
+    /// Two sentences of a paragraph, joined as their language joins sentences.
+    private static func join(_ a: String, _ b: String) -> String {
+        String(localized: "\(a) \(b)", comment: "两句之间的连接；中文译为不带空格")
     }
 
     /// Settings › General's footnote in a build with an update key (UpdatePolicy.footnote otherwise, which
@@ -1215,17 +1265,23 @@ enum UpdateInstallPolicy {
     /// also asks for one each time it opens (N10 n), and Update Now alone installs it (option 4).
     static func footnote(automatic: Bool, nightly: Bool = false) -> String {
         let checks = nightly
-            ? "Before it installs a new version, Sill checks it two ways: it must carry Apple’s signature and notarization for Sill’s developer, and a release must be signed with Sill’s own update key; a nightly build is signed by GitHub, which builds it."
-            : "Before it installs a new version, Sill checks it two ways: it must carry Apple’s signature and notarization for Sill’s developer, and the release must be signed with Sill’s own update key."
-        let ask = (nightly ? "Once a day, and with nightly builds on each time Sill opens, Sill asks GitHub whether a newer version is out."
-                           : "Once a day, Sill asks GitHub whether a newer version is out.")
-            + " GitHub sees this Mac’s IP address and which version of Sill it has; nothing else is sent."
+            ? String(localized: "Before it installs a new version, Sill checks it two ways: it must carry Apple’s signature and notarization for Sill’s developer, and a release must be signed with Sill’s own update key; a nightly build is signed by GitHub, which builds it.", comment: "设置更新区脚注：安装前的两项检查（含每夜构建版）")
+            : String(localized: "Before it installs a new version, Sill checks it two ways: it must carry Apple’s signature and notarization for Sill’s developer, and the release must be signed with Sill’s own update key.", comment: "设置更新区脚注：安装前的两项检查")
+        let askWhen = nightly
+            ? String(localized: "Once a day, and with nightly builds on each time Sill opens, Sill asks GitHub whether a newer version is out.", comment: "设置更新区脚注：每天一次（开启每夜构建版时每次打开也会）向 GitHub 询问新版本")
+            : String(localized: "Once a day, Sill asks GitHub whether a newer version is out.", comment: "设置更新区脚注：每天一次向 GitHub 询问新版本")
+        let ask = join(askWhen, String(localized: "GitHub sees this Mac’s IP address and which version of Sill it has; nothing else is sent.", comment: "设置更新区脚注：GitHub 能看到的信息"))
         if automatic {
-            let what = nightly ? "Sill downloads a new release" : "Sill downloads a new version"
-            let nightlies = nightly ? " A nightly build installs only when you click Update Now." : ""
-            return "\(ask) Automatically update Sill is on: \(what) \(UpdateAutoPolicy.coolingOffWords), then installs it and restarts once no device has been connected for \(UpdateAutoPolicy.quietMinutes) minutes; it never disconnects anyone.\(nightlies) \(checks) Update Now checks it the same way, at once."
+            let doing = nightly
+                ? String(localized: "Automatically update Sill is on: Sill downloads a new release \(UpdateAutoPolicy.coolingOffWords), then installs it and restarts once no device has been connected for \(minutesWords(UpdateAutoPolicy.quietMinutes)); it never disconnects anyone.", comment: "设置更新区脚注：开启自动更新（含每夜构建版时）的行为；第一个插值为等待时间短语，第二个为时长")
+                : String(localized: "Automatically update Sill is on: Sill downloads a new version \(UpdateAutoPolicy.coolingOffWords), then installs it and restarts once no device has been connected for \(minutesWords(UpdateAutoPolicy.quietMinutes)); it never disconnects anyone.", comment: "设置更新区脚注：开启自动更新的行为；第一个插值为等待时间短语，第二个为时长")
+            var text = join(ask, doing)
+            if nightly {
+                text = join(text, String(localized: "A nightly build installs only when you click Update Now.", comment: "设置更新区脚注：每夜构建版只能点“立即更新”安装"))
+            }
+            return join(join(text, checks), String(localized: "Update Now checks it the same way, at once.", comment: "设置更新区脚注：立即更新用同样的方式检查"))
         }
-        return "\(ask) Sill downloads and installs nothing by itself. Update Now downloads the new version from GitHub, puts it in place of this copy and restarts Sill; Open Release Page… shows it on GitHub instead. \(checks)"
+        return join(join(ask, String(localized: "Sill downloads and installs nothing by itself. Update Now downloads the new version from GitHub, puts it in place of this copy and restarts Sill; Open Release Page… shows it on GitHub instead.", comment: "设置更新区脚注：未开启自动更新时的行为")), checks)
     }
 }
 

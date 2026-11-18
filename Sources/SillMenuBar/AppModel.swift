@@ -113,7 +113,7 @@ final class AppModel {
         updater.showUpdated = { [weak self] in self?.showSettings?(.general) }
         updater.devices = { [weak self] in
             (self?.coordinator?.status.snapshot.devices ?? []).map {
-                UpdateInstallPolicy.Device(key: "\($0.endpoint) \(String(describing: $0.id))", name: $0.name ?? "a device")
+                UpdateInstallPolicy.Device(key: "\($0.endpoint) \(String(describing: $0.id))", name: $0.name ?? String(localized: "a device", comment: "设置更新区：设备没有名字时的称呼（用在“会断开……”之后）"))
             }
         }
         updater.pairing = { [weak self] in

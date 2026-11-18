@@ -258,7 +258,7 @@ final class AppUpdater {
             if r != self.refusal { self.refusal = r }
             if let r, r != self.loggedRefusal {
                 self.loggedRefusal = r
-                print("Update Now unavailable: \(Policy.words(r))")
+                print("Update Now unavailable: \(Policy.logWords(r))")
             }
             let waiting = self.afterRefresh
             self.afterRefresh = []

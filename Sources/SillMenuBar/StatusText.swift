@@ -473,6 +473,7 @@ enum MacRouteText {
         case "over the internet": return String(localized: "over the internet", comment: "Mac 设备连接路径，通过互联网")
         case "by address": return String(localized: "by address", comment: "Mac 设备连接路径，通过地址连接")
         case "over the USB cable": return String(localized: "over the USB cable", comment: "Mac 设备连接路径，通过 USB 线缆")
+        case "through a relay on this Mac": return String(localized: "through a relay on this Mac", comment: "Mac 设备连接路径，经由此 Mac 上的中继（如用户态 VPN 节点、隧道或代理）")
         case "on this Mac": return String(localized: "on this Mac", comment: "Mac 设备连接路径，来自此 Mac")
         case "directly": return String(localized: "directly", comment: "Mac 设备连接路径，直接无线连接")
         case "over Wi\u{2011}Fi": return String(localized: "over Wi\u{2011}Fi", comment: "Mac 设备连接路径，通过 Wi-Fi")

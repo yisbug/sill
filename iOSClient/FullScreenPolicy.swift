@@ -458,25 +458,32 @@ enum FullScreenPolicy {
 
     enum Copy {
         /// The hint's two lines.
-        static let hintTitle = "Controls hidden"
-        static let hintLine = "Swipe in from the left edge to bring them back."
+        static let hintTitle = String(localized: "Controls hidden", comment: "全屏模式隐藏界面时的提示标题")
+        static let hintLine = String(localized: "Swipe in from the left edge to bring them back.", comment: "全屏模式隐藏界面时的提示正文，说明如何召回控制")
         /// VoiceOver, every time it hides.
-        static let announcement = "Sill’s controls are hidden. Use the Show Controls action, or the escape gesture, to bring them back."
+        static let announcement = String(localized: "Sill’s controls are hidden. Use the Show Controls action, or the escape gesture, to bring them back.", comment: "界面隐藏时的 VoiceOver 播报")
         /// VoiceOver, when they come back.
-        static let shownAnnouncement = "Sill’s controls are back."
+        static let shownAnnouncement = String(localized: "Sill’s controls are back.", comment: "界面重新出现时的 VoiceOver 播报")
         /// The hidden picture as one element, for VoiceOver, Switch Control and Voice Control.
-        static func pictureLabel(mac: String) -> String { "\(mac)’s picture. Sill’s controls are hidden." }
-        static let action = "Show Controls"
+        static func pictureLabel(mac: String) -> String {
+            String(localized: "\(mac)’s picture. Sill’s controls are hidden.", comment: "全屏模式下画面的无障碍标签，插值为 Mac 名称")
+        }
+        static let action = String(localized: "Show Controls", comment: "全屏模式下召回控制的无障碍操作名称")
         /// Voice Control's names for it.
-        static let inputLabels = ["Show Controls", "Show Sill"]
+        static let inputLabels = [
+            String(localized: "Show Controls", comment: "语音控制：召回控制的口令"),
+            String(localized: "Show Sill", comment: "语音控制：召回 Sill 界面的口令"),
+        ]
         /// Settings › This iPad › Full Screen.
-        static let rowTitle = "Full Screen"
-        static let rowHint = "Hides Sill’s controls."
-        static let footnote = "Hides Sill’s controls, so only the picture shows. Swipe in from the left edge to bring them back."
+        static let rowTitle = String(localized: "Full Screen", comment: "设置面板中全屏开关行的标题")
+        static let rowHint = String(localized: "Hides Sill’s controls.", comment: "设置面板中全屏行的辅助功能提示")
+        static let footnote = String(localized: "Hides Sill’s controls, so only the picture shows. Swipe in from the left edge to bring them back.", comment: "设置面板中全屏行下方的说明")
         /// Settings › This iPad › Shake to Show Controls, and the line under it.
-        static let shakeTitle = "Shake to Show Controls"
-        static func shakeFootnote(device: String) -> String { "Shaking your \(device) brings the controls back too." }
+        static let shakeTitle = String(localized: "Shake to Show Controls", comment: "设置面板中摇动召回控制的开关标题")
+        static func shakeFootnote(device: String) -> String {
+            String(localized: "Shaking your \(device) brings the controls back too.", comment: "摇动开关下方的说明，插值为设备类型（iPad 或 iPhone）")
+        }
         /// Under the row while Sill's window does not fill the screen.
-        static let notOffered = "Full Screen works while Sill fills the screen."
+        static let notOffered = String(localized: "Full Screen works while Sill fills the screen.", comment: "Sill 窗口未占满屏幕时，全屏行下方的说明")
     }
 }

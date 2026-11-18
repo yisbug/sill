@@ -1919,7 +1919,7 @@ struct StreamScreen: View {
             .overlay { LockedMacShade(client: client) }
             .overlay(alignment: .top) { LinkLineView(text: streamLine, lines: streamLineLines) }
             // Full screen: the picture as one element for VoiceOver, Switch Control and Voice Control.
-            .overlay { HiddenPictureElement(hidden: hidden, mac: client.macName.isEmpty ? "The Mac" : client.macName,
+            .overlay { HiddenPictureElement(hidden: hidden, mac: client.macName.isEmpty ? String(localized: "The Mac", comment: "全屏模式下画面的无障碍标签里，Mac 名称缺失时的称呼") : client.macName,
                                             show: { showChrome(by: "an assistive technology") }) }
             .clipShape(streamShape(hidden))
             .overlay(streamShape(hidden).strokeBorder(Color.white.opacity(hidden ? 0 : 0.09), lineWidth: 1))

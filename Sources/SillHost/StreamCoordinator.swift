@@ -2188,7 +2188,11 @@ package final class StreamCoordinator {
                 // captures the window where it is, and raises and sizes nothing (LockPolicy.Allowed.actsOnWindows).
                 if !lockAllowed.windows { await lockedMidSwitch(source); return }
                 let acts = lockAllowed.actsOnWindows
-                if virtualDisplay, !lockAllowed.virtualDisplay { status.update { $0.lastStageFailure = "another user is on the screen" } }
+                if virtualDisplay, !lockAllowed.virtualDisplay {
+                    // 与其它失败原因同一写法：Mac 的设置按本机语言，发给设备的说明按设备语言。
+                    lastStageFailureText = { locale in String(localized: "another user is on the screen", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "虚拟显示器设置：另一位用户占用屏幕时窗口原位串流的原因") }
+                    status.update { $0.lastStageFailure = lastStageFailureText?(DeviceLanguage.hostLocale) }
+                }
                 // Today's path: capture the window where it is, at most at its display's own scale
                 // (a window on a 1x display drawn at 1x into a 2x buffer filled its top-left quarter).
                 let windowFilter = SCContentFilter(desktopIndependentWindow: w)

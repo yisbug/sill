@@ -69,13 +69,24 @@ enum UpdateAutoPolicy {
     /// A wait in Settings' words: "two days after it first finds it", "12 hours after it first finds it", "an hour
     /// after it first finds it", or "once it finds it" for none.
     static func waitWords(_ wait: TimeInterval) -> String {
-        guard wait > 0 else { return "once it finds it" }
+        guard wait > 0 else { return String(localized: "once it finds it", comment: "设置更新区：不设等待时的时间短语，接在“……自动安装”之后") }
         let minutes = Int((wait / 60).rounded())
-        if minutes < 60 { return "\(max(minutes, 1)) minute\(minutes > 1 ? "s" : "") after it first finds it" }
+        if minutes < 60 { return String(localized: "\(max(minutes, 1)) minutes after it first finds it", comment: "设置更新区：等待时间短语（复数变体），插值为分钟数；接在“……自动安装”之后") }
         let hours = Int((wait / 3600).rounded())
-        let small = ["a", "two", "three", "four", "five", "six", "seven"]
-        if hours % 24 == 0, (1...7).contains(hours / 24) { return "\(small[hours / 24 - 1]) day\(hours == 24 ? "" : "s") after it first finds it" }
-        return hours == 1 ? "an hour after it first finds it" : "\(hours) hours after it first finds it"
+        if hours % 24 == 0, (1...7).contains(hours / 24) {
+            switch hours / 24 {
+            case 1: return String(localized: "a day after it first finds it", comment: "设置更新区：等待时间短语，一天")
+            case 2: return String(localized: "two days after it first finds it", comment: "设置更新区：等待时间短语，两天")
+            case 3: return String(localized: "three days after it first finds it", comment: "设置更新区：等待时间短语，三天")
+            case 4: return String(localized: "four days after it first finds it", comment: "设置更新区：等待时间短语，四天")
+            case 5: return String(localized: "five days after it first finds it", comment: "设置更新区：等待时间短语，五天")
+            case 6: return String(localized: "six days after it first finds it", comment: "设置更新区：等待时间短语，六天")
+            default: return String(localized: "seven days after it first finds it", comment: "设置更新区：等待时间短语，七天")
+            }
+        }
+        return hours == 1
+            ? String(localized: "an hour after it first finds it", comment: "设置更新区：等待时间短语，一小时")
+            : String(localized: "\(hours) hours after it first finds it", comment: "设置更新区：等待时间短语，插值为小时数（两小时及以上）")
     }
 
     // MARK: What Sill remembers
@@ -196,7 +207,7 @@ enum UpdateAutoPolicy {
         guard UpdateInstallPolicy.isNewer(offered, build: releaseBuild, than: running, runningBuild: runningBuild, byBuild: false,
                                           overNightly: runningIsNightly) else { return .no("the offered release isn’t newer") }
         guard signed else { return .no("the release isn’t signed with Sill’s update key yet") }
-        if let r = refusal { return .no(UpdateInstallPolicy.words(r)) }
+        if let r = refusal { return .no(UpdateInstallPolicy.logWords(r)) }
         if isStopped(m, tag: offeredTag) { return .no("a stop signed with an update key names \(offered)") }
         if let highest = m.highestSigned.flatMap(UpdateInstallPolicy.strictVersion), offered < highest {
             return .no("the latest release went back from \(highest) to \(offered)")
@@ -216,6 +227,24 @@ enum UpdateAutoPolicy {
             if now.timeIntervalSince(a.last) < retryAfter { return .no("\(key) was tried at \(UpdateManifest.dateText(a.last))") }
         }
         return .go
+    }
+
+    /// The reasons `dates` refuses, in English (the log's; also what `DateVerdict.refuse` carries).
+    static let refuseClock = "its signature is dated later than this Mac’s clock"
+    static var refuseTooOld: String { "it was signed more than \(Int(maxAge / 86400)) days ago" }
+    static let refuseNoPublished = "GitHub’s answer doesn’t say when the release was published"
+    static let refuseNoRelease = "GitHub’s answer doesn’t say which release it is"
+
+    /// A refusal's reason as Settings says it (a phrase after "Sill didn’t install … by itself: "): the English the
+    /// log has, in the interface language; any other text (`nightlyNever`, which never reaches Settings) as it is.
+    static func refuseWords(_ reason: String) -> String {
+        switch reason {
+        case refuseClock: return String(localized: "its signature is dated later than this Mac’s clock", comment: "设置更新区：自动更新不安装的原因，签名日期晚于这台 Mac 的时钟（接在“Sill 没有自动安装……：”之后）")
+        case refuseTooOld: return String(localized: "it was signed more than \(Int(maxAge / 86400)) days ago", comment: "设置更新区：自动更新不安装的原因，签名时间过久，插值为天数（接在“Sill 没有自动安装……：”之后）")
+        case refuseNoPublished: return String(localized: "GitHub’s answer doesn’t say when the release was published", comment: "设置更新区：自动更新不安装的原因，GitHub 没说明发布时间（接在“Sill 没有自动安装……：”之后）")
+        case refuseNoRelease: return String(localized: "GitHub’s answer doesn’t say which release it is", comment: "设置更新区：自动更新不安装的原因，GitHub 没说明是哪个发布（接在“Sill 没有自动安装……：”之后）")
+        default: return reason
+        }
     }
 
     /// What the dates say to the automatic update.
@@ -253,13 +282,13 @@ enum UpdateAutoPolicy {
     static func dates(signedAt: Date, firstSeen: Date, now: Date, nightly: Bool = false,
                       github: GitHubClock = GitHubClock()) -> DateVerdict {
         if nightly { return .refuse(nightlyNever) }
-        if signedAt.timeIntervalSince(now) > clockSkew { return .refuse("its signature is dated later than this Mac’s clock") }
+        if signedAt.timeIntervalSince(now) > clockSkew { return .refuse(refuseClock) }
         let age = now.timeIntervalSince(signedAt)
-        if age > maxAge { return .refuse("it was signed more than \(Int(maxAge / 86400)) days ago") }
+        if age > maxAge { return .refuse(refuseTooOld) }
         let wait = coolingOff
         guard wait > 0 else { return .go }
-        if github.published == nil { return .refuse("GitHub’s answer doesn’t say when the release was published") }
-        if github.release == nil { return .refuse("GitHub’s answer doesn’t say which release it is") }
+        if github.published == nil { return .refuse(refuseNoPublished) }
+        if github.release == nil { return .refuse(refuseNoRelease) }
         let localEnd = max(signedAt, firstSeen).addingTimeInterval(wait)
         guard let ghNow = github.now, let ghFirst = github.firstSeen else { return .waitUntil(now < localEnd ? localEnd : nil) }
         let ghEnd = max(ghFirst, github.published ?? ghFirst).addingTimeInterval(wait)
@@ -507,7 +536,7 @@ enum UpdateAutoPolicy {
         if !canKeep {
             s.note = canKeepNote
         } else if !checkOn {
-            s.note = "Works while Check for updates automatically is on."
+            s.note = String(localized: "Works while Check for updates automatically is on.", comment: "设置更新区：自动更新开关下的说明，需先开启“自动检查更新”")
         } else {
             s.note = refusal.map(UpdateInstallPolicy.words) ?? (unreadable && !on ? unreadableNote : nil)
             s.enabled = true
@@ -519,9 +548,9 @@ enum UpdateAutoPolicy {
 
     /// Why a copy without Sill's keychain group can't keep the switch (the second pass's N9: a notarized build
     /// can lack the group too).
-    static let canKeepNote = "This copy of Sill can’t keep this setting: only Sill’s releases from GitHub can."
+    static let canKeepNote = String(localized: "This copy of Sill can’t keep this setting: only Sill’s releases from GitHub can.", comment: "设置更新区：此副本无法保存这项设置，只有 GitHub 上的正式版才能")
     /// Under the switch while Sill's keychain item couldn't be read (A3).
-    static let unreadableNote = "Sill couldn’t read what it keeps for this setting, so it is off. Turning it on starts it afresh."
+    static let unreadableNote = String(localized: "Sill couldn’t read what it keeps for this setting, so it is off. Turning it on starts it afresh.", comment: "设置更新区：读不出这项设置保存的内容，所以保持关闭，重新打开会从头开始")
 
     /// A release beside a nightly in the pane: what the automatic update would install by itself meanwhile.
     struct Alongside: Equatable, Sendable {
@@ -553,54 +582,65 @@ enum UpdateAutoPolicy {
     /// this nightly waits for a click on Update Now; and the release it would install by itself meanwhile, when there
     /// is one it would (not stopped, not below the release floor, not tried twice).
     static func nightlyOfferNote(_ m: Memory, release: Alongside?, now: Date) -> String {
-        let click = "This nightly installs only when you click Update Now."
+        let click = String(localized: "This nightly installs only when you click Update Now.", comment: "设置更新区：这个每夜构建版只能点“立即更新”安装")
         guard let r = release, !isStopped(m, tag: r.tag),
               m.highestSigned.flatMap(UpdateInstallPolicy.strictVersion).map({ r.version >= $0 }) ?? true,
               (m.attempts[r.version.description]?.count ?? 0) < maxAttempts else {
-            return "Automatically update Sill installs releases only. \(click)"
+            return join(String(localized: "Automatically update Sill installs releases only.", comment: "设置更新区：自动更新只安装正式版"), click)
         }
-        let timing: String
-        if let w = r.waitUntil, now < w { timing = " \(when(w, now: now, future: true)) or later" }
-        else if r.waitUntil == nil, coolingOff > 0 { timing = " \(coolingOffWords)" }
-        else { timing = "" }
-        return "Automatically update Sill installs releases only: it installs Sill \(r.version) by itself\(timing), once no device has been connected for \(quietMinutes) minutes. \(click)"
+        let minutes = UpdateInstallPolicy.minutesWords(quietMinutes)
+        let doing: String
+        if let w = r.waitUntil, now < w {
+            doing = String(localized: "Automatically update Sill installs releases only: it installs Sill \(r.version.description) by itself \(when(w, now: now, future: true)) or later, once no device has been connected for \(minutes).", comment: "设置更新区：自动更新只装正式版，并将在某时刻或之后自动安装；插值为版本号、时刻短语和时长")
+        } else if r.waitUntil == nil, coolingOff > 0 {
+            doing = String(localized: "Automatically update Sill installs releases only: it installs Sill \(r.version.description) by itself \(coolingOffWords), once no device has been connected for \(minutes).", comment: "设置更新区：自动更新只装正式版，并将在等待一段时间后自动安装；插值为版本号、等待时间短语和时长")
+        } else {
+            doing = String(localized: "Automatically update Sill installs releases only: it installs Sill \(r.version.description) by itself, once no device has been connected for \(minutes).", comment: "设置更新区：自动更新只装正式版，并将在无设备连接一段时间后自动安装；插值为版本号和时长")
+        }
+        return join(doing, click)
+    }
+
+    /// Two sentences of a paragraph, joined as their language joins sentences.
+    private static func join(_ a: String, _ b: String) -> String {
+        String(localized: "\(a) \(b)", comment: "两句之间的连接；中文译为不带空格")
     }
 
     /// While a release is offered and the switch is on: when Sill installs it by itself, or why it won't.
     static func offerNote(_ m: Memory, offered: SillVersion, offeredTag: String?, waitUntil: Date?, now: Date) -> String {
         if let offeredTag, isStopped(m, tag: offeredTag) {
-            return "A stop signed with Sill’s update key names Sill \(offered), so Sill won’t install it."
+            return String(localized: "A stop signed with Sill’s update key names Sill \(offered.description), so Sill won’t install it.", comment: "设置更新区：开发者用更新密钥签名的停用通知停掉了该版本；插值为版本号")
         }
         if let highest = m.highestSigned.flatMap(UpdateInstallPolicy.strictVersion), offered < highest {
-            return "Sill won’t install \(offered) by itself: Sill \(highest) was out before it. Update Now still can."
+            return String(localized: "Sill won’t install \(offered.description) by itself: Sill \(highest.description) was out before it. Update Now still can.", comment: "设置更新区：自动更新不装旧版本，因为更高的版本早已发布；插值为所提供的版本号和更高的版本号")
         }
         if let a = m.attempts[offered.description], a.count >= maxAttempts {
-            return "Sill won’t install \(offered) by itself again; Update Now still can."
+            return String(localized: "Sill won’t install \(offered.description) by itself again; Update Now still can.", comment: "设置更新区：自动更新已试过多次，不再自动安装该版本；插值为版本号")
         }
+        let minutes = UpdateInstallPolicy.minutesWords(quietMinutes)
         if let waitUntil {
             if now < waitUntil {
-                return "Sill installs it by itself \(when(waitUntil, now: now, future: true)) or later, once no device has been connected for \(quietMinutes) minutes."
+                return String(localized: "Sill installs it by itself \(when(waitUntil, now: now, future: true)) or later, once no device has been connected for \(minutes).", comment: "设置更新区：将在某时刻或之后自动安装；插值为时刻短语和时长")
             }
         } else if coolingOff > 0 {
             // Not read yet: the wait starts when this Sill first reads its signed release (A1).
-            return "Sill installs it by itself \(coolingOffWords), once no device has been connected for \(quietMinutes) minutes."
+            return String(localized: "Sill installs it by itself \(coolingOffWords), once no device has been connected for \(minutes).", comment: "设置更新区：将在等待一段时间后自动安装；插值为等待时间短语和时长")
         }
-        return "Sill installs it by itself once no device has been connected for \(quietMinutes) minutes."
+        return String(localized: "Sill installs it by itself once no device has been connected for \(minutes).", comment: "设置更新区：无设备连接一段时间后自动安装；插值为时长")
     }
 
     /// The pane's note after Sill updated itself (this launch runs that version), for `updatedShown`.
     static func updatedLine(_ m: Memory, running: SillVersion?, now: Date, runningBuild: Int? = nil) -> String? {
         guard let to = m.updatedTo, let at = m.updatedAt, let running, key(running, build: runningBuild) == to || running.description == to,
               now.timeIntervalSince(at) < updatedShown, at.timeIntervalSince(now) < clockSkew else { return nil }
-        return "Sill updated itself to \(to) \(when(at, now: now))."
+        return String(localized: "Sill updated itself to \(to) \(when(at, now: now)).", comment: "设置更新区：Sill 已自动更新到某版本；插值为版本号和时刻短语（如“今天 03:12”）")
     }
 
     /// What follows a failed automatic attempt's line.
     static func afterFailure(_ m: Memory, version: SillVersion) -> String {
         if let a = m.attempts[version.description], a.count >= maxAttempts {
-            return "Sill won’t install \(version) by itself again; Update Now still can."
+            return String(localized: "Sill won’t install \(version.description) by itself again; Update Now still can.", comment: "设置更新区：自动更新已试过多次，不再自动安装该版本；插值为版本号")
         }
-        return "Sill tries again after its next daily check."
+        return String(localized: "Sill tries again after its next daily check.", comment: "设置更新区：自动更新失败后，下次每日检查时会再试")
     }
 
     /// "today at 03:12", "yesterday at 21:40", "on 12 Nov 2026 at 03:12" (this Mac's zone and format);
@@ -608,11 +648,13 @@ enum UpdateAutoPolicy {
     static func when(_ date: Date, now: Date, future: Bool = false) -> String {
         let calendar = Calendar.current
         let time = DateFormatter.localizedString(from: date, dateStyle: .none, timeStyle: .short)
-        if calendar.isDate(date, inSameDayAs: now) { return "today at \(time)" }
+        if calendar.isDate(date, inSameDayAs: now) { return String(localized: "today at \(time)", comment: "时刻短语：今天某时；插值为时间") }
         if let other = calendar.date(byAdding: .day, value: future ? 1 : -1, to: now), calendar.isDate(date, inSameDayAs: other) {
-            return "\(future ? "tomorrow" : "yesterday") at \(time)"
+            return future
+                ? String(localized: "tomorrow at \(time)", comment: "时刻短语：明天某时；插值为时间")
+                : String(localized: "yesterday at \(time)", comment: "时刻短语：昨天某时；插值为时间")
         }
         let day = DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .none)
-        return "on \(day) at \(time)"
+        return String(localized: "on \(day) at \(time)", comment: "时刻短语：某日某时；插值为日期和时间")
     }
 }

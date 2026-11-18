@@ -173,13 +173,13 @@ public enum LockedMac {
 
     /// The line over the stream while the off-console view lasts (where the link's line goes), three lines at
     /// most; VoiceOver hears it once as it comes.
-    public static let viewLine = "Your account’s own desktop, not this Mac’s screen. Taps and keys reach it once your account is back on the screen."
+    public static let viewLine = String(localized: "Your account’s own desktop, not this Mac’s screen. Taps and keys reach it once your account is back on the screen.", comment: "串流画面上的提示行：另一位用户在使用 Mac 屏幕时，设备看到的是本账户自己的桌面，只能看")
 
     /// The Settings panel's header and the Apps drawer, above its open apps, in the off-console view.
-    public static let viewPanelLine = "Another user is on this Mac’s screen. You’re seeing your account’s own desktop and windows, not the screen. Taps, keys and opening apps wait until your account is back on it."
+    public static let viewPanelLine = String(localized: "Another user is on this Mac’s screen. You’re seeing your account’s own desktop and windows, not the screen. Taps, keys and opening apps wait until your account is back on it.", comment: "设置面板与应用抽屉里的说明：另一位用户在使用 Mac 屏幕时的只读视图")
 
     /// What VoiceOver hears after a dimmed Aa's name and value in the off-console view (no window is sized).
-    public static let viewTextScaleHint = "Available once your account is back on this Mac’s screen."
+    public static let viewTextScaleHint = String(localized: "Available once your account is back on this Mac’s screen.", comment: "文字大小控件的 VoiceOver 提示：只读视图期间不可用")
 
     /// The Apps drawer's and the Settings panel's line, where the Mac's windows would be. Another user's
     /// is the cover's title and line together, in Noah's words (2026-11-02), with no Mac's name in them.

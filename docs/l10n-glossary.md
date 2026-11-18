@@ -54,6 +54,15 @@ Sill、Mac、iPad、iPhone、Apple、Apple Pencil、Magic Keyboard、Mission Con
 | Terminal | 终端 | 指 macOS 的"终端"App |
 | hardware encoder / software encoder | 硬件编码器 / 软件编码器 | |
 | Voice input | 语音输入 | |
+| Full Screen | 全屏 | 视频/窗口的全屏模式 |
+| Picture in Picture | 画中画 | |
+| Show Controls | 显示控制 | |
+| Shake to Show Controls | 摇动以显示控制 | |
+| Update Now / Install Now / Try Again | 立即更新 / 立即安装 / 重试 | 设置里的更新按钮 |
+| Automatically update Sill | 自动更新 Sill | |
+| nightly build(s) | 每夜构建版 | |
+| release | 正式版 | 指 GitHub 上正式发布的版本，区别于每夜构建版 |
+| update key | 更新密钥 | 用来签名正式版的密钥；每夜构建版用"每夜密钥" |
 
 ## 写法约定
 

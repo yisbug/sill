@@ -360,8 +360,26 @@
         }
       }
     },
+    "%@ looks off on this %@ or on %@. Turn it on for both, then tap %@." : {
+      "comment" : "连接页远程连接失败提示，两端的 VPN 都可能没开；插值为 VPN 名称、设备类型、Mac 名称、Mac 名称",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ looks off on this %2$@ or on %3$@. Turn it on for both, then tap %4$@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ 在这台 %2$@ 或 %3$@ 上似乎未开启。请在两端都开启，然后轻点 %4$@。"
+          }
+        }
+      }
+    },
     "%@ looks off on this %@. Turn it on, then tap %@." : {
       "comment" : "连接页远程连接失败提示，插值为Mac 名称、设备类型、VPN 名称",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -856,6 +874,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ 的硬件编码器正忙或未响应，因此串流暂时以标准分辨率运行，帧率最高为 60 fps。"
+          }
+        }
+      }
+    },
+    "%@’s picture. Sill’s controls are hidden." : {
+      "comment" : "全屏模式下画面的无障碍标签，插值为 Mac 名称",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ 的画面。Sill 的控制已隐藏。"
           }
         }
       }
@@ -1637,6 +1666,18 @@
         }
       }
     },
+    "Another user is on this Mac’s screen. You’re seeing your account’s own desktop and windows, not the screen. Taps, keys and opening apps wait until your account is back on it." : {
+      "comment" : "设置面板与应用抽屉里的说明：另一位用户在使用 Mac 屏幕时的只读视图",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "另一位用户正在使用这台 Mac 的屏幕。你看到的是你账户自己的桌面和窗口，不是屏幕上的画面。轻点、按键和打开应用要等你的账户回到屏幕上。"
+          }
+        }
+      }
+    },
     "Another user started controlling this Mac." : {
       "comment" : "用户切换覆盖层标题",
       "extractionState" : "stale",
@@ -1724,6 +1765,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "选择窗口时可用。"
+          }
+        }
+      }
+    },
+    "Available once your account is back on this Mac’s screen." : {
+      "comment" : "文字大小控件的 VoiceOver 提示：只读视图期间不可用",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "等你的账户回到这台 Mac 的屏幕上后可用。"
           }
         }
       }
@@ -2285,6 +2338,27 @@
         }
       }
     },
+    "Controls hidden" : {
+      "comment" : "全屏模式隐藏界面时的提示标题",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "控制已隐藏"
+          }
+        }
+      }
+    },
+    "Copy" : {
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拷贝"
+          }
+        }
+      }
+    },
     "Copy on this %@, then come back to Sill: **Paste on %@**, on the note Sill shows then or in Settings, puts it where %@’s cursor is." : {
       "comment" : "导览剪贴板粘贴说明；插值为设备类型和 Mac 名称，双星号标出控件名称",
       "localizations" : {
@@ -2350,11 +2424,24 @@
     },
     "Desktop" : {
       "comment" : "串流工具栏：按钮名称",
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "桌面"
+          }
+        }
+      }
+    },
+    "Desktop %lld" : {
+      "comment" : "串流工具栏：桌面按钮名称，Mac 有多台显示器时带上当前显示器的序号",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "桌面 %lld"
           }
         }
       }
@@ -2421,6 +2508,30 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "关闭"
+          }
+        }
+      }
+    },
+    "Display %lld of %lld" : {
+      "comment" : "桌面按钮的 VoiceOver 值：第几台显示器、共几台",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 %1$lld 台显示器，共 %2$lld 台"
+          }
+        }
+      }
+    },
+    "Display %lld of %lld, %@" : {
+      "comment" : "桌面按钮的 VoiceOver 值：第几台显示器、共几台、显示器名称",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 %1$lld 台显示器，共 %2$lld 台，%3$@"
           }
         }
       }
@@ -2597,12 +2708,23 @@
       }
     },
     "Full Screen" : {
-      "comment" : "窗口控制菜单：按钮名称",
+      "comment" : "窗口控制菜单：按钮名称\n设置面板中全屏开关行的标题",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "全屏"
+          }
+        }
+      }
+    },
+    "Full Screen works while Sill fills the screen." : {
+      "comment" : "Sill 窗口未占满屏幕时，全屏行下方的说明",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "仅当 Sill 占满屏幕时，才能使用全屏。"
           }
         }
       }
@@ -2678,6 +2800,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "收起工具栏"
+          }
+        }
+      }
+    },
+    "Hides Sill’s controls, so only the picture shows. Swipe in from the left edge to bring them back." : {
+      "comment" : "设置面板中全屏行下方的说明",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐藏 Sill 的控制，只显示画面。从左边缘向内轻扫，即可让它们回来。"
+          }
+        }
+      }
+    },
+    "Hides Sill’s controls." : {
+      "comment" : "设置面板中全屏行的辅助功能提示",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "隐藏 Sill 的控制。"
           }
         }
       }
@@ -2844,6 +2988,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "更大画面"
+          }
+        }
+      }
+    },
+    "Leave Sill while %@’s picture shows, and it keeps playing in a small window over your other apps, with its sound when Send Audio is on. That window only shows the picture: tap it to come back to Sill. iOS starts it only while its own Start PiP Automatically setting is on." : {
+      "comment" : "画中画开关下方的说明，插值为 Mac 名称；“Start PiP Automatically”是 iOS 系统设置项的名称",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在显示 %@ 的画面时离开 Sill，画面会继续在其他应用上方的小窗口中播放；开启“发送声音”后，也会有声音。这个窗口只显示画面：轻点它即可回到 Sill。只有 iOS 自己的“自动启动画中画”设置处于开启状态时，iOS 才会启动它。"
           }
         }
       }
@@ -3672,6 +3827,17 @@
         }
       }
     },
+    "Picture in Picture" : {
+      "comment" : "设置面板中画中画开关的标题",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "画中画"
+          }
+        }
+      }
+    },
     "Pinch" : {
       "comment" : "主机设置面板：三指手势名称或对应操作",
       "localizations" : {
@@ -4059,6 +4225,28 @@
         }
       }
     },
+    "Shake to Show Controls" : {
+      "comment" : "设置面板中摇动召回控制的开关标题",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "摇动以显示控制"
+          }
+        }
+      }
+    },
+    "Shaking your %@ brings the controls back too." : {
+      "comment" : "摇动开关下方的说明，插值为设备类型（iPad 或 iPhone）",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "摇动你的 %@ 也能让控制回来。"
+          }
+        }
+      }
+    },
     "Share Clipboard" : {
       "comment" : "设置中共享剪贴板开关的标题",
       "extractionState" : "stale",
@@ -4082,6 +4270,17 @@
         }
       }
     },
+    "Show Controls" : {
+      "comment" : "全屏模式下召回控制的无障碍操作名称\n语音控制：召回控制的口令",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示控制"
+          }
+        }
+      }
+    },
     "Show Desktop" : {
       "comment" : "主机设置面板：三指手势名称或对应操作",
       "localizations" : {
@@ -4089,6 +4288,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "显示桌面"
+          }
+        }
+      }
+    },
+    "Show Sill" : {
+      "comment" : "语音控制：召回 Sill 界面的口令",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示 Sill"
           }
         }
       }
@@ -4139,6 +4349,7 @@
     },
     "Show the full Mac desktop" : {
       "comment" : "串流工具栏：显示桌面的无障碍标签",
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4202,6 +4413,30 @@
         }
       }
     },
+    "Shows the Mac’s desktop." : {
+      "comment" : "桌面按钮的 VoiceOver 提示：轻点显示 Mac 的桌面",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示 Mac 的桌面。"
+          }
+        }
+      }
+    },
+    "Shows the next display." : {
+      "comment" : "桌面按钮的 VoiceOver 提示：桌面正在串流，轻点切到下一台显示器",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "显示下一台显示器。"
+          }
+        }
+      }
+    },
     "Sill can’t use the camera. Enter the code instead, or allow the camera in Settings." : {
       "localizations" : {
         "zh-Hans" : {
@@ -4223,6 +4458,45 @@
         }
       }
     },
+    "Sill version %@" : {
+      "comment" : "VoiceOver 读出的版本标签：只有版本号，插值为版本号",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sill 版本 %@"
+          }
+        }
+      }
+    },
+    "Sill version %@, build %@" : {
+      "comment" : "VoiceOver 读出的版本标签：版本号与构建号都有，插值为版本号、构建号",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Sill version %1$@, build %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sill 版本 %@，构建 %@"
+          }
+        }
+      }
+    },
+    "Sill, build %@" : {
+      "comment" : "VoiceOver 读出的版本标签：只有构建号，插值为构建号",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sill，构建 %@"
+          }
+        }
+      }
+    },
     "SillHost keeps these until it quits." : {
       "comment" : "主机设置面板：设置保留期限说明",
       "localizations" : {
@@ -4230,6 +4504,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这些设置会保留到 SillHost 退出为止。"
+          }
+        }
+      }
+    },
+    "Sill’s controls are back." : {
+      "comment" : "界面重新出现时的 VoiceOver 播报",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sill 的控制已重新显示。"
+          }
+        }
+      }
+    },
+    "Sill’s controls are hidden. Use the Show Controls action, or the escape gesture, to bring them back." : {
+      "comment" : "界面隐藏时的 VoiceOver 播报",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sill 的控制已隐藏。使用“显示控制”操作或退出手势，即可让它们回来。"
           }
         }
       }
@@ -4467,6 +4763,17 @@
         }
       }
     },
+    "Swipe in from the left edge to bring them back." : {
+      "comment" : "全屏模式隐藏界面时的提示正文，说明如何召回控制",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "从左边缘向内轻扫，即可让它们回来。"
+          }
+        }
+      }
+    },
     "Switching to Wi‑Fi…" : {
       "comment" : "连接页切换到 Wi-Fi 的状态提示",
       "localizations" : {
@@ -4678,6 +4985,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这不是 Sill 配对码。"
+          }
+        }
+      }
+    },
+    "The Mac" : {
+      "comment" : "全屏模式下画面的无障碍标签里，Mac 名称缺失时的称呼",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mac"
           }
         }
       }
@@ -4999,8 +5317,26 @@
         }
       }
     },
+    "This %@ can’t look up %@. Is Tailscale on, here and on %@?" : {
+      "comment" : "连接页远程连接失败提示，插值为设备类型、Mac 地址、Mac 名称",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "This %1$@ can’t look up %2$@. Is Tailscale on, here and on %3$@?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这台 %1$@ 无法查询 %2$@ 的地址。Tailscale 在这里和 %3$@ 上都开着吗？"
+          }
+        }
+      }
+    },
     "This %@ can’t look up %@. Is Tailscale on?" : {
       "comment" : "连接页远程连接失败提示，插值为设备类型、Mac 地址",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5760,8 +6096,26 @@
         }
       }
     },
+    "Your VPN looks off on this %@ or on %@. Turn it on for both, then tap %@." : {
+      "comment" : "连接页远程连接失败提示，两端的 VPN 都可能没开；插值为设备类型、Mac 名称、Mac 名称",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your VPN looks off on this %1$@ or on %2$@. Turn it on for both, then tap %3$@."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的 VPN 在这台 %1$@ 或 %2$@ 上似乎未开启。请在两端都开启，然后轻点 %3$@。"
+          }
+        }
+      }
+    },
     "Your VPN looks off on this %@. Turn it on, then tap %@." : {
       "comment" : "连接页远程连接失败提示，插值为Mac 名称、设备类型",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5773,6 +6127,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这台 %@ 上的 VPN 似乎未开启。请先开启，再轻点 %@。"
+          }
+        }
+      }
+    },
+    "Your account’s own desktop, not this Mac’s screen. Taps and keys reach it once your account is back on the screen." : {
+      "comment" : "串流画面上的提示行：另一位用户在使用 Mac 屏幕时，设备看到的是本账户自己的桌面，只能看",
+      "extractionState" : "manual",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这是你账户自己的桌面，不是这台 Mac 屏幕上的画面。等你的账户回到屏幕上，轻点和按键才会生效。"
           }
         }
       }

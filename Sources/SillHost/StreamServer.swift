@@ -1028,7 +1028,7 @@ final class StreamServer {
     /// closed. The automatic update's install (Sill.app's AppUpdater), which must never disconnect anyone:
     /// it holds new sessions, then looks at how many are connected, in one step on `queue`, so no device
     /// can connect between its look and its quit. On `queue`.
-    private var heldGoodbye: Goodbye?
+    private var heldGoodbye: ((Locale) -> Goodbye)?
 
     /// Holds every new session from now on (each answered with the "restarting" goodbye: its message names
     /// this Mac, and the device reconnects by itself), or releases the hold (`hold` false), and says how
@@ -1036,9 +1036,13 @@ final class StreamServer {
     /// it is released. Waits for `queue`: never from `queue` itself.
     func holdNewSessions(_ hold: Bool) -> Int {
         dispatchPrecondition(condition: .notOnQueue(queue))
-        let goodbye = hold ? Goodbye(reason: Goodbye.restarting,
-                                     message: "\(macName) is restarting Sill to install an update. It reconnects in a moment.",
-                                     reconnect: true) : nil
+        // The message is made for each device's own language when its session is held (`register`).
+        let macName = macName
+        let goodbye: ((Locale) -> Goodbye)? = hold ? { locale in
+            Goodbye(reason: Goodbye.restarting,
+                    message: String(localized: "\(macName) is restarting Sill to install an update. It reconnects in a moment.", bundle: DeviceLanguage.bundle(for: locale), locale: locale, comment: "设备连接页：Mac 正在重启 Sill 以安装更新，插值为 Mac 名称"),
+                    reconnect: true)
+        } : nil
         return queue.sync {
             heldGoodbye = goodbye
             return clients.count
@@ -1051,7 +1055,7 @@ final class StreamServer {
     private func register(_ client: Client) -> Bool {
         if let goodbye = heldGoodbye {
             print("Held \(client.connection.endpoint): Sill is restarting to install an update.")
-            Self.closeWithGoodbye(goodbye, on: client.connection, queue: queue)
+            Self.closeWithGoodbye(goodbye(DeviceLanguage.locale(languages: client.languages)), on: client.connection, queue: queue)
             return false
         }
         client.connectedAt = Date().timeIntervalSince1970
@@ -1100,6 +1104,8 @@ final class StreamServer {
                 self.onClientRouteChanged?(connection, link)
             }
         }
+        // Known before the registration, so a held session's goodbye is in the device's own language.
+        client.languages = hello?.languages.map { Array($0.prefix(5)) }
         guard register(client) else { return }
         receiveLoop(client)
         onClientConnected?(connection, route, client.link)

@@ -68,6 +68,28 @@
         }
       }
     },
+    "%@ Is Available…": {
+      "comment": "状态菜单：有可用更新；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 可用…"
+          }
+        }
+      }
+    },
+    "%@ Is Ready to Install…": {
+      "comment": "状态菜单：更新已就绪、待安装；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已就绪，可以安装…"
+          }
+        }
+      }
+    },
     "%@ Mbps": {
       "comment": "Mac 自定义画质名称，插值为码率\n自定义画质名称；插值为按区域格式化的码率",
       "localizations": {
@@ -86,6 +108,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 请求配对"
+          }
+        }
+      }
+    },
+    "%@ and %@": {
+      "comment": "设置更新区：两台设备的名称列表",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ and %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 和 %2$@"
           }
         }
       }
@@ -172,6 +211,23 @@
         }
       }
     },
+    "%@ didn’t start, so %@ is back.": {
+      "comment": "设置更新区：新的每夜构建版没能启动，已退回旧版；插值为新版名称和旧版名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ didn’t start, so %2$@ is back."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 没能启动，所以已退回 %2$@。"
+          }
+        }
+      }
+    },
     "%@ fps · frame age %@ · RTT %@": {
       "comment": "状态卡设备统计，插值为帧率、画面延迟和往返延迟",
       "localizations": {
@@ -245,6 +301,17 @@
         }
       }
     },
+    "%@ is available.": {
+      "comment": "设置更新区：有可用更新；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 可用。"
+          }
+        }
+      }
+    },
     "%@ is locked": {
       "comment": "锁屏覆盖层标题，插值为 Mac 名称",
       "localizations": {
@@ -300,6 +367,28 @@
         }
       }
     },
+    "%@ is ready.": {
+      "comment": "设置更新区：更新已就绪；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已就绪。"
+          }
+        }
+      }
+    },
+    "%@ is restarting Sill to install an update. It reconnects in a moment.": {
+      "comment": "设备连接页：Mac 正在重启 Sill 以安装更新，插值为 Mac 名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 正在重启 Sill 以安装更新。稍后会自动重新连接。"
+          }
+        }
+      }
+    },
     "%@ is still paired: Sill couldn’t update the keychain (%@). Try again.": {
       "comment": "USB 配对通知移除失败；插值为设备名和钥匙串故障原因\n设备面板中移除配对失败的警告；插值为设备名和钥匙串故障原因",
       "localizations": {
@@ -317,6 +406,17 @@
         }
       }
     },
+    "%@ is unchanged.": {
+      "comment": "设置更新区：当前版本保持不变；插值为当前版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 保持不变。"
+          }
+        }
+      }
+    },
     "%@ isn’t responding.": {
       "comment": "设备菜单：应用未响应，插值为应用名称",
       "localizations": {
@@ -324,6 +424,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 未响应。"
+          }
+        }
+      }
+    },
+    "%@ isn’t signed with Sill’s nightly key yet, so it can’t be installed from here. Try again later.": {
+      "comment": "设置更新区：每夜构建版尚未用每夜密钥签名；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 尚未用 Sill 的每夜密钥签名，所以无法从这里安装。请稍后再试。"
           }
         }
       }
@@ -346,6 +457,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "附近的 %@ 请求配对。"
+          }
+        }
+      }
+    },
+    "%@ of %@ MB": {
+      "comment": "设置更新区：下载进度，插值为已下载和总大小（MB）",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ of %2$@ MB"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ / %2$@ MB"
           }
         }
       }
@@ -396,6 +524,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@ 倍"
+          }
+        }
+      }
+    },
+    "%@ was installed successfully.": {
+      "comment": "设置更新区：更新装好后新版 Sill 显示的绿色提示，插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 已成功安装。"
           }
         }
       }
@@ -456,6 +595,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "%1$@、%2$@"
+          }
+        }
+      }
+    },
+    "%@, %@ and %lld more": {
+      "comment": "设置更新区：三台及以上设备的名称列表，插值为前两台设备名和其余台数",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@, %2$@ and %3$lld more"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@、%2$@ 以及另外 %3$lld 台设备"
           }
         }
       }
@@ -527,6 +683,87 @@
                 "stringUnit": {
                   "state": "translated",
                   "value": "%g 秒"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld hours after it first finds it": {
+      "comment": "设置更新区：等待时间短语，插值为小时数（两小时及以上）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次发现它的 %lld 小时后"
+          }
+        }
+      }
+    },
+    "%lld minutes": {
+      "comment": "设置更新区：以分钟计的时长（复数变体）；插值为分钟数",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minute"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minutes"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld 分钟"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "%lld minutes after it first finds it": {
+      "comment": "设置更新区：等待时间短语（复数变体），插值为分钟数；接在“……自动安装”之后",
+      "localizations": {
+        "en": {
+          "variations": {
+            "plural": {
+              "one": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minute after it first finds it"
+                }
+              },
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "%lld minutes after it first finds it"
+                }
+              }
+            }
+          }
+        },
+        "zh-Hans": {
+          "variations": {
+            "plural": {
+              "other": {
+                "stringUnit": {
+                  "state": "translated",
+                  "value": "首次发现它的 %lld 分钟后"
                 }
               }
             }
@@ -679,6 +916,17 @@
         }
       }
     },
+    "A nightly build installs only when you click Update Now.": {
+      "comment": "设置更新区脚注：每夜构建版只能点“立即更新”安装",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每夜构建版只有在你点按“立即更新”时才会安装。"
+          }
+        }
+      }
+    },
     "A paired device can see and control this Mac on your network, nearby, and from afar while Remote Access is on. If one is lost, remove it here.": {
       "comment": "设备面板页脚中配对权限的说明",
       "localizations": {
@@ -696,6 +944,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "已配对设备可查看和控制这台 Mac。"
+          }
+        }
+      }
+    },
+    "A stop signed with Sill’s update key names Sill %@, so Sill won’t install it.": {
+      "comment": "设置更新区：开发者用更新密钥签名的停用通知停掉了该版本；插值为版本号",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "有一份用 Sill 的更新密钥签名的停用通知点名了 Sill %@，所以 Sill 不会安装它。"
           }
         }
       }
@@ -964,6 +1223,50 @@
         }
       }
     },
+    "An update of Sill didn’t finish: the new version didn’t start the first time, and Sill’s watcher couldn’t leave a whole copy of Sill in its place. If this copy misbehaves, download Sill again from getsill.app.": {
+      "comment": "设置更新区：更新没有完成，新版没能启动，守护进程也没能留下完整的 Sill",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 的更新没有完成：新版本第一次没能启动，Sill 的守护程序也没能在原处留下一份完整的 Sill。如果这份 Sill 运行不正常，请从 getsill.app 重新下载。"
+          }
+        }
+      }
+    },
+    "Another copy of Sill is running. Quit it first, then update.": {
+      "comment": "设置更新区：还有另一个 Sill 副本在运行",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一份 Sill 正在运行。请先退出它，再更新。"
+          }
+        }
+      }
+    },
+    "Another user is on this Mac’s screen. Devices see this account, and can’t click or type in it.": {
+      "comment": "状态卡副标题，另一位用户正在使用屏幕时设备只能查看本账户",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一位用户正在使用这台 Mac 的屏幕。设备看到的是此账户，且无法在其中点按或输入。"
+          }
+        }
+      }
+    },
+    "Another user is on this Mac’s screen. You’re seeing your account’s own desktop and windows, not the screen. Taps, keys and opening apps wait until your account is back on it.": {
+      "comment": "设置面板与应用抽屉里的说明：另一位用户在使用 Mac 屏幕时的只读视图",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一位用户正在使用这台 Mac 的屏幕。你看到的是你账户自己的桌面和窗口，不是屏幕上的画面。轻点、按键和打开应用要等你的账户回到屏幕上。"
+          }
+        }
+      }
+    },
     "Another user started controlling this Mac.": {
       "comment": "用户切换覆盖层标题",
       "localizations": {
@@ -1055,6 +1358,112 @@
         }
       }
     },
+    "Automatically update Sill": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "自动更新 Sill"
+          }
+        }
+      }
+    },
+    "Automatically update Sill installs releases only.": {
+      "comment": "设置更新区：自动更新只安装正式版",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“自动更新 Sill”只安装正式版。"
+          }
+        }
+      }
+    },
+    "Automatically update Sill installs releases only: it installs Sill %@ by itself %@ or later, once no device has been connected for %@.": {
+      "comment": "设置更新区：自动更新只装正式版，并将在某时刻或之后自动安装；插值为版本号、时刻短语和时长",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Automatically update Sill installs releases only: it installs Sill %1$@ by itself %2$@ or later, once no device has been connected for %3$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“自动更新 Sill”只安装正式版：它会在%2$@或之后自行安装 Sill %1$@，前提是已有 %3$@ 没有设备连接。"
+          }
+        }
+      }
+    },
+    "Automatically update Sill installs releases only: it installs Sill %@ by itself %@, once no device has been connected for %@.": {
+      "comment": "设置更新区：自动更新只装正式版，并将在等待一段时间后自动安装；插值为版本号、等待时间短语和时长",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Automatically update Sill installs releases only: it installs Sill %1$@ by itself %2$@, once no device has been connected for %3$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“自动更新 Sill”只安装正式版：它会在%2$@自行安装 Sill %1$@，前提是已有 %3$@ 没有设备连接。"
+          }
+        }
+      }
+    },
+    "Automatically update Sill installs releases only: it installs Sill %@ by itself, once no device has been connected for %@.": {
+      "comment": "设置更新区：自动更新只装正式版，并将在无设备连接一段时间后自动安装；插值为版本号和时长",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Automatically update Sill installs releases only: it installs Sill %1$@ by itself, once no device has been connected for %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“自动更新 Sill”只安装正式版：它会自行安装 Sill %1$@，前提是已有 %2$@ 没有设备连接。"
+          }
+        }
+      }
+    },
+    "Automatically update Sill is on: Sill downloads a new release %@, then installs it and restarts once no device has been connected for %@; it never disconnects anyone.": {
+      "comment": "设置更新区脚注：开启自动更新（含每夜构建版时）的行为；第一个插值为等待时间短语，第二个为时长",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Automatically update Sill is on: Sill downloads a new release %1$@, then installs it and restarts once no device has been connected for %2$@; it never disconnects anyone."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“自动更新 Sill”已开启：Sill 会在%1$@下载新的正式版，然后在已有 %2$@ 没有设备连接后安装并重启；它绝不会断开任何人的连接。"
+          }
+        }
+      }
+    },
+    "Automatically update Sill is on: Sill downloads a new version %@, then installs it and restarts once no device has been connected for %@; it never disconnects anyone.": {
+      "comment": "设置更新区脚注：开启自动更新的行为；第一个插值为等待时间短语，第二个为时长",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Automatically update Sill is on: Sill downloads a new version %1$@, then installs it and restarts once no device has been connected for %2$@; it never disconnects anyone."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“自动更新 Sill”已开启：Sill 会在%1$@下载新版本，然后在已有 %2$@ 没有设备连接后安装并重启；它绝不会断开任何人的连接。"
+          }
+        }
+      }
+    },
     "Available": {
       "comment": "虚拟显示设置中的可用状态",
       "localizations": {
@@ -1073,6 +1482,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "选择窗口时可用。"
+          }
+        }
+      }
+    },
+    "Available once your account is back on this Mac’s screen.": {
+      "comment": "文字大小控件的 VoiceOver 提示：只读视图期间不可用",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "等你的账户回到这台 Mac 的屏幕上后可用。"
           }
         }
       }
@@ -1127,6 +1547,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "均衡"
+          }
+        }
+      }
+    },
+    "Before it installs a new version, Sill checks it two ways: it must carry Apple’s signature and notarization for Sill’s developer, and a release must be signed with Sill’s own update key; a nightly build is signed by GitHub, which builds it.": {
+      "comment": "设置更新区脚注：安装前的两项检查（含每夜构建版）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 在安装新版本前会做两项检查：它必须带有 Apple 为 Sill 开发者签发的签名和公证，并且正式版必须用 Sill 自己的更新密钥签名；每夜构建版则由构建它的 GitHub 签名。"
+          }
+        }
+      }
+    },
+    "Before it installs a new version, Sill checks it two ways: it must carry Apple’s signature and notarization for Sill’s developer, and the release must be signed with Sill’s own update key.": {
+      "comment": "设置更新区脚注：安装前的两项检查",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 在安装新版本前会做两项检查：它必须带有 Apple 为 Sill 开发者签发的签名和公证，并且正式版必须用 Sill 自己的更新密钥签名。"
           }
         }
       }
@@ -1263,6 +1705,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "自动检查更新"
+          }
+        }
+      }
+    },
+    "Checking": {
+      "comment": "状态菜单副标题：正在检查",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在检查"
+          }
+        }
+      }
+    },
+    "Checking %@ with GitHub again…": {
+      "comment": "设置更新区：安装前再向 GitHub 确认一次；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在向 GitHub 再次确认 %@…"
+          }
+        }
+      }
+    },
+    "Checking %@…": {
+      "comment": "设置更新区：正在检查下载的更新；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在检查 %@…"
           }
         }
       }
@@ -1528,6 +2003,459 @@
         }
       }
     },
+    "Couldn’t update: Apple hasn’t notarized the downloaded app. %@": {
+      "comment": "设置更新区：下载的应用未经 Apple 公证；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：Apple 尚未公证下载的应用。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: GitHub answered with an error (HTTP %@). %@": {
+      "comment": "设置更新区：GitHub 返回错误；插值为 HTTP 状态码和“当前版本保持不变”一句",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Couldn’t update: GitHub answered with an error (HTTP %1$@). %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：GitHub 返回了错误（HTTP %1$@）。%2$@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: GitHub sent the download somewhere Sill doesn’t download from. %@": {
+      "comment": "设置更新区：GitHub 把下载指向了 Sill 不会下载的地址；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：GitHub 把下载指向了 Sill 不会下载的地方。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: GitHub’s answer wasn’t a nightly Sill can install. %@": {
+      "comment": "设置更新区：GitHub 的回复不是 Sill 能安装的每夜构建版；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：GitHub 的回复不是 Sill 能安装的每夜构建版。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: GitHub’s answer wasn’t a release Sill can install. %@": {
+      "comment": "设置更新区：GitHub 的回复不是 Sill 能安装的正式版；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：GitHub 的回复不是 Sill 能安装的正式版。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: Sill couldn’t write the update. %@": {
+      "comment": "设置更新区：Sill 无法写入更新；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：Sill 无法写入更新内容。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: macOS didn’t let Sill replace itself. %@": {
+      "comment": "设置更新区：macOS 不允许 Sill 替换自身；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：macOS 不允许 Sill 替换自身。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the app changed while Sill was installing it. %@": {
+      "comment": "设置更新区：安装过程中应用被改动；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：Sill 安装期间应用发生了变化。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the download didn’t match the release. %@": {
+      "comment": "设置更新区：下载内容与正式版不符；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的内容与正式版不符。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the download isn’t a Sill app. %@": {
+      "comment": "设置更新区：下载的内容不是 Sill 应用；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的内容不是 Sill 应用。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the download isn’t an archive Sill can install. %@": {
+      "comment": "设置更新区：下载的不是 Sill 能安装的压缩包；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的不是 Sill 能安装的压缩包。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the download stopped. %@": {
+      "comment": "设置更新区：下载中断；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载中断了。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app is version %@, not newer than this one. %@": {
+      "comment": "设置更新区：下载的应用并不比当前版本新；插值为下载版本号和“当前版本保持不变”一句",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Couldn’t update: the downloaded app is version %1$@, not newer than this one. %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用是 %1$@ 版，并不比当前版本新。%2$@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app isn’t Sill. %@": {
+      "comment": "设置更新区：下载的应用不是 Sill；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用不是 Sill。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app isn’t built as Sill’s releases are. %@": {
+      "comment": "设置更新区：下载的应用构建方式与 Sill 正式版不同；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用的构建方式与 Sill 的正式版不同。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app isn’t signed with the Developer ID of Sill’s developer. %@": {
+      "comment": "设置更新区：下载的应用不是用 Sill 开发者的 Developer ID 签名的；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用不是用 Sill 开发者的 Developer ID 签名的。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app isn’t the one signed with Sill’s nightly key. %@": {
+      "comment": "设置更新区：下载的应用不是用每夜密钥签名的那个；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用不是用 Sill 的每夜密钥签名的那一份。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app isn’t the one signed with Sill’s update key. %@": {
+      "comment": "设置更新区：下载的应用不是用 Sill 更新密钥签名的那个；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用不是用 Sill 的更新密钥签名的那一份。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app wouldn’t keep Sill’s paired devices. %@": {
+      "comment": "设置更新区：下载的应用无法保留已配对设备；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用无法保留 Sill 的已配对设备。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app wouldn’t keep Sill’s permissions. %@": {
+      "comment": "设置更新区：下载的应用无法沿用 Sill 现有的系统权限；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用无法沿用 Sill 现有的权限。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app’s code signature isn’t valid. %@": {
+      "comment": "设置更新区：下载的应用代码签名无效；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用的代码签名无效。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the downloaded app’s information isn’t Sill’s. %@": {
+      "comment": "设置更新区：下载的应用的信息与 Sill 不符；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：下载的应用的信息与 Sill 的不符。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the new version doesn’t run on this Mac. %@": {
+      "comment": "设置更新区：新版本不能在这台 Mac 上运行；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：新版本无法在这台 Mac 上运行。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the new version needs macOS %@ or later. %@": {
+      "comment": "设置更新区：新版本需要更新的 macOS；插值为最低 macOS 版本和“当前版本保持不变”一句",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Couldn’t update: the new version needs macOS %1$@ or later. %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：新版本需要 macOS %1$@ 或更高版本。%2$@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the nightly is signed with a nightly key this Sill doesn’t know. %@": {
+      "comment": "设置更新区：每夜构建版用了此 Sill 不认识的每夜密钥签名；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这个每夜构建版是用这份 Sill 不认识的每夜密钥签名的。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the nightly isn’t newer than this Sill. %@": {
+      "comment": "设置更新区：每夜构建版并不比当前版本新；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这个每夜构建版并不比当前的 Sill 新。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the nightly on GitHub isn’t the one signed with Sill’s nightly key. %@": {
+      "comment": "设置更新区：GitHub 上的每夜构建版不是用每夜密钥签名的那个；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：GitHub 上的每夜构建版不是用 Sill 的每夜密钥签名的那一份。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the nightly’s signature with Sill’s nightly key can’t be read. %@": {
+      "comment": "设置更新区：每夜构建版的每夜密钥签名无法读取；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这个每夜构建版用 Sill 的每夜密钥所做的签名无法读取。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the nightly’s signature with Sill’s nightly key isn’t valid. %@": {
+      "comment": "设置更新区：每夜构建版的每夜密钥签名无效；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这个每夜构建版用 Sill 的每夜密钥所做的签名无效。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the release carries a stop that isn’t signed with Sill’s update key. %@": {
+      "comment": "设置更新区：正式版带有一个未用更新密钥签名的停用通知；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这个正式版带有一份未用 Sill 的更新密钥签名的停用通知。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the release is signed with an update key this Sill doesn’t know. %@": {
+      "comment": "设置更新区：正式版用了此 Sill 不认识的更新密钥签名；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这个正式版是用这份 Sill 不认识的更新密钥签名的。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the release isn’t newer than this Sill. %@": {
+      "comment": "设置更新区：正式版并不比当前版本新；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这个正式版并不比当前的 Sill 新。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the release on GitHub isn’t the one signed with Sill’s update key. %@": {
+      "comment": "设置更新区：GitHub 上的正式版不是用更新密钥签名的那个；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：GitHub 上的正式版不是用 Sill 的更新密钥签名的那一份。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the release’s signature with Sill’s update key can’t be read. %@": {
+      "comment": "设置更新区：正式版的更新密钥签名无法读取；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这个正式版用 Sill 的更新密钥所做的签名无法读取。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: the release’s signature with Sill’s update key isn’t valid. %@": {
+      "comment": "设置更新区：正式版的更新密钥签名无效；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这个正式版用 Sill 的更新密钥所做的签名无效。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: there isn’t enough free space (about %lld MB are needed). %@": {
+      "comment": "设置更新区：可用空间不足；插值为所需 MB 数和“当前版本保持不变”一句",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Couldn’t update: there isn’t enough free space (about %1$lld MB are needed). %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：可用空间不足（大约需要 %1$lld MB）。%2$@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: this Mac couldn’t reach GitHub. %@": {
+      "comment": "设置更新区：这台 Mac 连不上 GitHub；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这台 Mac 连不上 GitHub。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: this Sill has no usable nightly key. %@": {
+      "comment": "设置更新区：此 Sill 没有可用的每夜密钥；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这份 Sill 没有可用的每夜密钥。%@"
+          }
+        }
+      }
+    },
+    "Couldn’t update: this Sill has no usable update key. %@": {
+      "comment": "设置更新区：此 Sill 没有可用的更新密钥；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法更新：这份 Sill 没有可用的更新密钥。%@"
+          }
+        }
+      }
+    },
     "Custom — %@ Mbps": {
       "comment": "Mac 自定义画质菜单标题，插值为码率\n自定义画质选项标题，插值为每秒兆比特数",
       "localizations": {
@@ -1546,6 +2474,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "剪切"
+          }
+        }
+      }
+    },
+    "Desktop": {
+      "comment": "串流工具栏：按钮名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "桌面"
+          }
+        }
+      }
+    },
+    "Desktop %lld": {
+      "comment": "串流工具栏：桌面按钮名称，Mac 有多台显示器时带上当前显示器的序号",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "桌面 %lld"
           }
         }
       }
@@ -1691,12 +2641,79 @@
         }
       }
     },
+    "Display %lld of %lld": {
+      "comment": "桌面按钮的 VoiceOver 值：第几台显示器、共几台",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Display %1$lld of %2$lld"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %1$lld 台显示器，共 %2$lld 台"
+          }
+        }
+      }
+    },
+    "Display %lld of %lld, %@": {
+      "comment": "桌面按钮的 VoiceOver 值：第几台显示器、共几台、显示器名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Display %1$lld of %2$lld, %3$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "第 %1$lld 台显示器，共 %2$lld 台，%3$@"
+          }
+        }
+      }
+    },
     "Done": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "完成"
+          }
+        }
+      }
+    },
+    "Downloading": {
+      "comment": "状态菜单副标题：正在下载",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在下载"
+          }
+        }
+      }
+    },
+    "Downloading %@…": {
+      "comment": "设置更新区：正在下载更新；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在下载 %@…"
+          }
+        }
+      }
+    },
+    "Downloading, %lld%%": {
+      "comment": "状态菜单副标题：正在下载，插值为百分比数字",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在下载，%lld%%"
           }
         }
       }
@@ -1822,6 +2839,17 @@
         }
       }
     },
+    "For a Mac you reach only through Sill. While another user, or the login window, is on this Mac’s screen, devices see this account’s own desktop and windows instead of nothing: not what the screen shows, and nothing they tap or type reaches this account until it’s back on the screen.": {
+      "comment": "设备面板：“另一位用户在使用屏幕时显示此账户”的说明",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "适用于只能通过 Sill 访问的 Mac。当另一位用户或登录窗口正占用这台 Mac 的屏幕时，设备看到的是此账户自己的桌面和窗口，而不是一片空白：这并不是屏幕上显示的画面，而且在此账户回到屏幕上之前，设备上的任何轻点或输入都不会作用于此账户。"
+          }
+        }
+      }
+    },
     "Forward TCP port %@ on your router to this Mac (%@), and reserve that address for this Mac in the router’s settings.": {
       "localizations": {
         "en": {
@@ -1866,6 +2894,72 @@
           "stringUnit": {
             "state": "translated",
             "value": "通用"
+          }
+        }
+      }
+    },
+    "Getting %@ from GitHub…": {
+      "comment": "设置更新区：正在从 GitHub 获取更新；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在从 GitHub 获取 %@…"
+          }
+        }
+      }
+    },
+    "GitHub sees this Mac’s IP address and which version of Sill it has; nothing else is sent.": {
+      "comment": "设置更新区脚注：GitHub 能看到的信息",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 能看到这台 Mac 的 IP 地址和它所用的 Sill 版本，除此之外不会发送任何信息。"
+          }
+        }
+      }
+    },
+    "GitHub’s answer doesn’t say when the release was published": {
+      "comment": "设置更新区：自动更新不安装的原因，GitHub 没说明发布时间（接在“Sill 没有自动安装……：”之后）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 的回复没有说明这个正式版的发布时间"
+          }
+        }
+      }
+    },
+    "GitHub’s answer doesn’t say which release it is": {
+      "comment": "设置更新区：自动更新不安装的原因，GitHub 没说明是哪个发布（接在“Sill 没有自动安装……：”之后）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 的回复没有说明这是哪一个正式版"
+          }
+        }
+      }
+    },
+    "GitHub’s latest release is no longer Sill %@. Check again.": {
+      "comment": "设置更新区：GitHub 上最新的正式版已不是所提供的那个；插值为版本号",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 上最新的正式版已不再是 Sill %@。请再检查一次。"
+          }
+        }
+      }
+    },
+    "GitHub’s newest nightly is no longer %@. Check again.": {
+      "comment": "设置更新区：GitHub 上最新的每夜构建版已不是所提供的那个；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "GitHub 上最新的每夜构建版已不再是 %@。请再检查一次。"
           }
         }
       }
@@ -1939,6 +3033,72 @@
           "stringUnit": {
             "state": "translated",
             "value": "在 iPhone 或 iPad 上打开 Sill，轻点这台 Mac；外出时则轻点“添加 Mac…”，然后将设备对准此配对码。"
+          }
+        }
+      }
+    },
+    "Install Now": {
+      "comment": "设置更新区按钮：立即安装",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即安装"
+          }
+        }
+      }
+    },
+    "Install and Disconnect": {
+      "comment": "设置更新区按钮：安装并断开设备",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安装并断开连接"
+          }
+        }
+      }
+    },
+    "Installing": {
+      "comment": "状态菜单副标题：正在安装",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在安装"
+          }
+        }
+      }
+    },
+    "Installing %@…": {
+      "comment": "设置更新区：正在安装更新；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在安装 %@…"
+          }
+        }
+      }
+    },
+    "Installing it restarts Sill and disconnects %@.": {
+      "comment": "设置更新区：安装会重启 Sill 并断开设备；插值为设备名称列表",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "安装会重启 Sill，并断开 %@ 的连接。"
+          }
+        }
+      }
+    },
+    "Installs by itself while no device is connected": {
+      "comment": "状态菜单副标题：没有设备连接时自动安装",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有设备连接时会自动安装"
           }
         }
       }
@@ -2222,6 +3382,17 @@
         }
       }
     },
+    "Nightly builds are built and signed by GitHub from Sill’s newest code; nobody looks at them first. They are less tested than releases and may break. Sill tells you when one is out, and Update Now installs it; a nightly never installs by itself, even with Automatically update Sill on. Turning this off doesn’t go back to the last release: Sill keeps the nightly you have until a release that is at least as new.": {
+      "comment": "设置更新区：“使用每夜构建版”开启时的说明（信任、风险和只能点“立即更新”安装）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每夜构建版由 GitHub 根据 Sill 最新的代码构建并签名，事先没有人审看。它们的测试不如正式版充分，可能会出问题。每夜构建版发布时 Sill 会告诉你，并由“立即更新”来安装；即使开启了“自动更新 Sill”，每夜构建版也不会自行安装。关闭此项并不会退回上一个正式版：在出现至少同样新的正式版之前，Sill 会保留你现有的每夜构建版。"
+          }
+        }
+      }
+    },
     "No VPN is running on this Mac. Install one such as Tailscale on this Mac and on your iPhone or iPad, or allow connections from the internet below.": {
       "localizations": {
         "zh-Hans": {
@@ -2315,6 +3486,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "尚未检查。"
+          }
+        }
+      }
+    },
+    "Not enough free space on %@: about %lld MB are needed.": {
+      "comment": "设置更新区：磁盘空间不足，插值为磁盘名称和所需 MB 数",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Not enough free space on %1$@: about %2$lld MB are needed."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ 上的可用空间不足：大约需要 %2$lld MB。"
           }
         }
       }
@@ -2506,6 +3694,17 @@
         }
       }
     },
+    "Once a day, Sill asks GitHub whether a newer version is out.": {
+      "comment": "设置更新区脚注：每天一次向 GitHub 询问新版本",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 每天会向 GitHub 询问一次是否有新版本。"
+          }
+        }
+      }
+    },
     "Once a day, Sill asks GitHub whether a newer version is out. GitHub sees this Mac’s IP address and which version of Sill it has; nothing else is sent. Sill never downloads or installs anything by itself: a new version opens its page on GitHub, where you download it.": {
       "comment": "设置更新检查：自动检查的隐私与下载方式说明",
       "localizations": {
@@ -2513,6 +3712,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sill 每天会向 GitHub 查询一次是否有新版本。GitHub 会看到这台 Mac 的 IP 地址和 Sill 版本，除此之外不会发送任何信息。Sill 不会自行下载或安装任何内容：发现新版本时会打开其 GitHub 页面，由你下载。"
+          }
+        }
+      }
+    },
+    "Once a day, and with nightly builds on each time Sill opens, Sill asks GitHub whether a newer version is out.": {
+      "comment": "设置更新区脚注：每天一次（开启每夜构建版时每次打开也会）向 GitHub 询问新版本",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 每天会向 GitHub 询问一次是否有新版本；开启每夜构建版后，每次打开 Sill 时也会询问。"
           }
         }
       }
@@ -3273,6 +4483,28 @@
         }
       }
     },
+    "Restarting": {
+      "comment": "状态菜单副标题：正在重启",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在重启"
+          }
+        }
+      }
+    },
+    "Restarting Sill…": {
+      "comment": "设置更新区：正在重启 Sill",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在重启 Sill…"
+          }
+        }
+      }
+    },
     "Retina": {
       "comment": "状态菜单分辨率选项",
       "localizations": {
@@ -3547,12 +4779,55 @@
         }
       }
     },
+    "Show the full Mac desktop": {
+      "comment": "串流工具栏：显示桌面的无障碍标签",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示完整的 Mac 桌面"
+          }
+        }
+      }
+    },
     "Show the pairing window to screen sharing": {
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "允许屏幕共享显示配对窗口"
+          }
+        }
+      }
+    },
+    "Show this account while another user is on the screen": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一位用户在使用屏幕时显示此账户"
+          }
+        }
+      }
+    },
+    "Shows the Mac’s desktop.": {
+      "comment": "桌面按钮的 VoiceOver 提示：轻点显示 Mac 的桌面",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示 Mac 的桌面。"
+          }
+        }
+      }
+    },
+    "Shows the next display.": {
+      "comment": "桌面按钮的 VoiceOver 提示：桌面正在串流，轻点切到下一台显示器",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "显示下一台显示器。"
           }
         }
       }
@@ -3596,6 +4871,40 @@
         }
       }
     },
+    "Sill %@ didn’t start the first time, and the copy it replaced failed its last check, so Sill %@ stayed. If it misbehaves, download Sill again from getsill.app.": {
+      "comment": "设置更新区：新版没能启动，旧副本又没通过最后检查，所以保留了当前版本；插值为当前版本号（两处）",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill %1$@ didn’t start the first time, and the copy it replaced failed its last check, so Sill %2$@ stayed. If it misbehaves, download Sill again from getsill.app."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill %1$@ 第一次没能启动，被它替换的旧副本又没能通过最后一次检查，所以保留了 Sill %2$@。如果运行不正常，请从 getsill.app 重新下载 Sill。"
+          }
+        }
+      }
+    },
+    "Sill %@ didn’t start, so %@ is back.": {
+      "comment": "设置更新区：新版本没能启动，已退回旧版；插值为新版本号和旧版名称",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill %1$@ didn’t start, so %2$@ is back."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill %1$@ 没能启动，所以已退回 %2$@。"
+          }
+        }
+      }
+    },
     "Sill %@ is available.": {
       "comment": "设置更新检查结果：插值为可用版本号\n设置更新检查：插值为可用版本号",
       "localizations": {
@@ -3603,6 +4912,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sill %@ 已可用。"
+          }
+        }
+      }
+    },
+    "Sill %@ isn’t signed with Sill’s update key yet, so it can’t be installed from here. Try again later, or open its release page.": {
+      "comment": "设置更新区：正式版尚未用更新密钥签名；插值为版本号",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill %@ 尚未用 Sill 的更新密钥签名，所以无法从这里安装。请稍后再试，或打开它的发布页面。"
           }
         }
       }
@@ -3651,6 +4971,78 @@
         }
       }
     },
+    "Sill at %@ changed since it started. Quit Sill and open it again.": {
+      "comment": "设置更新区：Sill 自启动后文件已变化，插值为路径",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "位于 %@ 的 Sill 在启动后发生了变化。请退出 Sill 并重新打开。"
+          }
+        }
+      }
+    },
+    "Sill belongs to another account on this Mac (%@). Update it from that account.": {
+      "comment": "设置更新区：Sill 属于这台 Mac 上的另一个账户，插值为账户名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 属于这台 Mac 上的另一个账户（%@）。请在那个账户中更新。"
+          }
+        }
+      }
+    },
+    "Sill changed on disk since it started. Quit Sill and open it again, then update.": {
+      "comment": "设置更新区：Sill 自启动后磁盘上的文件已变化",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 在启动后磁盘上的文件发生了变化。请退出 Sill 并重新打开，然后再更新。"
+          }
+        }
+      }
+    },
+    "Sill couldn’t put %@ back in place. Download Sill again from getsill.app and put it in your Applications folder.": {
+      "comment": "设置更新区：Sill 没能把旧版放回原处，也没有完整的旧副本；插值为旧版本号",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 没能把 %@ 放回原处。请从 getsill.app 重新下载 Sill，并放进“应用程序”文件夹。"
+          }
+        }
+      }
+    },
+    "Sill couldn’t put %@ back in place. It is at %@: quit Sill and move it to your Applications folder soon, as macOS empties that folder after a few days.": {
+      "comment": "设置更新区：Sill 没能把旧版放回原处，旧副本在临时位置；插值为旧版本号和旧副本所在路径",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill couldn’t put %1$@ back in place. It is at %2$@: quit Sill and move it to your Applications folder soon, as macOS empties that folder after a few days."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 没能把 %1$@ 放回原处。它在 %2$@：请尽快退出 Sill 并把它移到“应用程序”文件夹，因为 macOS 会在几天后清空那个文件夹。"
+          }
+        }
+      }
+    },
+    "Sill couldn’t read what it keeps for this setting, so it is off. Turning it on starts it afresh.": {
+      "comment": "设置更新区：读不出这项设置保存的内容，所以保持关闭，重新打开会从头开始",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 读不出为此设置保存的内容，所以它处于关闭状态。重新开启会从头开始。"
+          }
+        }
+      }
+    },
     "Sill couldn’t use its key in your keychain.": {
       "comment": "状态菜单钥匙串异常说明",
       "localizations": {
@@ -3673,6 +5065,23 @@
         }
       }
     },
+    "Sill didn’t install %@ by itself: %@. Update Now still can.": {
+      "comment": "设置更新区：Sill 没有自动安装该版本；插值为版本号和原因（一个短语）",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill didn’t install %1$@ by itself: %2$@. Update Now still can."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 没有自动安装 %1$@：%2$@。仍可点按“立即更新”。"
+          }
+        }
+      }
+    },
     "Sill doesn’t check for updates in test pattern mode.": {
       "comment": "设置更新检查：测试图案模式说明",
       "localizations": {
@@ -3680,6 +5089,128 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sill 在测试图案模式下不检查更新。"
+          }
+        }
+      }
+    },
+    "Sill downloads and installs nothing by itself. Update Now downloads the new version from GitHub, puts it in place of this copy and restarts Sill; Open Release Page… shows it on GitHub instead.": {
+      "comment": "设置更新区脚注：未开启自动更新时的行为",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 不会自行下载或安装任何内容。“立即更新”会从 GitHub 下载新版本，替换这份 Sill 并重启；“打开发布页面…”则会在 GitHub 上显示它。"
+          }
+        }
+      }
+    },
+    "Sill installs it by itself %@ or later, once no device has been connected for %@.": {
+      "comment": "设置更新区：将在某时刻或之后自动安装；插值为时刻短语和时长",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill installs it by itself %1$@ or later, once no device has been connected for %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 会在%1$@或之后自行安装它，前提是已有 %2$@ 没有设备连接。"
+          }
+        }
+      }
+    },
+    "Sill installs it by itself %@, once no device has been connected for %@.": {
+      "comment": "设置更新区：将在等待一段时间后自动安装；插值为等待时间短语和时长",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill installs it by itself %1$@, once no device has been connected for %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 会在%1$@自行安装它，前提是已有 %2$@ 没有设备连接。"
+          }
+        }
+      }
+    },
+    "Sill installs it by itself once no device has been connected for %@, then restarts.": {
+      "comment": "设置更新区：无设备连接一段时间后自动安装并重启；插值为时长（如“5 分钟”）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一旦已有 %@ 没有设备连接，Sill 就会自行安装它，然后重启。"
+          }
+        }
+      }
+    },
+    "Sill installs it by itself once no device has been connected for %@.": {
+      "comment": "设置更新区：无设备连接一段时间后自动安装；插值为时长",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "一旦已有 %@ 没有设备连接，Sill 就会自行安装它。"
+          }
+        }
+      }
+    },
+    "Sill is in a folder this account can’t change (%@).": {
+      "comment": "设置更新区：当前账户无权修改 Sill 所在文件夹，插值为文件夹路径",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 所在的文件夹（%@）当前账户无法修改。"
+          }
+        }
+      }
+    },
+    "Sill is on a disk this Mac can’t change (%@).": {
+      "comment": "设置更新区：Sill 所在磁盘只读，插值为磁盘名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 所在的磁盘无法被这台 Mac 修改（%@）。"
+          }
+        }
+      }
+    },
+    "Sill is on a network disk (%@), so it doesn’t update itself there.": {
+      "comment": "设置更新区：Sill 在网络磁盘上，插值为磁盘名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 位于网络磁盘（%@）上，所以不会在那里自行更新。"
+          }
+        }
+      }
+    },
+    "Sill is open in another account on this Mac (%@). Quit it there first, then update.": {
+      "comment": "设置更新区：另一个账户也在运行 Sill，插值为账户名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这台 Mac 上的另一个账户（%@）正在运行 Sill。请先在那里退出，再更新。"
+          }
+        }
+      }
+    },
+    "Sill is running from a disk image. Copy it to your Applications folder, open it from there, then update.": {
+      "comment": "设置更新区：Sill 正从磁盘映像运行，需先拷到应用程序文件夹",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 正从磁盘映像运行。请先把它拷到“应用程序”文件夹，再从那里打开，然后更新。"
           }
         }
       }
@@ -3706,6 +5237,34 @@
         }
       }
     },
+    "Sill nightly %@ (%@)": {
+      "comment": "每夜构建版的名称，插值为版本号和构建号",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill nightly %1$@ (%2$@)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 每夜构建版 %1$@（%2$@）"
+          }
+        }
+      }
+    },
+    "Sill runs through a link (%@), so it can’t replace itself there.": {
+      "comment": "设置更新区：Sill 通过链接运行，插值为路径",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 是通过链接运行的（%@），所以无法在那里替换自身。"
+          }
+        }
+      }
+    },
     "Sill streams at these while every connected device is away from home, through a VPN or over the internet, so a slow connection never starts at your home quality. A device away from home changes these, and never your Quality and Resolution above.": {
       "comment": "异地串流质量说明；当前未使用此质量",
       "localizations": {
@@ -3728,6 +5287,73 @@
         }
       }
     },
+    "Sill tries again after its next daily check.": {
+      "comment": "设置更新区：自动更新失败后，下次每日检查时会再试",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 会在下一次每日检查后再试一次。"
+          }
+        }
+      }
+    },
+    "Sill updated itself to %@ %@.": {
+      "comment": "设置更新区：Sill 已自动更新到某版本；插值为版本号和时刻短语（如“今天 03:12”）",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill updated itself to %1$@ %2$@."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 已于 %2$@ 自动更新到 %1$@。"
+          }
+        }
+      }
+    },
+    "Sill was just updated. Update Now is ready again in half a minute.": {
+      "comment": "设置更新区：刚更新完，半分钟后才可再次立即更新",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 刚刚更新过。半分钟后即可再次立即更新。"
+          }
+        }
+      }
+    },
+    "Sill won’t install %@ by itself again; Update Now still can.": {
+      "comment": "设置更新区：自动更新已试过多次，不再自动安装该版本；插值为版本号",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 不会再自动安装 %@；仍可点按“立即更新”。"
+          }
+        }
+      }
+    },
+    "Sill won’t install %@ by itself: Sill %@ was out before it. Update Now still can.": {
+      "comment": "设置更新区：自动更新不装旧版本，因为更高的版本早已发布；插值为所提供的版本号和更高的版本号",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill won’t install %1$@ by itself: Sill %2$@ was out before it. Update Now still can."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 不会自动安装 %1$@：在它之前已有 Sill %2$@ 发布。仍可点按“立即更新”。"
+          }
+        }
+      }
+    },
     "Sill — %@": {
       "comment": "菜单栏工具提示，插值为当前状态",
       "localizations": {
@@ -3746,6 +5372,23 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sill，%@"
+          }
+        }
+      }
+    },
+    "Sill’s developer stopped Sill %@ with a stop signed with Sill’s update key, so it isn’t installed. %@": {
+      "comment": "设置更新区：开发者用更新密钥签名的停用通知停掉了该版本；插值为版本号和“当前版本保持不变”一句",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "Sill’s developer stopped Sill %1$@ with a stop signed with Sill’s update key, so it isn’t installed. %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill 的开发者用 Sill 的更新密钥签名的停用通知停掉了 Sill %1$@，所以不会安装它。%2$@"
           }
         }
       }
@@ -4378,6 +6021,28 @@
         }
       }
     },
+    "This copy of Sill can’t keep this setting: only Sill’s releases from GitHub can.": {
+      "comment": "设置更新区：此副本无法保存这项设置，只有 GitHub 上的正式版才能",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这份 Sill 无法保存此设置：只有来自 GitHub 的 Sill 正式版才可以。"
+          }
+        }
+      }
+    },
+    "This copy of Sill isn’t a notarized release, so it can’t update itself.": {
+      "comment": "设置更新区：此副本不是经过公证的正式版，无法自行更新",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这份 Sill 不是经过公证的正式版，所以无法自行更新。"
+          }
+        }
+      }
+    },
     "This is the Mac’s name.": {
       "localizations": {
         "zh-Hans": {
@@ -4394,6 +6059,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "此网络。请通过 VPN 接入家中网络后使用，例如使用路由器上的 WireGuard。"
+          }
+        }
+      }
+    },
+    "This nightly installs only when you click Update Now.": {
+      "comment": "设置更新区：这个每夜构建版只能点“立即更新”安装",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这个每夜构建版只有在你点按“立即更新”时才会安装。"
+          }
+        }
+      }
+    },
+    "This run checks a test feed, so it doesn’t update itself.": {
+      "comment": "设置更新区：本次运行使用测试更新源，不会自行更新",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "本次运行使用的是测试更新源，所以不会自行更新。"
           }
         }
       }
@@ -4438,6 +6125,7 @@
       }
     },
     "Try Again": {
+      "comment": "设置更新区按钮：重试更新",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
@@ -4556,6 +6244,39 @@
         }
       }
     },
+    "Update": {
+      "comment": "设置更新区按钮：更新",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新"
+          }
+        }
+      }
+    },
+    "Update Now": {
+      "comment": "设置更新区按钮：立即更新",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "立即更新"
+          }
+        }
+      }
+    },
+    "Update Now checks it the same way, at once.": {
+      "comment": "设置更新区脚注：立即更新用同样的方式检查",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“立即更新”会用同样的方式立刻检查。"
+          }
+        }
+      }
+    },
     "Update Sill on your device to keep using %@. It needs version %@ or later.": {
       "comment": "设备连接页：设备需更新，插值为 Mac 名称和最低版本",
       "localizations": {
@@ -4603,6 +6324,60 @@
           "stringUnit": {
             "state": "translated",
             "value": "更新你 iPhone 上的 Sill，才能继续使用 %@。需要 %@ 或更高版本。"
+          }
+        }
+      }
+    },
+    "Update and Disconnect": {
+      "comment": "设置更新区按钮：更新并断开设备",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新并断开连接"
+          }
+        }
+      }
+    },
+    "Update cancelled. %@": {
+      "comment": "设置更新区：更新已取消；插值为“当前版本保持不变”一句",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新已取消。%@"
+          }
+        }
+      }
+    },
+    "Updating restarts Sill and disconnects %@.": {
+      "comment": "设置更新区：更新会重启 Sill 并断开设备；插值为设备名称列表",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新会重启 Sill，并断开 %@ 的连接。"
+          }
+        }
+      }
+    },
+    "Updating to %@…": {
+      "comment": "状态菜单：正在更新到某版本；插值为版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在更新到 %@…"
+          }
+        }
+      }
+    },
+    "Use nightly builds": {
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "使用每夜构建版"
           }
         }
       }
@@ -4797,13 +6572,63 @@
         }
       }
     },
+    "Works while Check for updates automatically is on.": {
+      "comment": "设置更新区：自动更新开关下的说明，需先开启“自动检查更新”",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“自动检查更新”开启时才有效。"
+          }
+        }
+      }
+    },
     "You have %@; opens its download page": {
-      "comment": "更新菜单副标题：插值为当前版本号",
+      "comment": "更新菜单副标题：插值为当前版本号\n状态菜单副标题：当前版本，点按打开下载页面；插值为当前版本名称",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "当前版本为 %@；打开下载页面"
+          }
+        }
+      }
+    },
+    "You have %@; update it in Settings": {
+      "comment": "状态菜单副标题：当前版本，可在设置中更新；插值为当前版本名称",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你当前使用的是 %@；可在设置中更新"
+          }
+        }
+      }
+    },
+    "You have a nightly build, %@ (%@). Sill updates to the next release that is at least as new.": {
+      "comment": "设置更新区：关闭每夜构建版后的说明（不会降级）；插值为当前每夜构建版的版本号和构建号",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "You have a nightly build, %1$@ (%2$@). Sill updates to the next release that is at least as new."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你当前使用的是每夜构建版 %1$@（%2$@）。Sill 会更新到下一个至少与它同样新的正式版。"
+          }
+        }
+      }
+    },
+    "Your account’s own desktop, not this Mac’s screen. Taps and keys reach it once your account is back on the screen.": {
+      "comment": "串流画面上的提示行：另一位用户在使用 Mac 屏幕时，设备看到的是本账户自己的桌面，只能看",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这是你账户自己的桌面，不是这台 Mac 屏幕上的画面。等你的账户回到屏幕上，轻点和按键才会生效。"
           }
         }
       }
@@ -4893,13 +6718,46 @@
         }
       }
     },
+    "a day after it first finds it": {
+      "comment": "设置更新区：等待时间短语，一天",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次发现它的一天后"
+          }
+        }
+      }
+    },
     "a device": {
-      "comment": "设备列表：没有名称的设备",
+      "comment": "设备列表：没有名称的设备\n设置更新区：设备没有名字时的称呼（用在“会断开……”之后）",
       "localizations": {
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
             "value": "一台设备"
+          }
+        }
+      }
+    },
+    "an hour after it first finds it": {
+      "comment": "设置更新区：等待时间短语，一小时",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次发现它的 1 小时后"
+          }
+        }
+      }
+    },
+    "another user is on the screen": {
+      "comment": "虚拟显示器设置：另一位用户占用屏幕时窗口原位串流的原因",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "另一位用户正在使用屏幕"
           }
         }
       }
@@ -5048,6 +6906,28 @@
         }
       }
     },
+    "five days after it first finds it": {
+      "comment": "设置更新区：等待时间短语，五天",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次发现它的五天后"
+          }
+        }
+      }
+    },
+    "four days after it first finds it": {
+      "comment": "设置更新区：等待时间短语，四天",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次发现它的四天后"
+          }
+        }
+      }
+    },
     "home.example.net": {
       "localizations": {
         "zh-Hans": {
@@ -5065,6 +6945,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "尺寸无效：%@"
+          }
+        }
+      }
+    },
+    "it was signed more than %lld days ago": {
+      "comment": "设置更新区：自动更新不安装的原因，签名时间过久，插值为天数（接在“Sill 没有自动安装……：”之后）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "它的签名已超过 %lld 天"
+          }
+        }
+      }
+    },
+    "its signature is dated later than this Mac’s clock": {
+      "comment": "设置更新区：自动更新不安装的原因，签名日期晚于这台 Mac 的时钟（接在“Sill 没有自动安装……：”之后）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "它的签名日期晚于这台 Mac 的时钟"
           }
         }
       }
@@ -5098,6 +7000,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "macOS 不允许 Sill 读取剪贴板，因此你在此处拷贝的内容会保留在这台 Mac 上。"
+          }
+        }
+      }
+    },
+    "macOS is running Sill from a temporary copy. Move Sill to your Applications folder, open it from there, then update.": {
+      "comment": "设置更新区：macOS 从临时副本运行 Sill（App 路径随机化），需先移到应用程序文件夹",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 正从临时副本运行 Sill。请先把 Sill 移到“应用程序”文件夹，再从那里打开，然后更新。"
           }
         }
       }
@@ -5200,6 +7113,23 @@
         }
       }
     },
+    "nightly %@ (%@)": {
+      "comment": "状态菜单：当前运行的是每夜构建版，插值为版本号和构建号",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "nightly %1$@ (%2$@)"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "每夜构建版 %1$@（%2$@）"
+          }
+        }
+      }
+    },
     "no P-256 key could be made": {
       "comment": "设备设置错误：无法生成主机身份密钥",
       "localizations": {
@@ -5207,6 +7137,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "无法生成 P-256 密钥"
+          }
+        }
+      }
+    },
+    "no device": {
+      "comment": "设置更新区：没有设备（用在“会断开……”之后）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "没有设备"
           }
         }
       }
@@ -5266,6 +7207,23 @@
         }
       }
     },
+    "on %@ at %@": {
+      "comment": "时刻短语：某日某时；插值为日期和时间",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "new",
+            "value": "on %1$@ at %2$@"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ %2$@"
+          }
+        }
+      }
+    },
     "on this Mac": {
       "comment": "Mac 设备连接路径，来自此 Mac",
       "localizations": {
@@ -5273,6 +7231,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "在这台 Mac 上"
+          }
+        }
+      }
+    },
+    "once it finds it": {
+      "comment": "设置更新区：不设等待时的时间短语，接在“……自动安装”之后",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "发现它后立即"
           }
         }
       }
@@ -5366,6 +7335,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "实体窗口（虚拟显示器：%@）"
+          }
+        }
+      }
+    },
+    "seven days after it first finds it": {
+      "comment": "设置更新区：等待时间短语，七天",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次发现它的七天后"
+          }
+        }
+      }
+    },
+    "six days after it first finds it": {
+      "comment": "设置更新区：等待时间短语，六天",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次发现它的六天后"
           }
         }
       }
@@ -5663,6 +7654,17 @@
         }
       }
     },
+    "the update": {
+      "comment": "设置更新区：版本不明时对“这次更新”的称呼，用在“正在从 GitHub 获取……”等句子里",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "更新"
+          }
+        }
+      }
+    },
     "the window didn’t move": {
       "comment": "虚拟显示器设置：窗口原位串流的原因",
       "localizations": {
@@ -5729,6 +7731,17 @@
         }
       }
     },
+    "three days after it first finds it": {
+      "comment": "设置更新区：等待时间短语，三天",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次发现它的三天后"
+          }
+        }
+      }
+    },
     "through %@": {
       "comment": "Mac 设备连接路径，插值为 VPN 服务名称",
       "localizations": {
@@ -5740,6 +7753,17 @@
         }
       }
     },
+    "through a relay on this Mac": {
+      "comment": "Mac 设备连接路径，经由此 Mac 上的中继（如用户态 VPN 节点、隧道或代理）",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "通过这台 Mac 上的中继"
+          }
+        }
+      }
+    },
     "through your VPN": {
       "comment": "Mac 设备连接路径，通过 VPN",
       "localizations": {
@@ -5747,6 +7771,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "通过你的 VPN"
+          }
+        }
+      }
+    },
+    "today at %@": {
+      "comment": "时刻短语：今天某时；插值为时间",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "今天 %@"
+          }
+        }
+      }
+    },
+    "tomorrow at %@": {
+      "comment": "时刻短语：明天某时；插值为时间",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "明天 %@"
+          }
+        }
+      }
+    },
+    "two days after it first finds it": {
+      "comment": "设置更新区：等待时间短语，两天",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "首次发现它的两天后"
           }
         }
       }
@@ -5791,6 +7848,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "使用二维码"
+          }
+        }
+      }
+    },
+    "yesterday at %@": {
+      "comment": "时刻短语：昨天某时；插值为时间",
+      "localizations": {
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "昨天 %@"
           }
         }
       }

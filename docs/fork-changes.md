@@ -19,6 +19,9 @@
    合并还没提交时 `<合并前>` 就是 `HEAD`；已经提交了就用 `ORIG_HEAD` 或记下的哈希。
 4. 按输出处理（见下一节），改完再跑，直到标记和译文两部分通过、"可能丢失的行"逐条看过。
 5. 上游新增的用户可见文案补上译文：`Scripts/l10n-sync.sh`，再 `Scripts/l10n-check.py`（要零缺失）。
+   - 先把上游新增的 `String` 文案改成 `String(localized:comment:)`（日志保持英文），再同步、翻译。
+   - `Scripts/l10n-sync.sh mac` 前先 `rm -rf .build/l10n/mac-build`：增量编译只提取重编过的文件，其余键会被误标成 stale。
+   - `l10n-sync.sh ios` 不提取 StreamProtocol 包里的键；协议层新增的键要手工加进 `iOSClient/Localizable.xcstrings`（`extractionState` 设 `manual`），两个目录的译文保持一致。
 6. 验收：`swift build -c release`；`Tests/checks/run-all.sh`；iOS 用 Xcode 26 构建
    （`xcodebuild -project iOSClient/Sill.xcodeproj -scheme Sill -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 CODE_SIGN_IDENTITY=- build`）。
 7. 更新本文件：同步点；上游已经自己做了的项删掉；合并时不得不改写的项改标记。
