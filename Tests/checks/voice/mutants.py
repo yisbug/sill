@@ -32,7 +32,7 @@ M = [
     ("小数当整数", V, "guard d.isFinite, d == d.rounded(), abs(d) < 1e15 else { return nil }", "guard d.isFinite, abs(d) < 1e15 else { return nil }"),
     # 片段
     ("上限多 1 字节可以", V, "guard audio.count <= VoiceClip.maxAudioBytes else {", "guard audio.count <= VoiceClip.maxAudioBytes + 1 else {"),
-    ("超限回 serviceError", V, "return .refuse(clip: clip, reason: .tooLarge, message: message(.tooLarge))", "return .refuse(clip: clip, reason: .serviceError, message: message(.tooLarge))"),
+    ("超限回 serviceError", V, "return .refuse(clip: clip, reason: .tooLarge, message: message(.tooLarge, locale: locale))", "return .refuse(clip: clip, reason: .serviceError, message: message(.tooLarge, locale: locale))"),
     ("不查格式", V, "guard format == VoiceClip.formatM4A else {", "guard format == format else {"),
     ("空音频可以", V, "        guard !audio.isEmpty else {", "        guard audio.isEmpty || !audio.isEmpty else {"),
     ("主机读的上限只有 1 MiB", V, "static let maxReadPayload = 2 * VoiceClip.maxAudioBytes + VoiceClip.headerLength",
