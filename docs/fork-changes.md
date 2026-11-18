@@ -212,7 +212,7 @@ has Sources/SillHost/VirtualStage.swift :: vd.refusedAgain
 
 ### F12 检查与 CI
 
-- 是什么：新增三组纯检查 `app-recency`、`voice`、`bar-collapse`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
+- 是什么：新增四组纯检查 `app-recency`、`voice`、`bar-collapse`、`phone-stream`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
 - 提交：`9d4ac02`、`39c0d25`、`4f80231`、`a632a5c`。
 - 合并时注意：`ci.yml` 的矩阵是一整行，上游每加一个检查这一行就冲突，合并后三个名字都要在；README 表格同理。
 
@@ -222,9 +222,28 @@ file Tests/checks/voice/module.txt
 has .github/workflows/ci.yml :: , app-recency,
 has .github/workflows/ci.yml :: , bar-collapse,
 has .github/workflows/ci.yml :: , voice,
+has .github/workflows/ci.yml :: , phone-stream,
 has Tests/checks/README.md :: | `app-recency` |
 has Tests/checks/README.md :: | `bar-collapse` |
+has Tests/checks/README.md :: | `phone-stream` |
 has Tests/checks/README.md :: | `voice` |
+```
+
+### F14 iPhone 串流界面：强制横屏、图标 Dock 栏、可调的默认缩放
+
+- 是什么：iPhone 的串流界面只允许横屏（`SillAppDelegate.supportedInterfaceOrientationsFor`，串流界面出现时置位并请求转横屏，消失时只解锁、不转回；连接界面照旧自由旋转），不再画竖屏的「画面 + 缩略图 + 按键 + 触摸板」排布，改画和 iPad 横屏一样的图标 Dock 栏（`Sill.barThumbnails` 开关 iPhone 也有）；旋转没完成、屏幕还是竖的时不发视口。文字大小（Aa）存在 `Sill.textScale`，顶栏的 Aa 和设置面板新增的「Text Size」读写同一个值，iPhone 没存过是 0.75×，iPad 是 Off；导览里 iPhone 不再提示「竖起手机用按键和触摸板」。规则在 `PhoneStream`，检查 `phone-stream`。
+- 提交：`git log --oneline --diff-filter=A -- iOSClient/PhoneStream.swift`（新增该文件的那次提交）。
+- 合并时注意：`StreamScreen.screen` 里的布局分支（`drawnLayout`）、`landscape(bar:)`、`appMenuWindows`、`tourThumbnails` 三处原来的 `DuoLayout.phoneArrangement` 特殊处理已去掉，上游若改回来要保留去掉的结果；`PhonePortraitLayout`、`PortraitStreamScreen` 的手机排布代码保留不删，只是 iPhone 走不到；`textScale` 不再是 `@State`，上游若改 `textScale` 的声明或调用处，要继续经 `textScaleBinding`。
+
+```fork-check
+file iOSClient/PhoneStream.swift
+file Tests/checks/phone-stream/main.swift
+has iOSClient/Sill.xcodeproj/project.pbxproj :: PhoneStream.swift
+has iOSClient/SillAppDelegate.swift :: supportedInterfaceOrientationsFor
+has iOSClient/StreamScreen.swift :: PhoneStream.
+has iOSClient/HostSettingsPanel.swift :: PhoneStream.textScaleKey
+has .github/workflows/ci.yml :: , phone-stream,
+has Tests/checks/README.md :: | `phone-stream` |
 ```
 
 ### F13 文档

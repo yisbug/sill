@@ -694,8 +694,9 @@ enum TourPolicy {
                 rows.append(row("arrow.up.arrow.down", spans(String(localized: "**Reverse Scrolling** turns a finger’s drag and the on-screen trackpad’s two-finger scroll around.", comment: "串流导览文案；双星号标出强调文字")), new: true))
                 rows.append(row("timer", spans(String(localized: "**Hold to Show Window Controls** sets how long you hold a window’s thumbnail before its controls show.", comment: "串流导览文案；双星号标出强调文字")), new: true))
             }
-            if layout == .landscape {
-                rows.append(row(iPad ? "ipad" : "iphone", spans(keysOnItsSide
+            // 本 fork（F14）：iPhone 的串流界面强制横屏、没有触摸板，不再提示竖起手机用按键和触摸板。
+            if layout == .landscape, iPad {
+                rows.append(row("ipad", spans(keysOnItsSide
                     ? String(localized: "**Turn your \(markedDevice) on its side** for a trackpad and keys.", comment: "导览横放设备的提示；插值为设备类型，双星号标出强调文字")
                     : String(localized: "**Hold your \(markedDevice) upright** for a trackpad and keys.", comment: "导览竖放设备的提示；插值为设备类型，双星号标出强调文字"))))
             }

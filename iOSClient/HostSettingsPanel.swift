@@ -59,6 +59,19 @@ struct HostSettingsPanel: View {
     @AppStorage(StreamClient.largerPictureKey) private var largerPicture = false
     /// 横屏 iPad 顶栏是否恢复窗口缩略图；只影响本设备，不发送给 Mac。
     @AppStorage("Sill.barThumbnails") private var barThumbnails = false
+    /// 文字大小（Aa）：这台设备的值，iPhone 没存过是 0.75×，其他设备是 Off；顶栏的 Aa 读写同一个键。
+    /// 只为变化而读，值经 `PhoneStream.textScale(stored:phone:)`，和 StreamScreen 一样处理启动参数的字符串。
+    @AppStorage(PhoneStream.textScaleKey) private var storedTextScale = -1.0
+    private var textScalePosition: Binding<Double> {
+        Binding(
+            get: {
+                _ = storedTextScale
+                let scale = PhoneStream.textScale(stored: UserDefaults.standard.object(forKey: PhoneStream.textScaleKey),
+                                                  phone: DuoLayout.phoneArrangement)
+                return TextScale.position(of: scale, offered: client.textScaleOffersOff)
+            },
+            set: { storedTextScale = PhoneStream.stored(for: TextScale.scale(at: $0)) })
+    }
     /// Whether the switch is offered here, the stream screen's say (`largerPictureOffered`): only on an
     /// iPhone without a hinge whose picture it makes larger.
     @Environment(\.largerPictureOffered) private var offersLargerPicture
@@ -584,14 +597,26 @@ struct HostSettingsPanel: View {
             .padding(.bottom, 6)
             .accessibilityAddTraits(.isHeader)
             .id(Self.gesturesGroupID)
-        if device == "iPad" {
-            Rows {
-                Toggle(isOn: $barThumbnails) {
-                    Text("Show window thumbnails in the top bar").foregroundStyle(Palette.text)
+        Rows {
+            Toggle(isOn: $barThumbnails) {
+                Text("Show window thumbnails in the top bar").foregroundStyle(Palette.text)
+            }
+            .rowFrame()
+        }
+        // 文字大小（和顶栏的 Aa 是同一个存储值，PhoneStream.textScaleKey）：改了立即生效，StreamScreen 读同一个键并重发视口。
+        Rows {
+            AdaptiveRow(title: PhoneStream.textSizeTitle, since: nil) {
+                Picker(PhoneStream.textSizeTitle, selection: textScalePosition) {
+                    ForEach(TextScale.detents(offered: client.textScaleOffersOff), id: \.self) {
+                        Text(TextScale.title(at: $0)).tag($0)
+                    }
                 }
-                .rowFrame()
+                .pickerStyle(.menu)
+                .fixedSize()
+                .accessibilityValue(TextScale.spoken(at: textScalePosition.wrappedValue))
             }
         }
+        Footnote(text: PhoneStream.textSizeFootnote)
         if offersLargerPicture {
             Rows {
                 Toggle(isOn: $largerPicture) {

@@ -10,6 +10,33 @@ import UIKit
 /// nothing says which window's session the bar's choices would reach), or when the window's session
 /// has no menus.
 final class SillAppDelegate: UIResponder, UIApplicationDelegate {
+    /// 串流界面是否在显示（本 fork，F14）：iPhone 上它显示时只允许横屏（`PhoneStream.locksLandscape`）。
+    /// 只在主线程读写：StreamScreen 出现、消失时经 `setStreamShown` 改，UIKit 在主线程问方向。
+    private(set) static var streamShown = false
+
+    /// StreamScreen 出现（true）或消失（false）：记下状态，让 UIKit 重新问支持的方向；iPhone 上出现时还请求转到横屏。
+    /// 消失时不转回竖屏，连接界面由设备朝向决定。
+    static func setStreamShown(_ shown: Bool) {
+        streamShown = shown
+        let phone = DuoLayout.phoneArrangement
+        for case let scene as UIWindowScene in UIApplication.shared.connectedScenes {
+            for window in scene.windows { window.rootViewController?.setNeedsUpdateOfSupportedInterfaceOrientations() }
+            if shown, PhoneStream.locksLandscape(phone: phone, streamShown: true) {
+                scene.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape)) { error in
+                    #if DEBUG
+                    print("orientation: asking for landscape was refused: \(error.localizedDescription)")
+                    #endif
+                }
+            }
+        }
+    }
+
+    /// iPhone 在串流界面里只允许横屏；其他情况是 Info.plist 允许的全部方向（iPhone 不含倒置，iPad 全部）。
+    func application(_ application: UIApplication, supportedInterfaceOrientationsFor window: UIWindow?) -> UIInterfaceOrientationMask {
+        if PhoneStream.locksLandscape(phone: DuoLayout.phoneArrangement, streamShown: Self.streamShown) { return .landscape }
+        return UIDevice.current.userInterfaceIdiom == .phone ? .allButUpsideDown : .all
+    }
+
     override func buildMenu(with builder: UIMenuBuilder) {
         super.buildMenu(with: builder)
         guard builder.system == .main else { return }

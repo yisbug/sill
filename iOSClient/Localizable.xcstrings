@@ -4522,6 +4522,28 @@
         }
       }
     },
+    "A smaller size shows more of the Mac’s window, with smaller text. It is the same setting as Aa in the toolbar." : {
+      "comment" : "设置面板里文字大小一行的脚注",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数值越小，Mac 窗口显示的内容越多，文字越小。它和顶栏的 Aa 是同一项设置。"
+          }
+        }
+      }
+    },
+    "Text Size" : {
+      "comment" : "设置面板里文字大小一行的标题，和顶栏的 Aa 是同一项设置",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "文字大小"
+          }
+        }
+      }
+    },
     "Text size" : {
       "localizations" : {
         "zh-Hans" : {

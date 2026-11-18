@@ -112,7 +112,30 @@ struct StreamScreen: View {
     /// The Aa control's text scale, device points per Mac point; nil means the Mac window has never
     /// been asked to fit (the control shows 1× for it). Up here, like `latched`, so it survives
     /// rotation and both layouts share it.
-    @State private var textScale: Double? = nil
+    ///
+    /// 本 fork（F14）：值存在 UserDefaults 的 `PhoneStream.textScaleKey`，顶栏的 Aa 和设置面板的「Text Size」
+    /// 读写同一个键；iPhone 没存过是 0.75×，其他设备是 Off。`storedTextScale` 只为变化而读（和 ThumbnailHold
+    /// 一样），值经 `PhoneStream.textScale(stored:phone:)`，启动参数给的字符串也认。
+    @AppStorage(PhoneStream.textScaleKey) private var storedTextScale = -1.0
+    #if DEBUG
+    /// 调试 harness 的覆盖值（init 的 `textScale:`、`-SillScale`、`-SillScaleScript`）：有值时盖过存储，且不写 UserDefaults。
+    @State private var textScaleOverride: Double?? = nil
+    #endif
+    private var textScale: Double? {
+        _ = storedTextScale
+        #if DEBUG
+        if let forced = textScaleOverride { return forced }
+        #endif
+        return PhoneStream.textScale(stored: UserDefaults.standard.object(forKey: PhoneStream.textScaleKey),
+                                     phone: DuoLayout.phoneArrangement)
+    }
+    private func setTextScale(_ scale: Double?) {
+        #if DEBUG
+        if textScaleOverride != nil { textScaleOverride = .some(scale); return }
+        #endif
+        storedTextScale = PhoneStream.stored(for: scale)
+    }
+    private var textScaleBinding: Binding<Double?> { Binding(get: { textScale }, set: { setTextScale($0) }) }
     /// The Aa slider is unfolded (finger down): the bars fade their other buttons meanwhile.
     @State private var scaleOpen = false
     /// The thumbnail whose traffic-light submenu is open (held for ThumbnailHold's length, 0.5 s unless
@@ -141,6 +164,8 @@ struct StreamScreen: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     /// The stream panel's size in points, reported by whichever layout is showing.
     @State private var panelSize: CGSize = .zero
+    /// 整块串流界面的尺寸（`screen` 的 GeometryReader 量到的），PhoneStream.sendsViewport 要看。
+    @State private var screenSize: CGSize = .zero
     /// The picture's pinch zoom (StreamZoom, issue #65): one per stream screen, so a turn keeps it and
     /// the next session starts at 1×. Held, not watched (`@State`, as `overlay` is; a `@StateObject`
     /// would redraw this whole screen at every step of a pinch): only the picture's own view watches it
@@ -216,7 +241,9 @@ struct StreamScreen: View {
         _drawerOpen = State(initialValue: drawerOpen)
         _keyboardShown = State(initialValue: keyboardShown)
         _scaleOpen = State(initialValue: scaleOpen)
-        _textScale = State(initialValue: textScale)
+        // -SillScale 0.25（Off 的位置）算 Off：覆盖值为 .some(nil)；传入的 textScale 非 nil 也覆盖存储。
+        _textScaleOverride = State(initialValue: textScale.map { Double?.some($0) }
+            ?? (UserDefaults.standard.double(forKey: "SillScale") > 0 ? Double??.some(nil) : nil))
         _settingsOpen = State(initialValue: settingsOpen)
         // The panel open over the keyboard, as in a session: it took the keyboard down, and closing
         // it puts it back (`-SillSettings 1 -SillKeyboard 1`).
@@ -239,7 +266,9 @@ struct StreamScreen: View {
         // Which layout, and at which size — see `DuoLayout` for the thresholds and the Duo posture
         // behind each one.
         GeometryReader { geo in
-            let duo = DuoLayout.of(geo.size)
+            // iPhone（本 fork，F14）：串流界面强制横屏，不论屏幕此刻是横是竖都画横屏布局（旋转未完成时
+            // 屏幕还是竖的）；iPad 和其他设备看尺寸。
+            let duo = Self.drawnLayout(geo.size)
             let layout: TourLayout = duo == .innerLandscape || duo == .outerLandscape ? .landscape
                 : (DuoLayout.drawsPhone(geo.size) ? .phone : .portrait)
             // The fold across this screen, in its own space (iOS 27.1 on the Duo; else as before).
@@ -259,8 +288,8 @@ struct StreamScreen: View {
                                                foldable: posture.hinge != .unknown) : nil
             // The Settings panel's switch: on an iPhone without a hinge whose picture Larger Picture
             // makes larger, judged on this screen held upright, whichever way it is held now.
-            let offersLarger = DuoLayout.phoneArrangement && posture.hinge == .unknown
-                && PhonePortraitLayout.offersLargerPicture(screen: geo.size)
+            // 本 fork（F14）：iPhone 不再画竖屏排布，Larger Picture 开关不再提供。
+            let offersLarger = false
             ZStack {
                 Group {
                     switch duo {
@@ -271,7 +300,7 @@ struct StreamScreen: View {
                     case .innerPortrait:
                         portrait(metrics: .regular)
                     case .outerPortrait:
-                        portrait(metrics: DuoLayout.phoneArrangement ? .phone : .compact, largerKeyboard: largerKeyboard)
+                        portrait(metrics: .compact, largerKeyboard: largerKeyboard)
                     }
                 }
                 // Under the pairing overlay and the tour nothing takes a touch: not the bar, and
@@ -279,7 +308,7 @@ struct StreamScreen: View {
                 .allowsHitTesting(!overlayShown && tour == nil)
                 // The pointer sprite follows the layout: the trackpad's arrow shows only in the
                 // laptop layout, and a rotation re-renders it at once; the Mac's arrow stays.
-                .onChange(of: DuoLayout.of(geo.size).isPortrait, initial: true) { _, portrait in
+                .onChange(of: duo.isPortrait, initial: true) { _, portrait in
                     client.setPointerLayout(portrait: portrait)
                 }
                 // The clipboard's chip on screen or not: its 20 s run only while it is, and VoiceOver
@@ -291,7 +320,7 @@ struct StreamScreen: View {
                 // Paste button and Dismiss take their touches over the stream's UIKit input view, and
                 // nothing else does (the frame around it is empty). Near the bar, off the link's line,
                 // inside the stream panel's corner; never while something is open over the stream.
-                if clipboardChipAllowed, client.clipboardChip || client.clipboardNote != nil, let panel = tourTargets[.stream] {
+                if clipboardChipAllowed, client.clipboardChip || client.clipboardNote != nil, let panel = safePanel(geo.size) {
                     let corner = ClipboardPolicy.chipCorner(landscape: layout == .landscape, linkLineShown: chipAvoidsTop)
                     ClipboardChip(client: client)
                         .frame(maxWidth: max(0, panel.width - 16), alignment: .trailing)
@@ -303,7 +332,7 @@ struct StreamScreen: View {
                 }
                 // 语音悬浮球（VoiceInputButton）：布局之上，导览与配对覆盖层之下；只在串流画面之内（不盖顶栏和键盘行），
                 // 避开剪贴板芯片与链路提示；设置面板、抽屉、导览、配对覆盖层打开时藏起。
-                if let panel = tourTargets[.stream] {
+                if let panel = safePanel(geo.size) {
                     let chip = clipboardChipAllowed && (client.clipboardChip || client.clipboardNote != nil)
                     VoiceInputLayer(client: client, area: panel,
                                     avoiding: VoiceInputLayer.avoiding(panel: panel,
@@ -326,8 +355,7 @@ struct StreamScreen: View {
                     // upright stand in the picture's whole room, the black under a short picture. The
                     // words follow what this Mac and this device have now (TourFeatures).
                     let features = tourFeatures(offersLarger: offersLarger)
-                    let tourThumbnails = layout == .landscape && !DuoLayout.phoneArrangement
-                        ? barThumbnails : largerKeyboard == nil
+                    let tourThumbnails = layout == .landscape ? barThumbnails : largerKeyboard == nil
                     let copy = tourCopy(run, layout, keysOnItsSide: posture.onInnerDisplay,
                                         thumbnails: tourThumbnails, features: features)
                     TourOverlay(run: run, copy: copy,
@@ -353,6 +381,8 @@ struct StreamScreen: View {
             .coordinateSpace(.named(TourSpace.name))
             .onPreferenceChange(TourTargetsKey.self) { tourTargets = $0 }
             .onChange(of: layout, initial: true) { _, now in layoutChanged(to: now) }
+            // 屏幕尺寸给 sendViewport 用：iPhone 上屏幕还是竖的时不发视口（PhoneStream.sendsViewport）。
+            .onChange(of: geo.size, initial: true) { _, size in screenSize = size }
             // A thumbnail's lights hang from the strip, which Larger Picture's arrangement has none
             // of: when the arrangement changes under them (what streams changed, or a turn), they
             // close rather than wait, unseen, to come back with the strip.
@@ -411,6 +441,8 @@ struct StreamScreen: View {
         .onAppear {
             // Where the software keyboard is, from now on: the laptop pose's key row follows it (#215).
             _ = KeyboardFrameMonitor.shared
+            // iPhone（本 fork，F14）：串流界面只允许横屏，并请求转到横屏。
+            SillAppDelegate.setStreamShown(true)
             // A click, a key, a pick, a menu item or a gesture from anywhere on this screen, before it
             // goes out: the input view sends what is still composed, then forgets what was typed, which
             // dictation and an input method may revise (#138).
@@ -446,6 +478,7 @@ struct StreamScreen: View {
         .onChange(of: keyboardTakers, initial: true) { _, takers in overlay.update(takers: takers) }
         // Rotation animates, and a Mac window resize restarts the stream, so let the size settle.
         .onChange(of: panelSize) { _, _ in sendViewport(after: 0.25) }
+        .onChange(of: screenSize) { _, _ in sendViewport(after: 0.25) }
         // Same wait for Aa: cycling from Off to 0.8× passes three sizes nobody wants the Mac to try.
         .onChange(of: textScale) { _, _ in sendViewport(after: 0.25) }
         // The stream rate follows the panel (`StreamClient.wantedFPS`): re-send when Low Power Mode
@@ -480,6 +513,8 @@ struct StreamScreen: View {
         .onDisappear {
             tourWait?.cancel()
             tourWait = nil
+            // 解除横屏锁；不主动转回竖屏，连接界面按设备朝向自由旋转。
+            SillAppDelegate.setStreamShown(false)
         }
     }
 
@@ -538,6 +573,8 @@ struct StreamScreen: View {
                 if Task.isCancelled { return }
             }
             guard client.connected, panelSize.width > 0, panelSize.height > 0 else { return }
+            // iPhone 上屏幕还是竖的（旋转没完成）：先不发，免得 Mac 先按竖屏尺寸改一次窗口；转完 screenSize 变了会再发。
+            guard PhoneStream.sendsViewport(phone: DuoLayout.phoneArrangement, screen: screenSize) else { return }
             let fps = StreamClient.wantedFPS(remote: client.awayCapsFrameRate)
             #if DEBUG
             print("viewport: \(Self.points(panelSize.width))×\(Self.points(panelSize.height)) pt, scale "
@@ -689,7 +726,7 @@ struct StreamScreen: View {
         if defaults.bool(forKey: "SillScaleOpen") {
             after(1.5) {
                 let scale = defaults.double(forKey: "SillScale")
-                if scale > 0 { textScale = TextScale.scale(at: scale) }     // 0.25 is Off's place: no scale
+                if scale > 0 { textScaleOverride = .some(TextScale.scale(at: scale)) }     // 0.25 is Off's place: no scale
                 // Aa sizes a window: over the Desktop, or nothing, its ruler does not open (TextScale.selectable).
                 guard client.textScaleSelectable else {
                     print("harness: the Aa ruler stays closed: Aa is for a window, and none streams")
@@ -714,7 +751,7 @@ struct StreamScreen: View {
             }
             after(time) {
                 print("harness: Aa set to " + (off ? "Off" : TextScale.title(at: scale!)) + " at " + Self.points(CGFloat(time)) + " s")
-                textScale = off ? nil : scale
+                textScaleOverride = .some(off ? nil : scale)
             }
         }
     }
@@ -1238,15 +1275,34 @@ struct StreamScreen: View {
         reduceMotion ? .opacity : .scale(scale: 0.94, anchor: anchor).combined(with: .opacity)
     }
 
+    /// 串流画面落在安全区里的部分（画面横屏下伸进两侧安全区，芯片、语音球只放在这部分，不进刘海、灵动岛底下）。
+    /// 屏幕坐标空间 `TourSpace` 的原点就是安全区左上角，所以安全区是 (0, 0, size)。
+    private func safePanel(_ size: CGSize) -> CGRect? {
+        guard let panel = tourTargets[.stream] else { return nil }
+        let safe = panel.intersection(CGRect(origin: .zero, size: size))
+        return safe.isNull || safe.isEmpty ? panel : safe
+    }
+
+    /// 这块屏幕实际画哪种布局：iPhone 的竖屏尺寸（含旋转途中）按横屏的画，其余照 `DuoLayout.of`。
+    private static func drawnLayout(_ size: CGSize) -> DuoLayout {
+        let duo = DuoLayout.of(size)
+        guard DuoLayout.phoneArrangement, PhoneStream.drawsLandscape(phone: true, size: size) else { return duo }
+        switch duo {
+        case .innerPortrait: return .innerLandscape
+        case .outerPortrait: return .outerLandscape
+        case .innerLandscape, .outerLandscape: return duo
+        }
+    }
+
     private func appMenuWindows(for window: WindowInfo) -> [WindowInfo] {
-        guard tourLayout == .landscape, !DuoLayout.phoneArrangement, !barThumbnails else { return [] }
+        guard tourLayout == .landscape, !barThumbnails else { return [] }
         return client.windows.filter {
             $0.bundleID == window.bundleID && (!window.bundleID.isEmpty || $0.appName == window.appName)
         }
     }
 
     private func landscape(bar plain: BarMetrics, width: CGFloat, fold: FoldInfo, barHidden: Bool) -> some View {
-        let plain = barThumbnails || DuoLayout.phoneArrangement ? plain.withThumbnails : plain
+        let plain = barThumbnails ? plain.withThumbnails : plain
         // The book pose (docs/iphone-duo-plan.md, (a)): nothing on the fold's band; elsewhere as before.
         let (bar, stripWidth) = plain.clearing(fold, width: width,
                                               compactButtonWidth: plain.usesAppIcons
@@ -1255,7 +1311,7 @@ struct StreamScreen: View {
             if !barHidden {
                 TopBar(client: client, metrics: bar, touches: touches, stripWidth: stripWidth, drawerOpen: $drawerOpen,
                        keyboardShown: $keyboardShown,
-                       textScale: $textScale, scaleOpen: $scaleOpen, windowMenu: $windowMenu,
+                       textScale: textScaleBinding, scaleOpen: $scaleOpen, windowMenu: $windowMenu,
                        settingsOpen: settingsOpen,
                        // 为末尾固定 44 pt 宽的折叠按钮及其间距预留空间。
                        menusFit: MacMenuButton.fits(width: width - 2 * bar.padding - BarCollapse.buttonWidth - bar.gap,
@@ -1275,7 +1331,7 @@ struct StreamScreen: View {
     private func portrait(metrics: PortraitMetrics, largerKeyboard: CGFloat? = nil) -> some View {
         PortraitStreamScreen(client: client, metrics: metrics, drawerOpen: $drawerOpen,
                              keyboardShown: $keyboardShown,
-                             textScale: $textScale, scaleOpen: $scaleOpen, windowMenu: $windowMenu,
+                             textScale: textScaleBinding, scaleOpen: $scaleOpen, windowMenu: $windowMenu,
                              latched: $latched, overlay: overlay,
                              settingsOpen: settingsOpen,
                              setSettings: { setSettings($0, restoreKeyboard: $1) },
@@ -1288,8 +1344,6 @@ struct StreamScreen: View {
                              largerKeyboard: largerKeyboard,
                              zoom: zoom)
     }
-
-    private var streamShape: RoundedRectangle { RoundedRectangle(cornerRadius: 12, style: .continuous) }
 
     private func contentArea(bar: BarMetrics) -> some View {
         ZStack(alignment: .topLeading) {
@@ -1316,12 +1370,13 @@ struct StreamScreen: View {
             // A locked Mac: its cover over the picture (LockedMac), under the link's line.
             .overlay { LockedMacShade(client: client) }
             .overlay(alignment: .top) { LinkLineView(text: shownLinkLine) }
-            .clipShape(streamShape)
-            .overlay(streamShape.strokeBorder(Color.white.opacity(0.09), lineWidth: 1))
-            // The panel itself, inside the padding: the size the host fits the Mac window to.
+            // 本 fork：串流画面横屏下铺满，不再留 8 pt 黑框和圆角，左右伸进安全区（刘海、灵动岛一侧），
+            // 顶栏展开与收起都一样；剩下的黑边只来自画面与 Mac 窗口比例不同（Aa 为 Off，或串流桌面）。
+            .clipped()
+            .ignoresSafeArea(.container, edges: .horizontal)
+            // The panel itself: the size the host fits the Mac window to.
             .onGeometryChange(for: CGSize.self, of: { $0.size }, action: { panelSize = $0 })
             .tourTarget(.stream)
-            .padding(8)
 
             // The dim comes after the overlay on purpose: with the drawer open a tap on the dim
             // closes the drawer instead of clicking the Mac.
@@ -1532,20 +1587,21 @@ private struct BarCollapseHandle: View {
 
     var body: some View {
         UnevenRoundedRectangle(bottomLeadingRadius: 13, bottomTrailingRadius: 13)
-            .fill(Palette.bar.opacity(0.35))
+            .fill(Palette.bar.opacity(0.85))
             .overlay {
                 UnevenRoundedRectangle(bottomLeadingRadius: 13, bottomTrailingRadius: 13)
-                    .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                    .stroke(Color.white.opacity(0.28), lineWidth: 1)
             }
             .overlay {
                 Image(systemName: "chevron.down")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Palette.text.opacity(0.75))
+                    .foregroundStyle(Palette.text)
             }
             .frame(width: BarCollapse.handleSize.width, height: BarCollapse.handleSize.height)
             .frame(height: BarCollapse.touchHeight, alignment: .top)
             .contentShape(Rectangle())
-            .opacity(dragging == nil ? 0.65 : 0.9)
+            .shadow(color: .black.opacity(0.4), radius: 4, y: 1)
+            .opacity(dragging == nil ? 0.92 : 1)
             .onTapGesture(perform: show)
             .gesture(
                 DragGesture(minimumDistance: 10, coordinateSpace: .named(TourSpace.name))
@@ -1683,7 +1739,8 @@ private struct TopBar: View {
         .frame(height: metrics.height)
         .padding(.horizontal, metrics.padding)
         // The bar's colour runs to the screen edge; its contents stay inside the safe area.
-        .background(Palette.bar.ignoresSafeArea(edges: .top))
+        // 顶栏底色铺到屏幕两侧的安全区（横屏刘海、灵动岛一侧），免得顶栏两端露出黑边；按钮仍在安全区内。
+        .background(Palette.bar.ignoresSafeArea(edges: [.top, .horizontal]))
     }
 
     private var iconMenusButton: some View {

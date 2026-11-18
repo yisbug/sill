@@ -1126,8 +1126,9 @@ let settingsL = words(.settings, L)
 check(settingsL.title == "Settings" && settingsL.subtitle == nil && settingsL.hint == "The last button in the bar.", "settings: title, hint")
 check(texts(settingsL) == [G1, G2, G3, G4, G5], "settings sideways on iPad: \(texts(settingsL))")
 check(settingsL.rows.map(\.symbol) == ["xmark.circle", "questionmark.circle", "arrow.up.arrow.down", "timer", "ipad"], "settings' symbols on iPad")
-check(texts(words(.settings, L, device: "iPhone")).last == "Hold your iPhone upright for a trackpad and keys."
-      && words(.settings, L, device: "iPhone").rows.last?.symbol == "iphone", "the upright row on iPhone")
+// 本 fork（F14）：iPhone 的串流界面强制横屏、没有触摸板，所以没有「竖起手机」这一行。
+check(texts(words(.settings, L, device: "iPhone")) == [G1, G2, G3, G4]
+      && !words(.settings, L, device: "iPhone").rows.contains { $0.symbol == "iphone" }, "no upright row on iPhone")
 check(texts(words(.settings, P)) == [G1, G2, G3, G4], "no upright row when upright")
 check(texts(words(.settings, L, voiceOver: true)) == [G1, G2, G5] && texts(words(.settings, P, voiceOver: true)) == [G1, G2],
       "under VoiceOver no Reverse Scrolling or hold rows (a drag and a hold)")
@@ -1150,8 +1151,7 @@ check(touchPad.rows[1].spoken == "Touch and hold to right-click.", "a row is spo
 // The iPhone Duo open: its keys and trackpad come with the device on its side (the laptop pose, open
 // flat upright), so the words say so where an iPhone's and the Duo's cover's say upright.
 let duoSettings = words(.settings, L, device: "iPhone", onItsSide: true)
-check(texts(duoSettings).last == "Turn your iPhone on its side for a trackpad and keys." && duoSettings.rows.last?.symbol == "iphone"
-      && duoSettings.rows.last?.spans.first == TourSpan(text: "Turn your iPhone on its side", strong: true), "the Duo's inner display sideways")
+check(texts(duoSettings) == [G1, G2, G3, G4] && !duoSettings.rows.contains { $0.symbol == "iphone" }, "the Duo's inner display sideways: no keys row on an iPhone")
 check(texts(duoSettings).prefix(4) == texts(words(.settings, L, device: "iPhone")).prefix(4), "the Duo: the other rows as before")
 check(words(.laptop, P, device: "iPhone", first: true, onItsSide: true).subtitle == "On its side, Sill adds keys and a trackpad.", "the Duo's laptop card")
 check(words(.laptop, P, device: "iPhone", first: false, onItsSide: true).subtitle == nil, "…only as a run's first")
@@ -1245,7 +1245,7 @@ check(laptopVO.rows.count == 3 && laptopVO.rows[0].spoken == "Command, Option, C
 func counts(_ layout: TourLayout, device: String, voiceOver: Bool = false, features: TourFeatures = allOn) -> [Int] {
     TourPolicy.steps(layout, voiceOver: voiceOver).map { words($0, layout, device: device, voiceOver: voiceOver, features: features).rows.count }
 }
-check(counts(L, device: "iPad") == [6, 5, 3, 5] && counts(L, device: "iPhone") == [5, 5, 3, 5], "sideways: 6 (5 on iPhone), 5, 3, 5")
+check(counts(L, device: "iPad") == [6, 5, 3, 5] && counts(L, device: "iPhone") == [5, 5, 3, 4], "sideways: 6 (5 on iPhone), 5, 3, 5 (4 on iPhone)")
 check(counts(P, device: "iPad") == [6, 3, 3, 4, 5] && counts(F, device: "iPhone") == [5, 5, 3, 4, 4], "the halves 6, 3, 3, 4, 5; a phone 5, 5, 3, 4, 4")
 check(counts(F, device: "iPhone", features: with { $0.largerPicture = false }).last == 3, "the Duo's cover: three on its laptop card")
 check(counts(L, device: "iPad", voiceOver: true) == [5, 3, 3] && counts(P, device: "iPad", voiceOver: true) == [3, 3, 2, 3]
