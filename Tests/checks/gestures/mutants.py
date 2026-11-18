@@ -10,7 +10,7 @@ orig = open(SRC).read()
 GATE = "guard fingersDown.count >= 3, !travelled, !holding else"
 ARM = "if !done, !cancelledEarly, let first = three.first, time - first.value.landedAt <= chordWindow {"
 SILENCE = "        if !silent {\n            silent = true\n            output = .silenced\n        }\n"
-TOGETHER = "let together = armedBy.allSatisfy { share(armedAt[$0]!, now[$0]!) >= swipeShare * along }\n                    && movers.values.allSatisfy { share($0.start, $0.now) > -swipeShare * along }"
+TOGETHER = "let together = armedBy.allSatisfy { share(armedAt[$0]!, now[$0]!) >= swipeShare * along }\n                && movers.values.allSatisfy { share($0.start, $0.now) > -swipeShare * along }"
 MUTANTS = {
     "M1 the window's edge left out": (ARM, ARM.replace("<= chordWindow", "< chordWindow")),
     "M2 the travel's edge let through": ("if distance(point, finger.landed) >= chordTravel { travelled = true }",
@@ -50,8 +50,8 @@ MUTANTS = {
     "M30 a Pencil never ends the silence": ("        if fingersDown.isEmpty { silent = false }\n    }", "    }"),
     "M31 a Pencil ends a gesture's silence mid-stroke": ("        if fingersDown.isEmpty { silent = false }\n    }", "        silent = false\n    }"),
     "M32 the first three to land arm (a resting thumb among them; the review's F1)": ("let three = byLanding.suffix(3)", "let three = byLanding.prefix(3)"),
-    "M34 the three need not move together (the review's F2)": ("let together = armedBy.allSatisfy { share(armedAt[$0]!, now[$0]!) >= swipeShare * along }\n                    &&",
-                                                               "let together = true\n                    &&"),
+    "M34 the three need not move together (the review's F2)": ("let together = armedBy.allSatisfy { share(armedAt[$0]!, now[$0]!) >= swipeShare * along }\n                &&",
+                                                               "let together = true\n                &&"),
     "M35 the together test's edge left out": (">= swipeShare * along }", "> swipeShare * along }"),
     "M36 another finger may go against the swipe": (TOGETHER, TOGETHER.split("\n")[0]),
     "M37 the against test's edge let through": ("> -swipeShare * along }", ">= -swipeShare * along }"),
@@ -65,6 +65,16 @@ MUTANTS = {
                                            "        if !done, armedBy.contains(id)"),
     "M44 fingers counted as every finger down (a resting thumb counted)": ("let fingers = min(3 + movers.count, 4)", "let fingers = min(fingersDown.count, 4)"),
     "M45 two fingers go silent": (GATE, GATE.replace("count >= 3", "count >= 2")),
+    # 本 fork：early（三指左右滑越过阈值即判定）
+    "M46 early: the distance's edge left out": ("guard hypot(dx, dy) >= swipeDistance,", "guard hypot(dx, dy) > swipeDistance,"),
+    "M47 early: no distance condition": ("guard hypot(dx, dy) >= swipeDistance,\n              let found", "guard let found"),
+    "M48 early: up and down too": ("found == .swipeLeft || found == .swipeRight else { return .none }", "found != .pinch else { return .none }"),
+    "M49 early: a fourth finger (even resting) allowed": ("guard armed, !done, others.isEmpty, fingersDown.count == 3 else", "guard armed, !done else"),
+    "M50 early: not marked decided": ("        done = true\n        return .gesture(found, fingers: 3)", "        return .gesture(found, fingers: 3)"),
+    "M51 early: the three need not move together": ("let found = swipeOf(dx: dx, dy: dy, now: now, movers: [:]),",
+                                                    "let found = Optional(abs(dx) > abs(dy) ? (dx < 0 ? Gesture.swipeLeft : .swipeRight) : (dy < 0 ? .swipeUp : .swipeDown)),"),
+    "M52 early: a lifted thumb counts as no other finger": ("guard armed, !done, others.isEmpty, fingersDown.count == 3 else", "guard armed, !done, fingersDown.count == 3 else"),
+    "M53 early: the axis rule left out": ("if major >= axisRatio * minor {\n            let swipe", "if major >= 0 {\n            let swipe"),
 }
 # M33: silence only once the stroke arms, as before the review (the review's F1): the silence moves into the
 # arming branch, so three fingers placed slowly, or beside a resting thumb, are not silent.

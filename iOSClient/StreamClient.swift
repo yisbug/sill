@@ -265,6 +265,11 @@ final class StreamClient: ObservableObject {
     /// 三指左右滑切换应用时沿用的 Dock 顺序与上次切换的时间（`switchApp`）。
     private var appSwitchOrder: [[UInt32]] = []
     private var appSwitchAt = -Double.infinity
+    /// 本 fork（PickFlow）：这个人选了、画面还没到的源；画面上的占位（PickShade）看它。主线程。
+    @Published private(set) var pickPending: StreamSource?
+    /// 同一时刻只让一次选择在路上，其余只留最新的一个排队（Mac 正切换时到的选择会被它丢掉）。主线程。
+    private var pickFlow = PickFlow<StreamSource>()
+    private var pickTimer: DispatchWorkItem?
     private var recencyActive: UInt32?
     private var awaitingMacActive = false
     /// When the Desktop was last picked on the device's own initiative (see the window list).
@@ -294,6 +299,8 @@ final class StreamClient: ObservableObject {
             if active != oldValue || active == appSelection.map(StreamSource.window) {
                 appSelection = nil
             }
+            // 本 fork（PickFlow）：这个人最后选的窗口还在路上或排着队，高亮留在它上面，不跟着中间那一次跳。
+            if case .window(let id)? = pickFlow.wanted?.source, active != .window(id) { appSelection = id }
             if active != oldValue { recencyActive = nil }
             recordActiveAppUse()
             // The pointer sprite shows nothing while nothing streams.
@@ -3684,6 +3691,9 @@ final class StreamClient: ObservableObject {
         recentRttMedians = []
         slowLink = false
         resetPointer()
+        // 本 fork（PickFlow）：这次会话的选择不带到下一次。
+        pickFlow.reset()
+        pickFlowChanged()
         // A tour cut short by the session's end takes its pause with it, and a held pointer move.
         pointerMoveOwed = false
         inputPaused = false
@@ -3773,7 +3783,72 @@ final class StreamClient: ObservableObject {
         } else {
             appSelection = nil
         }
-        request(source)
+        // 本 fork（PickFlow）：上一次选择还没结果时不发，只记最新的一个，等结果到了再发：Mac 正切换时收到的
+        // 选择会被它丢掉。没有连接（排版用的 mock）时照旧直接走。
+        guard connection != nil else { request(source); return }
+        if pickFlow.pick(source, active: active, now: CACurrentMediaTime()) {
+            request(source)
+        } else {
+            choicesSent += 1        // 这个人选过了：设备自己的"回到桌面"请求照样让路
+            #if DEBUG
+            print("switch: \(source) waits for the pick on its way (\(pickFlow.flight.map { "\($0.source)" } ?? "none"))")
+            #endif
+        }
+        pickFlowChanged()
+    }
+
+    // MARK: 本 fork：选择排队与切换计时（PickFlow）
+
+    /// PickFlow 变了之后：画面上的占位跟着它，到点的检查重新排。主线程。
+    private func pickFlowChanged() {
+        let pending = pickFlow.wanted?.source
+        if pickPending != pending { pickPending = pending }
+        pickTimer?.cancel()
+        pickTimer = nil
+        guard let at = pickFlow.deadline else { return }
+        let work = DispatchWorkItem { [weak self] in self?.pickFlowExpired() }
+        pickTimer = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + max(0, at - CACurrentMediaTime()) + 0.01, execute: work)
+    }
+
+    /// Mac 的窗口列表到了（`active` 和 `windows` 已经是它说的）：路上那次有结果了就发排队的；这个人要的画面到了就记耗时。
+    private func pickFlowListed() {
+        let live = Set(windows.map(\.id))
+        let result = pickFlow.listed(active: active, exists: { source in
+            if case .window(let id) = source { return live.contains(id) }
+            return true
+        }, hasPicture: { $0 != .none }, now: CACurrentMediaTime())
+        if let next = result.send { request(next) }
+        if let done = result.done { pickFlowDone(done) }
+        // 这次选择没成（窗口没了、被别处换掉）：高亮回到 Mac 实际串流的。
+        if pickFlow.wanted == nil, let selected = appSelection, active != .window(selected) { appSelection = nil }
+        pickFlowChanged()
+    }
+
+    /// 一个关键帧在网络队列上收到了（`at`）。
+    private func pickFlowKeyframe(_ at: TimeInterval) {
+        guard connection != nil else { return }
+        if let done = pickFlow.keyframe(receivedAt: at) { pickFlowDone(done) }
+        if pickPending != pickFlow.wanted?.source { pickFlowChanged() }
+    }
+
+    private func pickFlowExpired() {
+        let result = pickFlow.expire(active: active, now: CACurrentMediaTime())
+        if let next = result.send { request(next) }
+        if result.gaveUp {
+            #if DEBUG
+            print("switch: gave up waiting for the Mac")
+            #endif
+            if let selected = appSelection, active != .window(selected) { appSelection = nil }
+        }
+        pickFlowChanged()
+    }
+
+    /// 切换完成：从选到画面的耗时。调试控制台一行；Mac 那一侧各段的耗时在它的日志里（SwitchTiming）。
+    private func pickFlowDone(_ done: PickFlow<StreamSource>.Done) {
+        #if DEBUG
+        print("\(done.line): \(done.source)")
+        #endif
     }
 
     /// Asks the host to stream this source: the person's pick (`select`), or this device's own
@@ -4354,6 +4429,11 @@ final class StreamClient: ObservableObject {
                     DispatchQueue.main.async { self.freshKeyframeCame(token, timedOut: false) }
                 }
             }
+            // 本 fork（PickFlow）：这个人选的源的画面到了没有，看发出之后的第一个关键帧。
+            if header.isKeyframe {
+                let at = CACurrentMediaTime()
+                DispatchQueue.main.async { self.pickFlowKeyframe(at) }
+            }
             // The first keyframe after a locked Mac's unlock: its picture is back, the cover goes.
             if header.isKeyframe, unlockWaitsForKeyframe {
                 unlockWaitsForKeyframe = false
@@ -4424,6 +4504,7 @@ final class StreamClient: ObservableObject {
                     self.subscribeToMenus()
                     #if DEBUG
                     InputScript.sessionListed(self)   // -SillInputScript: its clock starts here
+                    PickScript.sessionListed(self)    // 本 fork：-SillPickScript，同上
                     SettingsScript.sessionListed(self)   // -SillSettingsScript: and this one's
                     if let test = UserDefaults.standard.string(forKey: "SillMoveHomeTest") { self.beginMoveHomeTest(test) }
                     #endif
@@ -4432,6 +4513,7 @@ final class StreamClient: ObservableObject {
                 let previous = self.active
                 self.windows = list.windows
                 self.active = list.active
+                self.pickFlowListed()       // 本 fork：路上那次选择有结果了就发排队的（PickFlow）
                 // Forget thumbnails for windows that are gone.
                 let live = Set(list.windows.map(\.id))
                 self.thumbnails = self.thumbnails.filter { live.contains($0.key) }

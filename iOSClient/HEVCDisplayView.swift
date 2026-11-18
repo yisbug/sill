@@ -573,6 +573,8 @@ struct ZoomedStreamView: View {
             .onGeometryChange(for: CGSize.self, of: { $0.size }) { zoom.paneResized(to: $0) }
             .scaleEffect(zoom.zoom.scale)
             .offset(zoom.zoom.offset)
+            // 本 fork（PickFlow）：选了另一个源、画面还没到时的占位，盖满画面区域，不跟着缩放。
+            .overlay { PickShade(client: client) }
             // Drawn past the pane when zoomed, and a clip does not clip hit testing: never a touch's target
             // (sideways the bar comes before the picture, and its buttons' touches must stay theirs).
             .allowsHitTesting(false)

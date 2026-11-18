@@ -879,5 +879,141 @@ check("app switch: nothing to switch to", G.appSwitchTarget(order: [], current: 
 check("app switch: up and down pick nothing", G.appSwitchTarget(order: dock, current: 10, gesture: .swipeUp) == nil)
 check("app switch: the order is kept a short while", G.appSwitchKeepsOrder > 0.5 && G.appSwitchKeepsOrder <= 3)
 
+// 本 fork：三指左右滑越过阈值即判定（early），不等抬手
+struct EarlyRun {
+    var early: [G.Output] = []      // early 返回的非 none 结果，按序
+    var ups: [G.Output] = []        // 抬手 / 落下返回的非 none 结果（silenced 除外）
+    var extra: [G.Output] = []      // 提前判定后继续调 early 的结果
+}
+/// 与 StrokeObserver 一样：同一时刻的移动都记完之后调一次 early；提前判定后每步仍照调，看是否再给。
+func runEarly(_ events: [Event], _ g: inout G) -> EarlyRun {
+    var r = EarlyRun()
+    for (i, e) in events.enumerated() {
+        switch e {
+        case .down(let id, let p, let t, let h): _ = g.down(id, at: p, time: t, holding: h)
+        case .move(let id, let p, let t):
+            g.moved(id, to: p, time: t)
+            var last = true
+            if i + 1 < events.count, case .move(_, _, let t2) = events[i + 1], t2 == t { last = false }
+            if last {
+                let out = g.early(time: t)
+                if out != .none { if r.early.isEmpty { r.early.append(out) } else { r.extra.append(out) } }
+            }
+        case .up(let id, let p, let t):
+            let out = g.up(id, at: p, time: t)
+            if out != .none { r.ups.append(out) }
+        case .cancel(let id): g.cancelled(id)
+        }
+    }
+    return r
+}
+func runEarly(_ events: [Event]) -> EarlyRun { var g = G(); return runEarly(events, &g) }
+do {
+    check("early: three fingers right 60 pt: swipeRight, fingers 3, and the lift adds nothing",
+          runEarly(swipe(dx: 60, dy: 0)).early == [.gesture(.swipeRight, fingers: 3)] && runEarly(swipe(dx: 60, dy: 0)).ups.isEmpty)
+    check("early: three fingers left 60 pt: swipeLeft, fingers 3, and the lift adds nothing",
+          runEarly(swipe(dx: -60, dy: 0)).early == [.gesture(.swipeLeft, fingers: 3)] && runEarly(swipe(dx: -60, dy: 0)).ups.isEmpty)
+    // 一步到位：恰好 40 与 39.9
+    check("early: exactly 40 pt right: swipeRight", runEarly(swipe(dx: 40, dy: 0, steps: 1)).early == [.gesture(.swipeRight, fingers: 3)])
+    check("early: 39.9 pt right: not early, the lift decides as before (nothing, under the flick's speed)",
+          runEarly(swipe(dx: 39.9, dy: 0, steps: 1)).early.isEmpty)
+    check("early: 39.9 pt left: not early", runEarly(swipe(dx: -39.9, dy: 0, steps: 1)).early.isEmpty)
+    // 越过的那一步就判定，而不是最后一步
+    do {
+        var g = G()
+        let ev = swipe(dx: 100, dy: 0, steps: 10)
+        var firstAt: Double?
+        for e in ev {
+            switch e {
+            case .down(let id, let p, let t, let h): _ = g.down(id, at: p, time: t, holding: h)
+            case .move(let id, let p, let t):
+                g.moved(id, to: p, time: t)
+                if id == 2, firstAt == nil, g.early(time: t) != .none { firstAt = t }
+            case .up(let id, let p, let t): _ = g.up(id, at: p, time: t)
+            case .cancel(let id): g.cancelled(id)
+            }
+        }
+        check("early: decided at the step that passes 40 pt (step 4 of 10), not at the lift", firstAt != nil && abs(firstAt! - (0.032 + 0.04)) < 1e-9)
+    }
+    // 判定一次后：再调 early 与抬手都是 none，silent 保持
+    do {
+        var g = G()
+        let ev = swipe(dx: 80, dy: 0)
+        let r = runEarly(ev, &g)
+        check("early: after deciding, early again gives nothing and the lift gives nothing", r.early.count == 1 && r.extra.isEmpty && r.ups.isEmpty)
+        check("early: the stroke stays silent until the next stroke's first touch", g.silent && g.early(time: 9) == .none)
+        _ = g.down(50, at: CGPoint(x: 10, y: 10), time: 20, holding: false)
+        check("early: the next stroke starts clean", !g.silent)
+    }
+    // 上滑、下滑：不提前，抬手照旧
+    for (name, dy, want) in [("up", CGFloat(-80), G.Gesture.swipeUp), ("down", 80, .swipeDown)] {
+        let r = runEarly(swipe(dx: 0, dy: dy))
+        check("early: three fingers \(name) 80 pt: not early, the lift gives \(want)", r.early.isEmpty && r.ups == [.gesture(want, fingers: 3)])
+    }
+    // 斜向：不满足 axisRatio
+    do {
+        let r = runEarly(swipe(dx: 60, dy: 50))
+        check("early: a diagonal (60, 50) is no early swipe", r.early.isEmpty)
+        let edge = runEarly(swipe(dx: 65, dy: 50))      // 65 / 50 = 1.3 恰好
+        check("early: exactly the axis ratio (65, 50): swipeRight", edge.early == [.gesture(.swipeRight, fingers: 3)])
+        check("early: just under the axis ratio (64.9, 50): not early", runEarly(swipe(dx: 64.9, dy: 50)).early.isEmpty)
+    }
+    // 捏合 / 张开：质心不动，不提前
+    check("early: a pinch gives nothing early", runEarly(pinch(scale: 0.45)).early.isEmpty)
+    check("early: a spread gives nothing early", runEarly(pinch(scale: 2)).early.isEmpty)
+    // 三指不同向：质心右移 60，但有一指逆着走
+    do {
+        let start = hand(3)
+        let end = [CGPoint(x: start[0].x - 20, y: start[0].y), CGPoint(x: start[1].x + 100, y: start[1].y), CGPoint(x: start[2].x + 100, y: start[2].y)]
+        let r = runEarly(path(start, to: end))
+        check("early: one finger against the swipe (centroid right 60): not early", r.early.isEmpty)
+        let ok = [CGPoint(x: start[0].x + 40, y: start[0].y), CGPoint(x: start[1].x + 70, y: start[1].y), CGPoint(x: start[2].x + 70, y: start[2].y)]
+        check("early: the same hand with the slow finger moving along enough: swipeRight", runEarly(path(start, to: ok)).early == [.gesture(.swipeRight, fingers: 3)])
+        let edge = [CGPoint(x: start[0].x + 20, y: start[0].y), CGPoint(x: start[1].x + 80, y: start[1].y), CGPoint(x: start[2].x + 80, y: start[2].y)]
+        check("early: a finger at exactly half the centroid's way (20 of 60 → needs 30): not early", runEarly(path(start, to: edge)).early.isEmpty)
+        let half = [CGPoint(x: start[0].x + 30, y: start[0].y), CGPoint(x: start[1].x + 75, y: start[1].y), CGPoint(x: start[2].x + 75, y: start[2].y)]
+        check("early: a finger at exactly half the centroid's way (30 of 60): swipeRight", runEarly(path(start, to: half)).early == [.gesture(.swipeRight, fingers: 3)])
+    }
+    // 第四根手指：不动的拇指（先落或后落）、一起滑的第四指；early 不给，抬手结果与原来一致
+    do {
+        /// 不动的拇指（id 9）：先于三指落下，或在三指落下之后、第一次移动之前落下。
+        func thumb(first: Bool) -> [Event] {
+            let down = Event.down(9, CGPoint(x: 120, y: 420), first ? 0 : 0.06, holding: false)
+            let three = swipe(3, dx: 80, dy: 0, t0: first ? 0.5 : 0)
+            if first { return [down] + three }
+            let landed = three.prefix(3), rest = three.dropFirst(3)
+            return Array(landed) + [down] + Array(rest)
+        }
+        let rest = runEarly(thumb(first: true))
+        check("early: a resting thumb down first, three swipe right: not early; the lift decides swipeRight, fingers 3",
+              rest.early.isEmpty && rest.ups == [.gesture(.swipeRight, fingers: 3)])
+        let late = runEarly(thumb(first: false))
+        check("early: a resting thumb landing after the three: not early; the lift decides swipeRight, fingers 3",
+              late.early.isEmpty && late.ups == [.gesture(.swipeRight, fingers: 3)])
+        let along = runEarly(swipe(4, dx: 80, dy: 0))
+        check("early: four fingers swipe right together: not early; the lift decides swipeRight, fingers 4",
+              along.early.isEmpty && along.ups == [.gesture(.swipeRight, fingers: 4)])
+        // 拇指先落、之后抬起，三指再滑：others 里仍有它，不提前
+        var ev: [Event] = [.down(9, CGPoint(x: 120, y: 420), 0, holding: false)]
+        for i in 0..<3 { ev.append(.down(i, hand(3)[i], 0.5 + 0.016 * Double(i), holding: false)) }
+        ev.append(.up(9, CGPoint(x: 120, y: 420), 0.55))
+        for k in 1...10 { for i in 0..<3 { ev.append(.move(i, CGPoint(x: hand(3)[i].x + 10 * CGFloat(k), y: hand(3)[i].y), 0.6 + 0.01 * Double(k))) } }
+        let lifted = runEarly(ev)
+        check("early: a thumb that rested and lifted before the swipe still keeps early off", lifted.early.isEmpty)
+        var g2 = G(); _ = runEarly(ev, &g2)
+        check("early: (that stroke is armed, so the test means it)", g2.armed)
+    }
+    // 未武装：一指、两指
+    check("early: one finger sliding right: nothing", runEarly(swipe(1, dx: 80, dy: 0)).early.isEmpty)
+    check("early: two fingers sliding right: nothing", runEarly(swipe(2, dx: 80, dy: 0)).early.isEmpty)
+    // 三指慢慢放下（未武装）再右滑：不提前
+    do {
+        let r = runEarly(stroke(hand(3), stagger: 0.3, steps: 10) { _, k, p in CGPoint(x: p.x + 8 * CGFloat(k), y: p.y) })
+        check("early: three fingers placed slowly (never armed): nothing early", r.early.isEmpty)
+    }
+    // 抬手前取消：不提前也不判定
+    check("early: nothing early before any move", { var g = G(); return g.early(time: 0) == .none }())
+}
+
 print("\(passes + fails) checks, \(fails) failed")
 exit(fails == 0 ? 0 : 1)

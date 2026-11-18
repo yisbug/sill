@@ -193,6 +193,8 @@ package final class StreamCoordinator {
     /// Desktop request can land then (StreamClient's window list handling) and must not override
     /// the user's pick.
     private var pickArrivedWhileSwitching: StreamSource?
+    /// 本 fork：正在进行或最近一次切换的计时（SwitchTiming）；startPipeline 把它交给新编码器的回调。
+    private var switchTiming: SwitchTiming?
     /// The client's last stream panel size and text scale. One stream, so with several clients
     /// the last one to report wins. Only ever one a host takes (ViewportBounds); a refused one
     /// leaves it as it was.
@@ -1816,6 +1818,9 @@ package final class StreamCoordinator {
         case .stay: return
         }
         switching = true
+        // 本 fork：这次切换各段的耗时，流起来后写进日志（SwitchTiming）。
+        let timing = SwitchTiming(restart: source == active)
+        switchTiming = timing
         if source != active { missingPolls = 0 }    // a window's looks off the list are its own
         restartOf = (source == active && source != .none) ? source : nil
         defer {
@@ -1860,6 +1865,7 @@ package final class StreamCoordinator {
         await capture.stop()
         await syntheticCapture.stop()
         await stillCapture.stop()
+        timing.stopped()
         // Every queue drained: let the old encoder go.
         capture.onFrame = nil; syntheticCapture.onFrame = nil; stillCapture.onFrame = nil
         placeholderStreams = false
@@ -2098,9 +2104,11 @@ package final class StreamCoordinator {
             title = String(localized: "Locked", comment: "状态菜单：Mac 已锁定"); kind = .desktop
         }
 
+        timing.placed()
         do {
             try await startPipeline(source: source, filter: filter, sourceRect: sourceRect, displayScale: displayScale,
                                     width: width, height: height, describe: describe, title: title, kind: kind, picture: picture)
+            print(timing.started(describe))
         } catch {
             // `picked`, not a catalog lookup: a staged window may have left the on-screen list.
             if virtualDisplay, stage.isStaged, let w = picked {
@@ -2236,6 +2244,7 @@ package final class StreamCoordinator {
             }
         }
         let server = self.server
+        let timing = switchTiming       // 本 fork：新流的第一帧发出时写一行（SwitchTiming）
         enc.onEncoded = { [weak self] data, isKey, parameterSets in
             let now = Date().timeIntervalSince1970
             if let ps = parameterSets {
@@ -2246,6 +2255,7 @@ package final class StreamCoordinator {
                 Task { @MainActor in self?.parameterSetsSent(sets, at: sentAt) }
             }
             server.broadcast(StreamMessage(kind: .frame, timestamp: now, isKeyframe: isKey, payload: data), picture: picture)
+            if let line = timing?.firstFrame() { print(line) }
         }
         if source == .desktop, picture != .placeholder, desktopStartsToFail > 0 {
             // TEST ONLY (SILL_TEST_DESKTOP_FAIL, a --synthetic host): this start fails where the capture

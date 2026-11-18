@@ -218,16 +218,7 @@ struct TrackpadGestures {
         let movers = others.filter { distance($0.value.start, $0.value.now) >= chordTravel }
         let fingers = min(3 + movers.count, 4)
         if travel >= swipeDistance || (travel >= flickDistance && speed(to: end, at: time) >= flickSpeed) {
-            let major = max(abs(dx), abs(dy)), minor = min(abs(dx), abs(dy))
-            if major >= axisRatio * minor {
-                let swipe: Gesture = abs(dx) > abs(dy) ? (dx < 0 ? .swipeLeft : .swipeRight) : (dy < 0 ? .swipeUp : .swipeDown)
-                let axis = swipe.direction!
-                let along = dx * axis.dx + dy * axis.dy
-                func share(_ from: CGPoint, _ to: CGPoint) -> CGFloat { (to.x - from.x) * axis.dx + (to.y - from.y) * axis.dy }
-                let together = armedBy.allSatisfy { share(armedAt[$0]!, now[$0]!) >= swipeShare * along }
-                    && movers.values.allSatisfy { share($0.start, $0.now) > -swipeShare * along }
-                if together { return (swipe, fingers) }
-            }
+            if let found = swipeOf(dx: dx, dy: dy, now: now, movers: movers) { return (found, fingers) }
         }
         // A pinch or a spread: the three and the others that moved, each from where it was at arming
         // (or landed, after) to where it is now or lifted.
@@ -239,6 +230,38 @@ struct TrackpadGestures {
         if change <= 1 - pinchRatio { return (.pinch, fingers) }
         if change >= 1 + pinchRatio { return (.spread, fingers) }
         return nil
+    }
+
+    /// 本 fork：质心位移 (dx, dy) 是否成立一次滑动（轴向占优、三指同向、其他动过的手指没有逆着滑），成立则给出方向。
+    /// `decide`（抬手时）与 `early`（移动中）共用同一套判断；距离的门槛各自在调用处。
+    private func swipeOf(dx: CGFloat, dy: CGFloat, now: [Int: CGPoint],
+                       movers: [Int: (start: CGPoint, now: CGPoint)]) -> Gesture? {
+        let major = max(abs(dx), abs(dy)), minor = min(abs(dx), abs(dy))
+        if major >= axisRatio * minor {
+            let swipe: Gesture = abs(dx) > abs(dy) ? (dx < 0 ? .swipeLeft : .swipeRight) : (dy < 0 ? .swipeUp : .swipeDown)
+            let axis = swipe.direction!
+            let along = dx * axis.dx + dy * axis.dy
+            func share(_ from: CGPoint, _ to: CGPoint) -> CGFloat { (to.x - from.x) * axis.dx + (to.y - from.y) * axis.dy }
+            let together = armedBy.allSatisfy { share(armedAt[$0]!, now[$0]!) >= swipeShare * along }
+                && movers.values.allSatisfy { share($0.start, $0.now) > -swipeShare * along }
+            if together { return swipe }
+        }
+        return nil
+    }
+
+    /// 本 fork：三指左右滑在移动中越过 `swipeDistance` 的那一刻就判定，不等抬手。一次触摸事件里的移动都记完之后调用，
+    /// 至多返回一次；只在屏幕上正好是武装这一笔的三根手指（没有过别的手指）时才提前，上下滑、捏合、张开、四指仍等抬手，
+    /// 不走 flick。返回后这一笔视为已判定：抬手的 `up` 与再次调用都是 `.none`，silent 照旧保持到下一笔。
+    mutating func early(time: TimeInterval) -> Output {
+        guard armed, !done, others.isEmpty, fingersDown.count == 3 else { return .none }
+        let now = nowOfArmed()
+        let start = centroid(armedAt), end = centroid(now)
+        let dx = end.x - start.x, dy = end.y - start.y
+        guard hypot(dx, dy) >= swipeDistance,
+              let found = swipeOf(dx: dx, dy: dy, now: now, movers: [:]),
+              found == .swipeLeft || found == .swipeRight else { return .none }
+        done = true
+        return .gesture(found, fingers: 3)
     }
 
     /// The centroid's speed over the last `flickWindow` before `time`: from the last place it was at

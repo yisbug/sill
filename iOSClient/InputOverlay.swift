@@ -1761,11 +1761,17 @@ final class StrokeObserver: UIGestureRecognizer, UIGestureRecognizerDelegate {
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent) {
         var moves: [Int: CGPoint] = [:]
+        var latest: TimeInterval = 0
         for touch in ordered(touches) {
             guard let id = ids[ObjectIdentifier(touch)] else { continue }
             let point = touch.location(in: view)
             strokes.moved(id, to: point, time: touch.timestamp)
             moves[id] = point
+            latest = max(latest, touch.timestamp)
+        }
+        // 本 fork：三指左右滑在移动中越过阈值就判定，不等抬手；先手势后 onTouch，与 touchesEnded 一致。
+        if !moves.isEmpty, case .gesture(let gesture, let fingers) = strokes.early(time: latest) {
+            onGesture(gesture, fingers)
         }
         if !moves.isEmpty { onTouch(.moved(moves)) }
     }

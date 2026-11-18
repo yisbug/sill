@@ -212,7 +212,7 @@ has Sources/SillHost/VirtualStage.swift :: vd.refusedAgain
 
 ### F12 检查与 CI
 
-- 是什么：新增五组纯检查 `app-recency`、`voice`、`bar-collapse`、`phone-stream`、`traffic-stats`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
+- 是什么：新增六组纯检查 `app-recency`、`voice`、`bar-collapse`、`phone-stream`、`traffic-stats`、`pick-flow`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
 - 提交：`9d4ac02`、`39c0d25`、`4f80231`、`a632a5c`。
 - 合并时注意：`ci.yml` 的矩阵是一整行，上游每加一个检查这一行就冲突，合并后三个名字都要在；README 表格同理。
 
@@ -292,6 +292,33 @@ has iOSClient/StreamClient.swift :: self?.countTraffic(received: n)
 has iOSClient/StreamClient.swift :: func flushTraffic()
 has iOSClient/HostSettingsPanel.swift :: TrafficStatsView(client: client
 has iOSClient/ContentView.swift :: TrafficStatsView(client: client
+```
+
+### F17 切换应用更跟手：选择排队、越过阈值即判定、占位画面、切换计时
+
+- 是什么（起因见 2026-11-18 的日志分析：窗口换窗口 Mac 端中位 402 ms、p90 1.1 s，期间设备上是冻住的旧画面；连续切换时 Mac 只做第一次）：
+  - 选择排队（设备端，规则 `PickFlow`，检查 `pick-flow`）：Mac 正切到另一个源时收到的选择会被它丢掉（`StreamCoordinator.handlePick`，上游行为，没有改）。设备同一时刻只让一次选择在路上，它有结果（窗口列表说 Mac 在串流它了，或换成了别的源）之前，新的选择只记最新的一个，结果到了再发；8 s 没结果就不等了。Dock 高亮（`appSelection`）留在最后选的那个上。`StreamClient.select` 经它发；设备自己的请求（回到桌面、移动连接后重选）不经它。
+  - 占位画面（`PickShade`，挂在 `ZoomedStreamView` 上）：选了另一个源、画面还没到时，盖上目标窗口的缩略图和转圈（桌面没有缩略图，只压暗）；Mac 说在串流它了并且发出后收到过关键帧就撤（`StreamClient.pickPending`），最多 9 s。
+  - 三指左右滑越过阈值即判定（`TrackpadGestures.early`，`StrokeObserver.touchesMoved` 调）：屏上正好是武装这一笔的三指、质心水平位移 ≥ 40 pt、三指同向时，不等抬手就判定；上下滑、捏合、张开、四指照旧在抬手时判定。检查在 `gestures`。
+  - 切换计时：Mac 端每次切换或重启在日志里写两行（`SwitchTiming`：停旧采集、摆好新源、起编码器和采集各多久；首帧发出时刻）；设备端 Debug 控制台写一行从选到画面的耗时（`PickFlow.Done.line`）。调试参数 `-SillPickScript '<t> desktop|none|window:ID; …'` 在模拟器里替人做选择（只对回环上的合成测试主机生效）；`-SillPickShade desktop|<窗口 ID>` 让占位一直显示，给排版 mock 拍照用。
+- 提交：`git log --oneline -- iOSClient/PickFlow.swift Sources/SillHost/SwitchTiming.swift`。
+- 合并时注意：`StreamCoordinator.select` 与 `startPipeline` 里各多几行 `timing`（上游常改这两个函数，冲突时把这几行挪到对应位置：停完旧采集后 `timing.stopped()`、`startPipeline` 前 `timing.placed()`、成功后 `print(timing.started(describe))`、`onEncoded` 里 `timing?.firstFrame()`）。`StreamClient` 里窗口列表处理多一行 `pickFlowListed()`、收帧处多一段关键帧通知、`active` 的 `didSet` 多一行、`tearDown` 多两行。上游若让 Mac 自己排队切换中到来的选择，`PickFlow` 的排队可以撤，占位和计时仍可留。
+
+```fork-check
+file iOSClient/PickFlow.swift
+file Sources/SillHost/SwitchTiming.swift
+file Tests/checks/pick-flow/main.swift
+has iOSClient/Sill.xcodeproj/project.pbxproj :: PickFlow.swift
+has iOSClient/StreamClient.swift :: if pickFlow.pick(source, active: active
+has iOSClient/StreamClient.swift :: self.pickFlowListed()
+has iOSClient/StreamClient.swift :: self.pickFlowKeyframe(at)
+has iOSClient/HEVCDisplayView.swift :: PickShade(client: client)
+has iOSClient/TrackpadGestures.swift :: mutating func early(
+has iOSClient/InputOverlay.swift :: strokes.early(
+has Sources/SillHost/StreamCoordinator.swift :: print(timing.started(describe))
+has Sources/SillHost/StreamCoordinator.swift :: timing?.firstFrame()
+has .github/workflows/ci.yml :: , pick-flow,
+has Tests/checks/README.md :: | `pick-flow` |
 ```
 
 ### F13 文档
