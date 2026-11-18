@@ -5,6 +5,12 @@
       "comment": "App 显示名",
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill"
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -17,6 +23,12 @@
       "comment": "本地网络权限说明",
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finds your Mac on the local network."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -29,6 +41,12 @@
       "comment": "相机权限说明",
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill scans the code on your Mac to pair with it."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
@@ -41,6 +59,12 @@
       "comment": "麦克风权限说明",
       "extractionState": "manual",
       "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sill records your voice to type it on your Mac."
+          }
+        },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",

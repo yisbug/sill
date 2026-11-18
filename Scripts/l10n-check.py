@@ -7,6 +7,7 @@
       把 JSON（键到译文或完整本地化对象）写进两个目录已有的同名键。
 
 忽略 stale、shouldTranslate: false，以及纯符号、数字和空白的键。
+iOSClient/InfoPlist.xcstrings 的键是 Info.plist 的键名，所以源语言也要有值。
 """
 import argparse
 from collections import Counter
@@ -18,6 +19,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parent.parent
 CATALOGS = [ROOT / "iOSClient/Localizable.xcstrings", ROOT / "Packaging/Localizable.xcstrings"]
+# 键是 Info.plist 的键名而不是原文的目录，值为所属的界面目录（用它的上线语言）。
+INFO_PLISTS = {ROOT / "iOSClient/InfoPlist.xcstrings": CATALOGS[0]}
 SPEC = re.compile(
     r"(?P<argument>%arg)\b|%#@(?P<substitution>[^@]+)@|"
     r"%(?:(?P<position>\d+)\$)?(?P<format>[-+ #0']*(?:\d+|\*)?(?:\.(?:\d+|\*))?"
@@ -161,6 +164,23 @@ def check(path, languages, list_missing):
     return int(failed)
 
 
+def check_info_plist(path, languages):
+    """源语言也必须有值：缺了的话，构建出的 InfoPlist.strings 会把键名本身当成文字显示。"""
+    if not path.exists():
+        print(f"{path.relative_to(ROOT)}：不存在")
+        return 1
+    data = json.loads(path.read_text())
+    failed = False
+    for lang in [data.get("sourceLanguage", "en")] + languages:
+        missing = [key for key, entry in data["strings"].items()
+                   if not translation_complete(entry.get("localizations", {}).get(lang, {}))]
+        print(f"{path.relative_to(ROOT)} [{lang}]：共 {len(data['strings'])} 条，缺 {len(missing)} 条")
+        for key in missing:
+            print("  缺：", json.dumps(key, ensure_ascii=False))
+        failed |= bool(missing)
+    return int(failed)
+
+
 def apply(file, lang):
     table = json.loads(Path(file).read_text())
     if not isinstance(table, dict) or any(not isinstance(value, (str, dict)) for value in table.values()):
@@ -192,6 +212,7 @@ def main():
             return 0
         languages = languages_by_catalog()
         results = [check(path, languages[path], args.list_missing) for path in CATALOGS]
+        results += [check_info_plist(path, languages[owner]) for path, owner in INFO_PLISTS.items()]
         return max(results)
     except (OSError, ValueError, KeyError) as error:
         print(f"本地化检查失败：{error}", file=sys.stderr)
