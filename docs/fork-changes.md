@@ -212,7 +212,7 @@ has Sources/SillHost/VirtualStage.swift :: vd.refusedAgain
 
 ### F12 检查与 CI
 
-- 是什么：新增六组纯检查 `app-recency`、`voice`、`bar-collapse`、`phone-stream`、`traffic-stats`、`pick-flow`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
+- 是什么：新增七组纯检查 `app-recency`、`voice`、`bar-collapse`、`phone-stream`、`traffic-stats`、`pick-flow`、`viewport-owner`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
 - 提交：`9d4ac02`、`39c0d25`、`4f80231`、`a632a5c`。
 - 合并时注意：`ci.yml` 的矩阵是一整行，上游每加一个检查这一行就冲突，合并后三个名字都要在；README 表格同理。
 
@@ -251,7 +251,7 @@ has Tests/checks/README.md :: | `phone-stream` |
 ### F15 串流界面：画面铺满、浮动入口更醒目、语音球长按菜单、启动续连、三指切换应用
 
 - 是什么：
-  - 横屏串流画面去掉 8 pt 黑框和圆角，左右伸进安全区（刘海、灵动岛一侧），顶栏底色也铺到两侧；剪贴板芯片和语音球只放在画面落在安全区里的部分（`StreamScreen.safePanel`）。剩下的黑边只来自画面与 Mac 窗口比例不同（Aa 为 Off，或串流桌面）。
+  - 横屏串流画面去掉 8 pt 黑框和圆角，伸进两侧安全区，顶栏底色也铺过去；**iPhone 上灵动岛（刘海）那一侧例外，留黑边**（用户 2026-11-18：灵动岛区域还是用黑边），只铺另一侧：规则 `PhoneStream.islandSide`、`fills`（检查在 `phone-stream`），`StreamScreen.fillEdges` 按界面方向取，经环境值 `streamFillEdges` 给顶栏；剪贴板芯片和语音球只放在画面落在安全区里的部分（`StreamScreen.safePanel`）。剩下的黑边只来自画面与 Mac 窗口比例不同（Aa 为 Off，或串流桌面）。
   - 顶栏收起后的浮动入口不透明度调高（底色 0.85、整体 0.92，加阴影）。
   - 语音球空闲时底色略透明（`VoiceInputPolicy.idleFillOpacity` 0.78）；长按弹出系统菜单，紧挨着球：全选并删除、全选、全选并复制、全选并剪切、粘贴、撤销、重做、回车，按键经 `KeyChord.press` 发给 Mac（规则 `VoiceInputPolicy.QuickAction`、`strokes`，检查在 `voice`）。
   - 启动续连：App 打开时为最近连过、还能自动拨的那台 Mac 起一个自动重连（和断线重连同一条路），连接界面之上铺它上次的画面和「正在连接…」与取消；连上进串流，20 s 没连上或重连结束就回连接界面并提示（规则 `ConnectionList.resumeMacID`、`resumeState`，检查在 `connection-list`；状态 `StreamClient.launchResume`，界面 `LaunchResumeView`）。上次的画面在离开前台时（`willResignActive`）也留一张，只在磁贴样式下。
@@ -263,7 +263,7 @@ has Tests/checks/README.md :: | `phone-stream` |
 ```fork-check
 has iOSClient/StreamScreen.swift :: safePanel(
 has iOSClient/StreamScreen.swift :: Palette.bar.opacity(0.85)
-has iOSClient/StreamScreen.swift :: Palette.bar.ignoresSafeArea(edges: [.top, .horizontal])
+has iOSClient/StreamScreen.swift :: Palette.bar.ignoresSafeArea(edges: Edge.Set.top.union(fillEdges))
 has iOSClient/VoiceInputPolicy.swift :: enum QuickAction
 has iOSClient/VoiceInputButton.swift :: .contextMenu {
 has iOSClient/ContentView.swift :: LaunchResumeView
@@ -272,6 +272,8 @@ has iOSClient/StreamClient+Remote.swift :: func startLaunchResume()
 has iOSClient/StreamClient.swift :: keepPictureForLaunch()
 has iOSClient/ConnectionList.swift :: static func resumeMacID
 has iOSClient/TrackpadGestures.swift :: static func switchesApp
+has iOSClient/PhoneStream.swift :: static func islandSide
+has iOSClient/StreamScreen.swift :: .ignoresSafeArea(.container, edges: fillEdges)
 has iOSClient/StreamClient.swift :: private func switchApp
 has iOSClient/HostSettingsPanel.swift :: "Switch Apps"
 ```
@@ -294,13 +296,13 @@ has iOSClient/HostSettingsPanel.swift :: TrafficStatsView(client: client
 has iOSClient/ContentView.swift :: TrafficStatsView(client: client
 ```
 
-### F17 切换应用更跟手：选择排队、越过阈值即判定、占位画面、切换计时
+### F17 切换应用更跟手：选择排队、三指跟手翻页、占位画面、切换计时
 
 - 是什么（起因见 2026-11-18 的日志分析：窗口换窗口 Mac 端中位 402 ms、p90 1.1 s，期间设备上是冻住的旧画面；连续切换时 Mac 只做第一次）：
   - 选择排队（设备端，规则 `PickFlow`，检查 `pick-flow`）：Mac 正切到另一个源时收到的选择会被它丢掉（`StreamCoordinator.handlePick`，上游行为，没有改）。设备同一时刻只让一次选择在路上，它有结果（窗口列表说 Mac 在串流它了，或换成了别的源）之前，新的选择只记最新的一个，结果到了再发；8 s 没结果就不等了。Dock 高亮（`appSelection`）留在最后选的那个上。`StreamClient.select` 经它发；设备自己的请求（回到桌面、移动连接后重选）不经它。
   - 占位画面（`PickShade`，挂在 `ZoomedStreamView` 上）：选了另一个源、画面还没到时，盖上目标窗口的缩略图和转圈（桌面没有缩略图，只压暗）；Mac 说在串流它了并且发出后收到过关键帧就撤（`StreamClient.pickPending`），最多 9 s。
-  - 三指左右滑越过阈值即判定（`TrackpadGestures.early`，`StrokeObserver.touchesMoved` 调）：屏上正好是武装这一笔的三指、质心水平位移 ≥ 40 pt、三指同向时，不等抬手就判定；上下滑、捏合、张开、四指照旧在抬手时判定。检查在 `gestures`。
-  - 切换计时：Mac 端每次切换或重启在日志里写两行（`SwitchTiming`：停旧采集、摆好新源、起编码器和采集各多久；首帧发出时刻）；设备端 Debug 控制台写一行从选到画面的耗时（`PickFlow.Done.line`）。调试参数 `-SillPickScript '<t> desktop|none|window:ID; …'` 在模拟器里替人做选择（只对回环上的合成测试主机生效）；`-SillPickShade desktop|<窗口 ID>` 让占位一直显示，给排版 mock 拍照用。
+  - 三指左右滑是跟手的翻页（用户 2026-11-18：滑动时能拖拽整个屏幕、带动画）：屏上正好是武装这一笔的三指、质心水平位移 ≥ 12 pt、三指同向时这一笔进入翻页（`TrackpadGestures.drag`，输出 `.paging`、`.pageEnded`、`.pageCancelled`），串流画面跟着手指横移，旁边带出目标应用的缩略图页（`PagerStage`、`PagerModel`，在 `PickFlow.swift`）；松手时位移过了 `pageCommitDistance`（min(120, 宽 × 0.22)）或朝位移方向甩得够快就翻（`pageCommit`）：立刻发出选择，画面同时滑到位，滑完由占位接上；否则弹回。那一边没有可切的应用时只有带阻尼的小幅位移（`pageOffset`）。开了减弱动态效果时画面不动，该切照样切。翻页不可用（手势开关关着、没连接）时三指左右滑照旧在抬手时判定。执行在 `StreamClient.page`；`StrokeObserver` 的 `onPage`、`pagingEnabled` 按窗口找会话（`PageReceivers`）。上下滑、捏合、张开、四指照旧在抬手时判定。检查在 `gestures`。
+  - 切换计时：Mac 端每次切换或重启在日志里写两行（`SwitchTiming`：停旧采集、摆好新源、起编码器和采集各多久；首帧发出时刻）；设备端 Debug 控制台写一行从选到画面的耗时（`PickFlow.Done.line`）。调试参数 `-SillPickScript '<t> desktop|none|window:ID; …'` 在模拟器里替人做选择（只对回环上的合成测试主机生效）；`-SillPickShade desktop|<窗口 ID>` 让占位一直显示、`-SillPageDrag <dx>` 把翻页固定在这个偏移，给排版 mock 拍照用。
 - 提交：`git log --oneline -- iOSClient/PickFlow.swift Sources/SillHost/SwitchTiming.swift`。
 - 合并时注意：`StreamCoordinator.select` 与 `startPipeline` 里各多几行 `timing`（上游常改这两个函数，冲突时把这几行挪到对应位置：停完旧采集后 `timing.stopped()`、`startPipeline` 前 `timing.placed()`、成功后 `print(timing.started(describe))`、`onEncoded` 里 `timing?.firstFrame()`）。`StreamClient` 里窗口列表处理多一行 `pickFlowListed()`、收帧处多一段关键帧通知、`active` 的 `didSet` 多一行、`tearDown` 多两行。上游若让 Mac 自己排队切换中到来的选择，`PickFlow` 的排队可以撤，占位和计时仍可留。
 
@@ -312,13 +314,32 @@ has iOSClient/Sill.xcodeproj/project.pbxproj :: PickFlow.swift
 has iOSClient/StreamClient.swift :: if pickFlow.pick(source, active: active
 has iOSClient/StreamClient.swift :: self.pickFlowListed()
 has iOSClient/StreamClient.swift :: self.pickFlowKeyframe(at)
-has iOSClient/HEVCDisplayView.swift :: PickShade(client: client)
-has iOSClient/TrackpadGestures.swift :: mutating func early(
-has iOSClient/InputOverlay.swift :: strokes.early(
+has iOSClient/HEVCDisplayView.swift :: PagerStage(pager: client.pager
+has iOSClient/PickFlow.swift :: PickShade(client: client)
+has iOSClient/StreamClient.swift :: func page(_ event: StrokeObserver.PageEvent)
+has iOSClient/TrackpadGestures.swift :: mutating func drag(
+has iOSClient/TrackpadGestures.swift :: static func pageCommit(
+has iOSClient/InputOverlay.swift :: strokes.drag(
 has Sources/SillHost/StreamCoordinator.swift :: print(timing.started(describe))
 has Sources/SillHost/StreamCoordinator.swift :: timing?.firstFrame()
 has .github/workflows/ci.yml :: , pick-flow,
 has Tests/checks/README.md :: | `pick-flow` |
+```
+
+### F18 几台设备同时连着时，窗口按正在用的那台的面板定尺寸
+
+- 是什么：上游是"谁最后发视口就按谁的"，而每次换源每台设备都会重发视口，所以 iPhone 和 iPad 同时连着时窗口尺寸在两者之间来回跳（另一台上下或左右出黑边），每次切换后还多重启一次串流（2026-11-18 的日志，每次多 450–600 ms）。现在每台设备的视口各记各的，窗口按最近有人操作的那台的来（触摸、按键、手势、窗口按钮、菜单项、打开应用，判断借用 `DisplayWake.activity`；选了一个窗口也算）；别的设备发来视口只记下；正在用的那台走了换成剩下的里面最近用过的。只有一台设备时和上游一样。规则 `ViewportOwner`（检查 `viewport-owner`），换主人时日志写一行 `Viewport: the window now fits …`。
+- 提交：`git log --oneline -- Sources/SillHost/ViewportOwner.swift`。
+- 合并时注意：`StreamCoordinator` 的 `.viewport` 分支里 `viewport = v` 换成了 `viewports.received` + `viewport = viewports.chosen`；`handle` 里 `deviceActive(...)` 之后多一行 `viewportUsed(by:)`，`.selectSource` 分支多一行；断开与清零处各多一行。上游若自己做了按设备分视口，这一项撤掉。
+
+```fork-check
+file Sources/SillHost/ViewportOwner.swift
+file Tests/checks/viewport-owner/main.swift
+has Sources/SillHost/StreamCoordinator.swift :: _ = viewports.received(v, from: id)
+has Sources/SillHost/StreamCoordinator.swift :: { viewportUsed(by: connection) }
+has Sources/SillHost/StreamCoordinator.swift :: self.viewportLeft(connection)
+has .github/workflows/ci.yml :: , viewport-owner,
+has Tests/checks/README.md :: | `viewport-owner` |
 ```
 
 ### F13 文档

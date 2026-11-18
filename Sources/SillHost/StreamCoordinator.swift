@@ -199,6 +199,8 @@ package final class StreamCoordinator {
     /// the last one to report wins. Only ever one a host takes (ViewportBounds); a refused one
     /// leaves it as it was.
     private var viewport: Viewport?
+    /// 本 fork（ViewportOwner）：每台设备各自的视口，和窗口按哪一台的来；`viewport` 是它选中的那个。
+    private var viewports = ViewportOwner<ObjectIdentifier, Viewport>()
     /// When each connection's last "Viewport from … refused" line was printed: one a second at most.
     private var viewportRefusedLineAt: [ObjectIdentifier: CFAbsoluteTime] = [:]
     /// Each connection's last viewport scale, nil for none: Aa going from a scale to Off puts the windows back.
@@ -581,6 +583,7 @@ package final class StreamCoordinator {
                 guard let self else { return }
                 self.clientFPS[ObjectIdentifier(connection)] = nil
                 self.fitScales[ObjectIdentifier(connection)] = nil
+                self.viewportLeft(connection)       // 本 fork：正在用的那台走了，窗口改按剩下的（ViewportOwner）
                 self.settingsArrivals[ObjectIdentifier(connection)] = nil
                 self.settingsIgnoredLineAt[ObjectIdentifier(connection)] = nil
                 let id = ObjectIdentifier(connection)
@@ -626,6 +629,7 @@ package final class StreamCoordinator {
                 self.voice.devicesConnected = count > 0   // 有设备时每 2 秒看一次 meeppo-voice
                 // Nobody is watching: stop capturing and encoding. The next client picks afresh.
                 if count == 0 { self.viewport = nil; self.clientFPS = [:]; self.fitScales = [:] }   // the next device starts from scratch
+                if count == 0 { self.viewports.reset() }
                 if count == 0 { self.gestureChords.forget() }                 // and did not open a view it could close
                 // On the software encoder, the hardware is checked only while someone watches.
                 if count == 0 { self.stopRecheck() } else { self.devicesPresent(firstArrived: wasEmpty) }
@@ -1172,12 +1176,17 @@ package final class StreamCoordinator {
         // Every message goes to DisplayWake, which alone says which of them is a person at the device
         // (a pick never is: the device asks for the Desktop by itself), issue #134; at the lock's reading.
         deviceActive(.message(message.kind, input), connection, reading: reading)
+        // 本 fork（ViewportOwner）：有人在这台设备上操作了（DisplayWake 的判断：设备自己发的不算），窗口改按它的面板。
+        if displayWake.activity(.message(message.kind, input), at: CFAbsoluteTimeGetCurrent()) != nil { viewportUsed(by: connection) }
         switch message.kind {
         case .selectSource:
             guard let source = Wire.decode(StreamSource.self, from: message.payload) else { return }
             // A window picked comes forward on the Mac, which closes a view a gesture opened; the
             // Desktop picked (as a device does before a gesture made over a window) leaves it.
             if case .window = source { gestureChords.forget() }
+            // 本 fork（ViewportOwner）：选了一个窗口的设备就是正在用的那台（设备自己只会要桌面或重选它正看着的），
+            // 这次选择按它的面板定尺寸；正在切换时交给 select 的收尾。
+            if case .window = source { viewportUsed(by: connection, apply: switching) }
             // A pick from the device's switcher, or the device's own request (StreamClient's window
             // list: the Desktop at a connection's start or once the Mac stopped it, and after a move
             // what it watched, the Desktop or a window).
@@ -1292,7 +1301,9 @@ package final class StreamCoordinator {
                 Stats.shared.bump("win.fitOff")
                 restored = restoreFits(keeping: nil)
             }
-            viewport = v
+            // 本 fork（ViewportOwner）：各记各的，窗口按正在用的那台设备的来；别的设备重发视口不再改窗口。
+            _ = viewports.received(v, from: id)
+            viewport = viewports.chosen
             clientFPS[id] = v.fps ?? 60
             // The flip its connection made waited for this, its rate (`flipAwaits`): the restart the
             // rate needs takes the flip too, and the flip alone restarts once when the rate needs none.
@@ -1725,6 +1736,31 @@ package final class StreamCoordinator {
         if let last = viewportRefusedLineAt[id], now >= last, now - last < 1 { return }
         viewportRefusedLineAt[id] = now
         print("Viewport from \(deviceName(connection)) refused: \(why)")
+    }
+
+    // MARK: 本 fork：几台设备时窗口按正在用的那台的面板（ViewportOwner）
+
+    /// 有人在 `connection` 这台设备上操作了，或者它选了一个窗口：它成为窗口尺寸的主人。选中的视口变了就按新的改
+    /// 窗口（一次重启）；正在切换时交给 select 的收尾去做。不等它做完：这条消息本身（一次点击、一次选择）照常往下走。
+    private func viewportUsed(by connection: NWConnection, apply: Bool = true) {
+        guard viewports.used(by: ObjectIdentifier(connection)) else { return }
+        viewportOwnerChanged(to: connection, apply: apply)
+    }
+
+    private func viewportLeft(_ connection: NWConnection) {
+        guard viewports.left(ObjectIdentifier(connection)), viewports.chosen != nil else { viewport = viewports.chosen; return }
+        viewportOwnerChanged(to: nil, apply: true)
+    }
+
+    private func viewportOwnerChanged(to connection: NWConnection?, apply: Bool) {
+        viewport = viewports.chosen
+        if let v = viewport {
+            let who = connection.map { deviceName($0) } ?? "the device still connected"
+            print("Viewport: the window now fits \(who) (\(ViewportBounds.whole(v.width))×\(ViewportBounds.whole(v.height)) pt): it is the one in use.")
+        }
+        guard apply else { return }
+        if switching { viewportArrivedWhileSwitching = true; return }
+        Task { @MainActor in await self.applyViewportToActiveWindow() }
     }
 
     /// A new viewport while a window streams. The encoder is fixed to the old size, but the

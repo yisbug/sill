@@ -21,6 +21,29 @@ enum PhoneStream {
     /// 旋转完成后面板尺寸变化会再触发一次。其他设备照旧发。
     static func sendsViewport(phone: Bool, screen: CGSize) -> Bool { !phone || screen.width > screen.height }
 
+    // MARK: 灵动岛一侧留黑边
+
+    /// 屏幕的左或右。
+    enum Side: Equatable { case left, right }
+
+    /// 横屏时灵动岛（刘海）在屏幕的哪一侧：界面方向是 landscapeRight（机身顶部朝左）时在左，landscapeLeft 时在右。
+    /// 不是 iPhone，或者方向还不知道（刚出现、还竖着）时是 nil。
+    static func islandSide(phone: Bool, landscapeRight: Bool?) -> Side? {
+        guard phone, let landscapeRight else { return nil }
+        return landscapeRight ? .left : .right
+    }
+
+    /// 串流画面和顶栏底色往哪一侧伸进安全区。iPhone：只伸进没有灵动岛的那一侧，灵动岛那一侧留黑边（画面不被它挡住）；
+    /// 方向还不知道时两侧都不伸。其他设备两侧都伸（iPad 横屏两侧本来就没有安全区）。
+    static func fills(phone: Bool, island: Side?) -> (left: Bool, right: Bool) {
+        guard phone else { return (true, true) }
+        switch island {
+        case .left?: return (false, true)
+        case .right?: return (true, false)
+        case nil: return (false, false)
+        }
+    }
+
     // MARK: 文字大小的存储
 
     /// 缩放的持久化键（顶栏的 Aa 和设置面板的「Text Size」读写同一个值）。

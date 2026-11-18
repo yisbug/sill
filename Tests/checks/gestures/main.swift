@@ -47,7 +47,7 @@ func run(_ events: [Event], _ g: inout G) -> Run {
         case .down(let id, let p, let t, let h): out = g.down(id, at: p, time: t, holding: h)
         case .move(let id, let p, let t): g.moved(id, to: p, time: t)
         case .up(let id, let p, let t): out = g.up(id, at: p, time: t)
-        case .cancel(let id): g.cancelled(id)
+        case .cancel(let id): out = g.cancelled(id)
         }
         if out != .none { r.outputs.append(out) }
         if out == .silenced, r.silencedAt == nil { r.silencedAt = i }
@@ -879,140 +879,196 @@ check("app switch: nothing to switch to", G.appSwitchTarget(order: [], current: 
 check("app switch: up and down pick nothing", G.appSwitchTarget(order: dock, current: 10, gesture: .swipeUp) == nil)
 check("app switch: the order is kept a short while", G.appSwitchKeepsOrder > 0.5 && G.appSwitchKeepsOrder <= 3)
 
-// 本 fork：三指左右滑越过阈值即判定（early），不等抬手
-struct EarlyRun {
-    var early: [G.Output] = []      // early 返回的非 none 结果，按序
-    var ups: [G.Output] = []        // 抬手 / 落下返回的非 none 结果（silenced 除外）
-    var extra: [G.Output] = []      // 提前判定后继续调 early 的结果
+// 本 fork：三指翻页拖动（drag / pageEnded / pageCancelled）与松手的纯函数
+struct PageRun {
+    var drags: [G.Output] = []      // drag 返回的非 none 结果，按序
+    var others: [G.Output] = []     // 落下、抬手、取消返回的非 none 结果（silenced 除外）
+    var lastDx: CGFloat?            // 最后一个 .paging 的 dx
 }
-/// 与 StrokeObserver 一样：同一时刻的移动都记完之后调一次 early；提前判定后每步仍照调，看是否再给。
-func runEarly(_ events: [Event], _ g: inout G) -> EarlyRun {
-    var r = EarlyRun()
+/// 与 StrokeObserver 一样：同一时刻的移动都记完之后调一次 drag(time:enabled:)。
+func runPage(_ events: [Event], _ g: inout G, enabled: Bool = true) -> PageRun {
+    var r = PageRun()
     for (i, e) in events.enumerated() {
+        var out = G.Output.none
         switch e {
-        case .down(let id, let p, let t, let h): _ = g.down(id, at: p, time: t, holding: h)
+        case .down(let id, let p, let t, let h): out = g.down(id, at: p, time: t, holding: h)
         case .move(let id, let p, let t):
             g.moved(id, to: p, time: t)
             var last = true
             if i + 1 < events.count, case .move(_, _, let t2) = events[i + 1], t2 == t { last = false }
             if last {
-                let out = g.early(time: t)
-                if out != .none { if r.early.isEmpty { r.early.append(out) } else { r.extra.append(out) } }
+                let d = g.drag(time: t, enabled: enabled)
+                if d != .none { r.drags.append(d) }
+                if case .paging(let dx) = d { r.lastDx = dx }
             }
-        case .up(let id, let p, let t):
-            let out = g.up(id, at: p, time: t)
-            if out != .none { r.ups.append(out) }
-        case .cancel(let id): g.cancelled(id)
+        case .up(let id, let p, let t): out = g.up(id, at: p, time: t)
+        case .cancel(let id): out = g.cancelled(id)
         }
+        if out != .none && out != .silenced { r.others.append(out) }
     }
     return r
 }
-func runEarly(_ events: [Event]) -> EarlyRun { var g = G(); return runEarly(events, &g) }
+func runPage(_ events: [Event], enabled: Bool = true) -> PageRun { var g = G(); return runPage(events, &g, enabled: enabled) }
+func near(_ a: CGFloat, _ b: CGFloat, _ eps: CGFloat = 1e-6) -> Bool { abs(a - b) <= eps }
+func isPaging(_ o: G.Output) -> Bool { if case .paging = o { return true } else { return false } }
+func ended(_ r: PageRun) -> (dx: CGFloat, v: CGFloat)? {
+    for o in r.others { if case .pageEnded(let dx, let v) = o { return (dx, v) } }
+    return nil
+}
+func hasGesture(_ outs: [G.Output]) -> Bool { outs.contains { if case .gesture = $0 { return true } else { return false } } }
 do {
-    check("early: three fingers right 60 pt: swipeRight, fingers 3, and the lift adds nothing",
-          runEarly(swipe(dx: 60, dy: 0)).early == [.gesture(.swipeRight, fingers: 3)] && runEarly(swipe(dx: 60, dy: 0)).ups.isEmpty)
-    check("early: three fingers left 60 pt: swipeLeft, fingers 3, and the lift adds nothing",
-          runEarly(swipe(dx: -60, dy: 0)).early == [.gesture(.swipeLeft, fingers: 3)] && runEarly(swipe(dx: -60, dy: 0)).ups.isEmpty)
-    // 一步到位：恰好 40 与 39.9
-    check("early: exactly 40 pt right: swipeRight", runEarly(swipe(dx: 40, dy: 0, steps: 1)).early == [.gesture(.swipeRight, fingers: 3)])
-    check("early: 39.9 pt right: not early, the lift decides as before (nothing, under the flick's speed)",
-          runEarly(swipe(dx: 39.9, dy: 0, steps: 1)).early.isEmpty)
-    check("early: 39.9 pt left: not early", runEarly(swipe(dx: -39.9, dy: 0, steps: 1)).early.isEmpty)
-    // 越过的那一步就判定，而不是最后一步
-    do {
-        var g = G()
-        let ev = swipe(dx: 100, dy: 0, steps: 10)
-        var firstAt: Double?
-        for e in ev {
-            switch e {
-            case .down(let id, let p, let t, let h): _ = g.down(id, at: p, time: t, holding: h)
-            case .move(let id, let p, let t):
-                g.moved(id, to: p, time: t)
-                if id == 2, firstAt == nil, g.early(time: t) != .none { firstAt = t }
-            case .up(let id, let p, let t): _ = g.up(id, at: p, time: t)
-            case .cancel(let id): g.cancelled(id)
-            }
-        }
-        check("early: decided at the step that passes 40 pt (step 4 of 10), not at the lift", firstAt != nil && abs(firstAt! - (0.032 + 0.04)) < 1e-9)
-    }
-    // 判定一次后：再调 early 与抬手都是 none，silent 保持
-    do {
-        var g = G()
-        let ev = swipe(dx: 80, dy: 0)
-        let r = runEarly(ev, &g)
-        check("early: after deciding, early again gives nothing and the lift gives nothing", r.early.count == 1 && r.extra.isEmpty && r.ups.isEmpty)
-        check("early: the stroke stays silent until the next stroke's first touch", g.silent && g.early(time: 9) == .none)
-        _ = g.down(50, at: CGPoint(x: 10, y: 10), time: 20, holding: false)
-        check("early: the next stroke starts clean", !g.silent)
-    }
-    // 上滑、下滑：不提前，抬手照旧
-    for (name, dy, want) in [("up", CGFloat(-80), G.Gesture.swipeUp), ("down", 80, .swipeDown)] {
-        let r = runEarly(swipe(dx: 0, dy: dy))
-        check("early: three fingers \(name) 80 pt: not early, the lift gives \(want)", r.early.isEmpty && r.ups == [.gesture(want, fingers: 3)])
-    }
-    // 斜向：不满足 axisRatio
-    do {
-        let r = runEarly(swipe(dx: 60, dy: 50))
-        check("early: a diagonal (60, 50) is no early swipe", r.early.isEmpty)
-        let edge = runEarly(swipe(dx: 65, dy: 50))      // 65 / 50 = 1.3 恰好
-        check("early: exactly the axis ratio (65, 50): swipeRight", edge.early == [.gesture(.swipeRight, fingers: 3)])
-        check("early: just under the axis ratio (64.9, 50): not early", runEarly(swipe(dx: 64.9, dy: 50)).early.isEmpty)
-    }
-    // 捏合 / 张开：质心不动，不提前
-    check("early: a pinch gives nothing early", runEarly(pinch(scale: 0.45)).early.isEmpty)
-    check("early: a spread gives nothing early", runEarly(pinch(scale: 2)).early.isEmpty)
-    // 三指不同向：质心右移 60，但有一指逆着走
+    // 进入的阈值：一步到位 11 pt 不进，12 pt 进
+    check("page: 11 pt right in one step: not paging", runPage(swipe(dx: 11, dy: 0, steps: 1)).drags.isEmpty)
+    let at12 = runPage(swipe(dx: 12, dy: 0, steps: 1))
+    check("page: exactly 12 pt right: paging, dx 12", at12.drags.count == 1 && at12.lastDx.map { near($0, 12) } == true)
+    check("page: -12 pt: paging, dx -12", runPage(swipe(dx: -12, dy: 0, steps: 1)).lastDx.map { near($0, -12) } == true)
+    check("page: -11 pt: not paging", runPage(swipe(dx: -11, dy: 0, steps: 1)).drags.isEmpty)
+    // 进入后每次移动都报告 dx
+    let ten = runPage(swipe(dx: 100, dy: 0, steps: 10))
+    let dxs = ten.drags.compactMap { o -> CGFloat? in if case .paging(let dx) = o { return dx } else { return nil } }
+    check("page: right 100 in 10 steps: paging from step 2 (20 pt), every step's dx after", dxs.count == 9
+          && zip(dxs, (2...10).map { CGFloat($0) * 10 }).allSatisfy { near($0, $1) })
+    check("page: and the lift gives .pageEnded, never a gesture", ended(ten) != nil && !hasGesture(ten.others) && ten.others.count == 1)
+    check("page: .pageEnded's dx is the centroid's final 100", ended(ten).map { near($0.dx, 100) } == true)
+    // 轴向：恰好 1.3 进，略低不进
+    check("page: (13, 10) exactly the axis ratio: paging", !runPage(swipe(dx: 13, dy: 10, steps: 1)).drags.isEmpty)
+    check("page: (12.9, 10) under the axis ratio: not paging", runPage(swipe(dx: 12.9, dy: 10, steps: 1)).drags.isEmpty)
+    check("page: (-13, -10): paging leftward", runPage(swipe(dx: -13, dy: -10, steps: 1)).lastDx.map { near($0, -13) } == true)
+    // 进入后转成竖向：仍报告水平位移
     do {
         let start = hand(3)
-        let end = [CGPoint(x: start[0].x - 20, y: start[0].y), CGPoint(x: start[1].x + 100, y: start[1].y), CGPoint(x: start[2].x + 100, y: start[2].y)]
-        let r = runEarly(path(start, to: end))
-        check("early: one finger against the swipe (centroid right 60): not early", r.early.isEmpty)
-        let ok = [CGPoint(x: start[0].x + 40, y: start[0].y), CGPoint(x: start[1].x + 70, y: start[1].y), CGPoint(x: start[2].x + 70, y: start[2].y)]
-        check("early: the same hand with the slow finger moving along enough: swipeRight", runEarly(path(start, to: ok)).early == [.gesture(.swipeRight, fingers: 3)])
-        let edge = [CGPoint(x: start[0].x + 20, y: start[0].y), CGPoint(x: start[1].x + 80, y: start[1].y), CGPoint(x: start[2].x + 80, y: start[2].y)]
-        check("early: a finger at exactly half the centroid's way (20 of 60 → needs 30): not early", runEarly(path(start, to: edge)).early.isEmpty)
-        let half = [CGPoint(x: start[0].x + 30, y: start[0].y), CGPoint(x: start[1].x + 75, y: start[1].y), CGPoint(x: start[2].x + 75, y: start[2].y)]
-        check("early: a finger at exactly half the centroid's way (30 of 60): swipeRight", runEarly(path(start, to: half)).early == [.gesture(.swipeRight, fingers: 3)])
-    }
-    // 第四根手指：不动的拇指（先落或后落）、一起滑的第四指；early 不给，抬手结果与原来一致
-    do {
-        /// 不动的拇指（id 9）：先于三指落下，或在三指落下之后、第一次移动之前落下。
-        func thumb(first: Bool) -> [Event] {
-            let down = Event.down(9, CGPoint(x: 120, y: 420), first ? 0 : 0.06, holding: false)
-            let three = swipe(3, dx: 80, dy: 0, t0: first ? 0.5 : 0)
-            if first { return [down] + three }
-            let landed = three.prefix(3), rest = three.dropFirst(3)
-            return Array(landed) + [down] + Array(rest)
+        var ev: [Event] = start.enumerated().map { .down($0.offset, $0.element, Double($0.offset) * 0.016, holding: false) }
+        for (k, (x, y)) in [(20.0, 0.0), (20.0, 40.0), (25.0, 120.0)].enumerated() {
+            for i in 0..<3 { ev.append(.move(i, CGPoint(x: start[i].x + x, y: start[i].y + y), 0.1 + 0.02 * Double(k))) }
         }
-        let rest = runEarly(thumb(first: true))
-        check("early: a resting thumb down first, three swipe right: not early; the lift decides swipeRight, fingers 3",
-              rest.early.isEmpty && rest.ups == [.gesture(.swipeRight, fingers: 3)])
-        let late = runEarly(thumb(first: false))
-        check("early: a resting thumb landing after the three: not early; the lift decides swipeRight, fingers 3",
-              late.early.isEmpty && late.ups == [.gesture(.swipeRight, fingers: 3)])
-        let along = runEarly(swipe(4, dx: 80, dy: 0))
-        check("early: four fingers swipe right together: not early; the lift decides swipeRight, fingers 4",
-              along.early.isEmpty && along.ups == [.gesture(.swipeRight, fingers: 4)])
-        // 拇指先落、之后抬起，三指再滑：others 里仍有它，不提前
+        ev += (0..<3).map { .up($0, CGPoint(x: start[$0].x + 25, y: start[$0].y + 120), 0.2 + 0.01 * Double($0)) }
+        let r = runPage(ev)
+        let d = r.drags.compactMap { o -> CGFloat? in if case .paging(let dx) = o { return dx } else { return nil } }
+        check("page: locked once in: turning to go down 120 still reports the horizontal 20, 20, 25", d.count == 3 && near(d[0], 20) && near(d[1], 20) && near(d[2], 25))
+        check("page: and the lift gives .pageEnded, not swipe down", ended(r) != nil && !hasGesture(r.others))
+    }
+    // 三指同向：一指逆着走
+    do {
+        let start = hand(3)
+        let against = [CGPoint(x: start[0].x - 10, y: start[0].y), CGPoint(x: start[1].x + 20, y: start[1].y), CGPoint(x: start[2].x + 20, y: start[2].y)]
+        check("page: one finger against (centroid right 10): not paging, at any step", runPage(path(start, to: against, steps: 1)).drags.isEmpty)
+        let edge = [CGPoint(x: start[0].x + 6, y: start[0].y), CGPoint(x: start[1].x + 15, y: start[1].y), CGPoint(x: start[2].x + 15, y: start[2].y)]
+        check("page: a finger at exactly half the centroid's 12: paging", !runPage(path(start, to: edge, steps: 1)).drags.isEmpty)
+        let under = [CGPoint(x: start[0].x + 5.9, y: start[0].y), CGPoint(x: start[1].x + 15.05, y: start[1].y), CGPoint(x: start[2].x + 15.05, y: start[2].y)]
+        check("page: a finger just under half the centroid's 12: not paging", runPage(path(start, to: under, steps: 1)).drags.isEmpty)
+    }
+    // 第四指、有过别的手指、未武装、enabled: false
+    do {
+        let resting = runPage([.down(9, CGPoint(x: 120, y: 420), 0, holding: false)] + swipe(dx: 80, dy: 0, t0: 0.5))
+        check("page: a resting thumb down: not paging; the lift decides swipeRight as before", resting.drags.isEmpty
+              && resting.others == [.gesture(.swipeRight, fingers: 3)])
         var ev: [Event] = [.down(9, CGPoint(x: 120, y: 420), 0, holding: false)]
         for i in 0..<3 { ev.append(.down(i, hand(3)[i], 0.5 + 0.016 * Double(i), holding: false)) }
         ev.append(.up(9, CGPoint(x: 120, y: 420), 0.55))
         for k in 1...10 { for i in 0..<3 { ev.append(.move(i, CGPoint(x: hand(3)[i].x + 10 * CGFloat(k), y: hand(3)[i].y), 0.6 + 0.01 * Double(k))) } }
-        let lifted = runEarly(ev)
-        check("early: a thumb that rested and lifted before the swipe still keeps early off", lifted.early.isEmpty)
-        var g2 = G(); _ = runEarly(ev, &g2)
-        check("early: (that stroke is armed, so the test means it)", g2.armed)
+        var g2 = G()
+        let lifted = runPage(ev, &g2)
+        check("page: a thumb that rested and lifted before still keeps paging off", lifted.drags.isEmpty && g2.armed)
+        let four = runPage(swipe(4, dx: 80, dy: 0))
+        check("page: four fingers swipe right: not paging; the lift decides swipeRight, fingers 4", four.drags.isEmpty
+              && four.others == [.gesture(.swipeRight, fingers: 4)])
+        check("page: one finger: nothing", runPage(swipe(1, dx: 80, dy: 0)).drags.isEmpty)
+        check("page: two fingers: nothing", runPage(swipe(2, dx: 80, dy: 0)).drags.isEmpty)
+        check("page: three placed slowly (never armed): nothing",
+              runPage(stroke(hand(3), stagger: 0.3, steps: 10) { _, k, p in CGPoint(x: p.x + 8 * CGFloat(k), y: p.y) }).drags.isEmpty)
+        let off = runPage(swipe(dx: 80, dy: 0), enabled: false)
+        check("page: enabled false: not paging; the lift decides swipeRight as before", off.drags.isEmpty && off.others == [.gesture(.swipeRight, fingers: 3)])
+        let offLeft = runPage(swipe(dx: -80, dy: 0), enabled: false)
+        check("page: enabled false, left: swipeLeft at the lift", offLeft.others == [.gesture(.swipeLeft, fingers: 3)])
+        check("page: nothing before any move", { var g = G(); return g.drag(time: 0, enabled: true) == .none }())
     }
-    // 未武装：一指、两指
-    check("early: one finger sliding right: nothing", runEarly(swipe(1, dx: 80, dy: 0)).early.isEmpty)
-    check("early: two fingers sliding right: nothing", runEarly(swipe(2, dx: 80, dy: 0)).early.isEmpty)
-    // 三指慢慢放下（未武装）再右滑：不提前
+    // 速度：构造已知轨迹（每 10 ms 右移 5 pt，即 500 pt/s；再往左 2 pt 一步）
     do {
-        let r = runEarly(stroke(hand(3), stagger: 0.3, steps: 10) { _, k, p in CGPoint(x: p.x + 8 * CGFloat(k), y: p.y) })
-        check("early: three fingers placed slowly (never armed): nothing early", r.early.isEmpty)
+        let start = hand(3)
+        var ev: [Event] = start.enumerated().map { .down($0.offset, $0.element, 0, holding: false) }
+        var x: CGFloat = 0
+        for k in 1...10 { x += 5; for i in 0..<3 { ev.append(.move(i, CGPoint(x: start[i].x + x, y: start[i].y), 0.01 * Double(k))) } }
+        // 抬手在 0.1 s，与最后一步同一时刻：0.05 s 之前最后的位置是 0.05 s 时的 25 pt；(50 - 25) / 0.05 = 500
+        ev.append(.up(0, CGPoint(x: start[0].x + x, y: start[0].y), 0.1))
+        let r = runPage(ev)
+        check("page: 5 pt each 10 ms rightward, lifted at once: velocity +500", ended(r).map { near($0.v, 500, 1e-6) && near($0.dx, 50) } == true)
+        var back: [Event] = start.enumerated().map { .down($0.offset, $0.element, 0, holding: false) }
+        var bx: CGFloat = 0
+        for k in 1...10 { bx -= 4; for i in 0..<3 { back.append(.move(i, CGPoint(x: start[i].x + bx, y: start[i].y), 0.01 * Double(k))) } }
+        back.append(.up(1, CGPoint(x: start[1].x + bx, y: start[1].y), 0.1))
+        check("page: 4 pt each 10 ms leftward: velocity -400, dx -40", ended(runPage(back)).map { near($0.v, -400, 1e-6) && near($0.dx, -40) } == true)
+        // 先快后停：最后 60 ms 不动，速度 0
+        var still = ev.dropLast().map { $0 }
+        still.append(.up(0, CGPoint(x: start[0].x + x, y: start[0].y), 0.16))
+        check("page: still 60 ms before the lift: velocity 0", ended(runPage(still)).map { near($0.v, 0) } == true)
     }
-    // 抬手前取消：不提前也不判定
-    check("early: nothing early before any move", { var g = G(); return g.early(time: 0) == .none }())
+    // 翻页后：再抬别的手指、再调 drag 都是 none；silent 保持；下一笔干净
+    do {
+        var g = G()
+        let ev = swipe(dx: 80, dy: 0)
+        let r = runPage(ev, &g)
+        check("page: one .pageEnded for the stroke, the other lifts nothing", r.others.count == 1 && ended(r) != nil)
+        check("page: drag after the end: none", g.drag(time: 9, enabled: true) == .none)
+        check("page: the stroke stays silent", g.silent)
+        _ = g.down(50, at: CGPoint(x: 10, y: 10), time: 20, holding: false)
+        check("page: the next stroke starts clean", !g.silent && !g.paging)
+    }
+    // 抬起一指结束翻页之后：剩下的手指被取消、再落一指，都不再给结果
+    do {
+        let ev = swipe(dx: 80, dy: 0)
+        let firstUp = ev.firstIndex { if case .up = $0 { return true } else { return false } }!
+        let afterCancel = Array(ev.prefix(firstUp + 1)) + [.cancel(1), .cancel(2)]
+        check("page: after .pageEnded, the others cancelled: nothing more", runPage(afterCancel).others.count == 1)
+        let afterDown = Array(ev.prefix(firstUp + 1)) + [.down(7, CGPoint(x: 500, y: 500), 0.5, holding: false)]
+        check("page: after .pageEnded, a finger lands: nothing more", runPage(afterDown).others.count == 1)
+    }
+    // 翻页中系统取消、落下第四指
+    do {
+        let ev = swipe(dx: 60, dy: 0)
+        let cut = Array(ev.prefix(3 + 3 * 5)) + [.cancel(0), .cancel(1), .cancel(2)]
+        var g = G()
+        let r = runPage(cut, &g)
+        check("page: cancelled while paging: one .pageCancelled", r.others == [.pageCancelled] && !r.drags.isEmpty)
+        check("page: and drag after it: none", g.drag(time: 9, enabled: true) == .none)
+        let early = Array(ev.prefix(3)) + [.cancel(0)]
+        check("page: cancelled before paging: nothing", runPage(early).others.isEmpty)
+        var four = Array(ev.prefix(3 + 3 * 5))
+        four.append(.down(7, CGPoint(x: 500, y: 500), 0.09, holding: false))
+        four += Array(ev.dropFirst(3 + 3 * 5))
+        let r4 = runPage(four)
+        check("page: a fourth finger lands while paging: .pageCancelled, no .pageEnded, no gesture", r4.others == [.pageCancelled])
+        check("page: and no more .paging after it", r4.drags.count == 4)
+    }
+    // 上下滑、捏合、张开：照旧
+    for (name, dy, want) in [("up", CGFloat(-80), G.Gesture.swipeUp), ("down", 80, .swipeDown)] {
+        let r = runPage(swipe(dx: 0, dy: dy))
+        check("page: three fingers \(name) 80: not paging, the lift gives \(want)", r.drags.isEmpty && r.others == [.gesture(want, fingers: 3)])
+    }
+    check("page: a pinch: not paging, pinch at the lift", { let r = runPage(pinch(scale: 0.45)); return r.drags.isEmpty && r.others == [.gesture(.pinch, fingers: 3)] }())
+    check("page: a spread: not paging, spread at the lift", { let r = runPage(pinch(scale: 2)); return r.drags.isEmpty && r.others == [.gesture(.spread, fingers: 3)] }())
+}
+// 松手的纯函数
+do {
+    check("pageCommitDistance: wide screens cap at 120", near(G.pageCommitDistance(width: 1000), 120))
+    check("pageCommitDistance: narrow, width × 0.22", near(G.pageCommitDistance(width: 400), 88))
+    check("pageCommitDistance: the two meet at 120 / 0.22", near(G.pageCommitDistance(width: 120 / 0.22), 120, 1e-9))
+    check("pageCommit: far enough right, no speed: swipeRight", G.pageCommit(dx: 88, velocity: 0, width: 400) == .swipeRight)
+    check("pageCommit: just short, slow: nil", G.pageCommit(dx: 87.9, velocity: 0, width: 400) == nil)
+    check("pageCommit: far enough left: swipeLeft", G.pageCommit(dx: -120, velocity: 0, width: 1000) == .swipeLeft)
+    check("pageCommit: -119.9 on a wide screen: nil", G.pageCommit(dx: -119.9, velocity: 0, width: 1000) == nil)
+    check("pageCommit: short but flicked at 500 the same way: swipeRight", G.pageCommit(dx: 20, velocity: 500, width: 400) == .swipeRight)
+    check("pageCommit: short, flicked at 499.9: nil", G.pageCommit(dx: 20, velocity: 499.9, width: 400) == nil)
+    check("pageCommit: short, flicked left at -500: swipeLeft", G.pageCommit(dx: -20, velocity: -500, width: 400) == .swipeLeft)
+    check("pageCommit: short left flicked right: nil", G.pageCommit(dx: -20, velocity: 800, width: 400) == nil)
+    check("pageCommit: far enough but flicked back at 100: nil", G.pageCommit(dx: 200, velocity: -100, width: 400) == nil)
+    check("pageCommit: far enough, back at 99.9 (a lift's jitter): swipeRight", G.pageCommit(dx: 200, velocity: -99.9, width: 400) == .swipeRight)
+    check("pageCommit: far left, flicked back right at 100: nil", G.pageCommit(dx: -200, velocity: 100, width: 400) == nil)
+    check("pageCommit: zero displacement: nil, even flicked", G.pageCommit(dx: 0, velocity: 900, width: 400) == nil && G.pageCommit(dx: 0, velocity: -900, width: 400) == nil)
+    check("pageOffset: with a target, dx itself", near(G.pageOffset(dx: 37, width: 400, hasTarget: true), 37) && near(G.pageOffset(dx: -37, width: 400, hasTarget: true), -37))
+    check("pageOffset: with a target, held to ±width", near(G.pageOffset(dx: 450, width: 400, hasTarget: true), 400) && near(G.pageOffset(dx: -450, width: 400, hasTarget: true), -400))
+    check("pageOffset: no target, a quarter", near(G.pageOffset(dx: 100, width: 400, hasTarget: false), 25) && near(G.pageOffset(dx: -100, width: 400, hasTarget: false), -25))
+    check("pageOffset: no target, at most ±60", near(G.pageOffset(dx: 400, width: 400, hasTarget: false), 60) && near(G.pageOffset(dx: -400, width: 400, hasTarget: false), -60))
+    check("pageStart is 12, the back speed 100", G().pageStart == 12 && G.pageBackSpeed == 100)
 }
 
 print("\(passes + fails) checks, \(fails) failed")

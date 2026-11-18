@@ -569,12 +569,18 @@ struct ZoomedStreamView: View {
     @ObservedObject var zoom: StreamZoomModel
 
     var body: some View {
-        StreamView(client: client, zoom: zoom.zoom)
+        // 本 fork：三指翻页拖动时整个画面跟着手指横移，旁边带出要进来的那一页（PagerStage，PickFlow.swift）；
+        // 选了另一个源、画面还没到时的占位（PickShade）也在那里，盖满画面区域，不跟着缩放。
+        PagerStage(pager: client.pager, client: client, content: StreamView(client: client, zoom: zoom.zoom)
             .onGeometryChange(for: CGSize.self, of: { $0.size }) { zoom.paneResized(to: $0) }
             .scaleEffect(zoom.zoom.scale)
-            .offset(zoom.zoom.offset)
-            // 本 fork（PickFlow）：选了另一个源、画面还没到时的占位，盖满画面区域，不跟着缩放。
-            .overlay { PickShade(client: client) }
+            .offset(zoom.zoom.offset))
+            .onGeometryChange(for: CGFloat.self, of: { $0.size.width }) { width in
+                client.pager.setWidth(width)
+                #if DEBUG
+                client.debugPageDrag()
+                #endif
+            }
             // Drawn past the pane when zoomed, and a clip does not clip hit testing: never a touch's target
             // (sideways the bar comes before the picture, and its buttons' touches must stay theirs).
             .allowsHitTesting(false)

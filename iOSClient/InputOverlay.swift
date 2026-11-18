@@ -201,6 +201,9 @@ final class InputOverlayView: UIView, UITextInput, UIGestureRecognizerDelegate {
         strokes.onSilenced = { [weak self] in self?.strokeSilenced() }
         strokes.onGesture = { [weak self] gesture, fingers in _ = self?.sendGesture(gesture, fingers) }
         strokes.onTouch = { [weak self] touch in self?.zoomTouch(touch) }
+        // 本 fork：三指翻页拖动，交给这个窗口的会话（StreamClient.page）。
+        strokes.pagingEnabled = { [weak self] in PageReceivers.lookup(self?.window)?.pagingEnabled ?? false }
+        strokes.onPage = { [weak self] event in PageReceivers.lookup(self?.window)?.page(event) }
         addGestureRecognizer(strokes)
 
         // iPadOS shows no input source switch while the hardware keyboard's hold draws nothing: the
@@ -1687,6 +1690,17 @@ struct InputOverlay: UIViewRepresentable {
 
 // MARK: - Stroke observer
 
+/// 本 fork：一个窗口里三指翻页拖动交给谁：可不可以翻，以及拖动的每一步（StreamClient）。按窗口找，因为每个 Sill 窗口
+/// 各有一个会话；App 里由 PagerModel 登记（PickFlow.swift）。没有登记（触控测试台）时翻页不可用，三指左右滑照旧在
+/// 抬手时判定。
+protocol PageReceiver: AnyObject {
+    var pagingEnabled: Bool { get }
+    func page(_ event: StrokeObserver.PageEvent)
+}
+enum PageReceivers {
+    static var lookup: (UIWindow?) -> PageReceiver? = { _ in nil }
+}
+
 /// Feeds a surface's `TrackpadGestures` with every direct touch, so a stroke that has three fingers
 /// down before any has moved sends the Mac nothing but its gesture, if it makes one
 /// (docs/trackpad-gestures-plan.md §6.2). One on each glass surface: the portrait trackpad and the
@@ -1721,6 +1735,11 @@ final class StrokeObserver: UIGestureRecognizer, UIGestureRecognizerDelegate {
         case down(Int, CGPoint), moved([Int: CGPoint]), up(Int), cancelled(Int)
     }
     var onTouch: (Touch) -> Void = { _ in }
+    /// 本 fork：三指翻页拖动此刻可用（三指左右滑会切应用的时候）；只在这一笔已武装时问。
+    var pagingEnabled: () -> Bool = { false }
+    /// 本 fork：翻页拖动的每一步：拖动中的水平位移、抬手（位移与水平速度）、被取消（弹回）。
+    enum PageEvent { case moved(CGFloat), ended(dx: CGFloat, velocity: CGFloat), cancelled }
+    var onPage: (PageEvent) -> Void = { _ in }
     /// Each touch of the stroke, numbered as it lands.
     private var ids: [ObjectIdentifier: Int] = [:]
     private var nextID = 0
@@ -1754,7 +1773,11 @@ final class StrokeObserver: UIGestureRecognizer, UIGestureRecognizerDelegate {
             nextID += 1
             ids[ObjectIdentifier(touch)] = id
             let point = touch.location(in: view)
-            if strokes.down(id, at: point, time: touch.timestamp, holding: holding()) == .silenced { onSilenced() }
+            switch strokes.down(id, at: point, time: touch.timestamp, holding: holding()) {
+            case .silenced: onSilenced()
+            case .pageCancelled: onPage(.cancelled)      // 本 fork：翻页中落下第四指，弹回
+            default: break
+            }
             onTouch(.down(id, point))
         }
     }
@@ -1769,9 +1792,9 @@ final class StrokeObserver: UIGestureRecognizer, UIGestureRecognizerDelegate {
             moves[id] = point
             latest = max(latest, touch.timestamp)
         }
-        // 本 fork：三指左右滑在移动中越过阈值就判定，不等抬手；先手势后 onTouch，与 touchesEnded 一致。
-        if !moves.isEmpty, case .gesture(let gesture, let fingers) = strokes.early(time: latest) {
-            onGesture(gesture, fingers)
+        // 本 fork：这一事件的移动都记完之后看翻页拖动；先翻页后 onTouch，与 touchesEnded 一致。
+        if !moves.isEmpty, case .paging(let dx) = strokes.drag(time: latest, enabled: strokes.armed && pagingEnabled()) {
+            onPage(.moved(dx))
         }
         if !moves.isEmpty { onTouch(.moved(moves)) }
     }
@@ -1779,8 +1802,10 @@ final class StrokeObserver: UIGestureRecognizer, UIGestureRecognizerDelegate {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent) {
         for touch in ordered(touches) {
             guard let id = ids.removeValue(forKey: ObjectIdentifier(touch)) else { continue }
-            if case .gesture(let gesture, let fingers) = strokes.up(id, at: touch.location(in: view), time: touch.timestamp) {
-                onGesture(gesture, fingers)
+            switch strokes.up(id, at: touch.location(in: view), time: touch.timestamp) {
+            case .gesture(let gesture, let fingers): onGesture(gesture, fingers)
+            case .pageEnded(let dx, let velocity): onPage(.ended(dx: dx, velocity: velocity))     // 本 fork
+            default: break
             }
             onTouch(.up(id))
         }
@@ -1789,7 +1814,7 @@ final class StrokeObserver: UIGestureRecognizer, UIGestureRecognizerDelegate {
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent) {
         for touch in ordered(touches) {
             guard let id = ids.removeValue(forKey: ObjectIdentifier(touch)) else { continue }
-            strokes.cancelled(id)
+            if strokes.cancelled(id) == .pageCancelled { onPage(.cancelled) }     // 本 fork：弹回
             onTouch(.cancelled(id))
         }
     }
@@ -1800,7 +1825,7 @@ final class StrokeObserver: UIGestureRecognizer, UIGestureRecognizerDelegate {
     override func reset() {
         super.reset()
         for id in ids.values.sorted() {
-            strokes.cancelled(id)
+            if strokes.cancelled(id) == .pageCancelled { onPage(.cancelled) }     // 本 fork：弹回
             onTouch(.cancelled(id))
         }
         ids.removeAll()

@@ -269,4 +269,170 @@ struct PickShade: View {
         .accessibilityHidden(true)
     }
 }
+
+// MARK: 本 fork：三指翻页拖动的画面
+
+/// 本 fork：三指翻页拖动的界面状态：画面的横向偏移，两边要进来的窗口，是否在拖动或动画中。偏移每帧都变（触摸 120 Hz），
+/// 所以单独一个对象，只有 `PagerStage` 看它；StreamClient 的 @Published 不变，串流画面以外的界面不跟着重算。
+/// StreamClient 持有一个（`pager`），并在这里登记，让触摸面按窗口找到它（PageReceivers）。主线程。
+final class PagerModel: ObservableObject {
+    /// 两边要进来的窗口：`left` 是手指往右滑时从左边进来的（Dock 里的下一个），`right` 是往左滑时从右边进来的。
+    struct Targets: Equatable {
+        var left: UInt32?
+        var right: UInt32?
+    }
+    /// 串流画面横向挪了多少（pt）：往右为正。
+    @Published private(set) var offset: CGFloat = 0
+    @Published private(set) var targets = Targets()
+    /// 在拖动或动画中：这时才画两边要进来的页。
+    @Published private(set) var active = false
+    /// 已经决定翻过去、正滑到位：这段时间占位（PickShade）不叠在移出去的旧画面上，滑完在原位出现。
+    @Published private(set) var committing = false
+    /// 画面区域的宽度（ZoomedStreamView 量出来告诉这里）。
+    @Published private(set) var width: CGFloat = 0
+    /// 每次开始、提交、弹回、复位都加一，过期的动画完成回调不再做事。
+    private var generation = 0
+    private weak var client: StreamClient?
+
+    /// 登记过的（每个会话一个），按窗口找。
+    private static let all = NSHashTable<PagerModel>.weakObjects()
+
+    init(client: StreamClient) {
+        self.client = client
+        Self.all.add(self)
+        PageReceivers.lookup = PagerModel.receiver(in:)
+    }
+
+    /// 这个窗口里的会话：它的画面（displayView）就在这个窗口里。
+    static func receiver(in window: UIWindow?) -> PageReceiver? {
+        guard let window else { return nil }
+        return all.allObjects.lazy.compactMap(\.client).first { $0.displayView.window === window }
+    }
+
+    func setWidth(_ new: CGFloat) {
+        if new != width { width = new }
+    }
+
+    /// 拖动开始：记下两边的目标。
+    func began(left: UInt32?, right: UInt32?) {
+        generation += 1
+        withTransaction(Self.still) {
+            targets = Targets(left: left, right: right)
+            committing = false
+            active = true
+        }
+    }
+
+    /// 拖动中：跟手，不带动画。
+    func drag(to x: CGFloat) {
+        withTransaction(Self.still) { offset = x }
+    }
+
+    /// 松手翻过去：`toward` 是 1（往右）或 -1；画面滑到 ±width，滑完无动画地归零，由占位接上。
+    func commit(toward: CGFloat, animated: Bool) {
+        generation += 1
+        let mine = generation
+        committing = true
+        guard animated, width > 0 else { finish(); return }
+        withAnimation(.easeOut(duration: 0.22)) {
+            offset = toward * width
+        } completion: { [weak self] in
+            guard let self, self.generation == mine else { return }
+            self.finish()
+        }
+    }
+
+    /// 不翻、到头了、被取消：弹回 0。
+    func bounce() {
+        generation += 1
+        let mine = generation
+        committing = false
+        guard offset != 0 else { finish(); return }
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.85), completionCriteria: .removed) {
+            offset = 0
+        } completion: { [weak self] in
+            guard let self, self.generation == mine else { return }
+            self.finish()
+        }
+    }
+
+    /// 会话结束：什么都不留。
+    func reset() {
+        generation += 1
+        finish()
+    }
+
+    private func finish() {
+        withTransaction(Self.still) {
+            offset = 0
+            active = false
+            committing = false
+            targets = Targets()
+        }
+    }
+
+    private static var still: Transaction {
+        var t = Transaction()
+        t.disablesAnimations = true
+        return t
+    }
+}
+
+extension StreamClient: PageReceiver {}
+
+/// 本 fork：串流画面（`content`，已经按缩放变换过）跟着翻页的偏移横向平移，旁边紧挨着带出要进来的那一页；
+/// 占位（PickShade）随画面移动，翻过去的那一小段动画里不显示，滑完在原位出现。只看 PagerModel，所以每帧只重算这里。
+/// 只是看的：不接触摸，VoiceOver 不读。
+struct PagerStage<Content: View>: View {
+    @ObservedObject var pager: PagerModel
+    let client: StreamClient
+    let content: Content
+
+    var body: some View {
+        ZStack {
+            content
+                .overlay {
+                    if !pager.committing { PickShade(client: client) }
+                }
+                .offset(x: pager.offset)
+            if pager.active {
+                // 手指往右（offset > 0）时从左边进来，往左时从右边；那边没有目标就什么都不带出来。
+                PageIncoming(image: image(pager.targets.left), present: pager.targets.left != nil)
+                    .offset(x: pager.offset - pager.width)
+                PageIncoming(image: image(pager.targets.right), present: pager.targets.right != nil)
+                    .offset(x: pager.offset + pager.width)
+            }
+        }
+        .allowsHitTesting(false)
+    }
+
+    private func image(_ id: UInt32?) -> UIImage? {
+        id.flatMap { client.thumbnails[$0] }
+    }
+}
+
+/// 本 fork：翻页时要进来的那一页，与占位（PickShade）的窗口样式一致：黑底、目标窗口缩略图 `scaledToFit`、0.25 的压暗，
+/// 不带转圈；没有缩略图只是黑底；那边没有目标（`present` 为 false）什么都不画。
+private struct PageIncoming: View {
+    let image: UIImage?
+    let present: Bool
+
+    var body: some View {
+        ZStack {
+            if present {
+                Color.black
+                if let image {
+                    Image(uiImage: image)
+                        .resizable()
+                        .interpolation(.medium)
+                        .scaledToFit()
+                    Color.black.opacity(0.25)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+}
 #endif

@@ -40,6 +40,18 @@ for size in [landscape, portrait, square] {
     check("非 iPhone 总发 \(size)", P.sendsViewport(phone: false, screen: size))
 }
 
+// 灵动岛一侧留黑边（本 fork）。
+check("iPhone，机身顶部朝左：灵动岛在左", P.islandSide(phone: true, landscapeRight: true) == .left)
+check("iPhone，机身顶部朝右：灵动岛在右", P.islandSide(phone: true, landscapeRight: false) == .right)
+check("iPhone，方向还不知道：不知道在哪", P.islandSide(phone: true, landscapeRight: nil) == nil)
+check("非 iPhone 没有灵动岛一侧", P.islandSide(phone: false, landscapeRight: true) == nil && P.islandSide(phone: false, landscapeRight: false) == nil
+      && P.islandSide(phone: false, landscapeRight: nil) == nil)
+check("灵动岛在左：只铺右侧", P.fills(phone: true, island: .left) == (false, true))
+check("灵动岛在右：只铺左侧", P.fills(phone: true, island: .right) == (true, false))
+check("iPhone 方向未知：两侧都不铺", P.fills(phone: true, island: nil) == (false, false))
+check("非 iPhone 两侧都铺", P.fills(phone: false, island: nil) == (true, true) && P.fills(phone: false, island: .left) == (true, true)
+      && P.fills(phone: false, island: .right) == (true, true))
+
 // 读回：没存。
 check("没存 iPhone", P.textScale(stored: nil, phone: true) == 0.75)
 check("没存 iPad", P.textScale(stored: nil, phone: false) == nil)

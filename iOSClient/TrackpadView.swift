@@ -259,6 +259,9 @@ final class TrackpadSurface: UIView, UIGestureRecognizerDelegate {
         strokes.holding = { [weak self] in self?.dragging ?? false }
         strokes.onSilenced = { [weak self] in self?.strokeSilenced() }
         strokes.onGesture = { [weak self] gesture, fingers in self?.gestureDecided(gesture, fingers: fingers) }
+        // 本 fork：三指翻页拖动，交给这个窗口的会话（StreamClient.page），与画面上的输入视图一样。
+        strokes.pagingEnabled = { [weak self] in PageReceivers.lookup(self?.window)?.pagingEnabled ?? false }
+        strokes.onPage = { [weak self] event in PageReceivers.lookup(self?.window)?.page(event) }
         addGestureRecognizer(strokes)
     }
 

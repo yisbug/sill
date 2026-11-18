@@ -270,6 +270,11 @@ final class StreamClient: ObservableObject {
     /// 同一时刻只让一次选择在路上，其余只留最新的一个排队（Mac 正切换时到的选择会被它丢掉）。主线程。
     private var pickFlow = PickFlow<StreamSource>()
     private var pickTimer: DispatchWorkItem?
+    /// 本 fork：三指翻页拖动的界面状态（偏移、两边要进来的窗口）。每帧都变，所以不在这个对象的 @Published 里：
+    /// 只有画面上的翻页视图看它（ZoomedStreamView）。主线程。
+    private(set) lazy var pager = PagerModel(client: self)
+    /// 本 fork：这一次翻页拖动开始时查到的切换顺序（`appSwitchPlan`）；松手真的切了才记成 `appSwitchOrder`。
+    private var pagePlan: (order: [[UInt32]], mine: UInt32?)?
     private var recencyActive: UInt32?
     private var awaitingMacActive = false
     /// When the Desktop was last picked on the device's own initiative (see the window list).
@@ -3694,6 +3699,9 @@ final class StreamClient: ObservableObject {
         // 本 fork（PickFlow）：这次会话的选择不带到下一次。
         pickFlow.reset()
         pickFlowChanged()
+        // 本 fork：翻页拖动也不带到下一次。
+        pagePlan = nil
+        pager.reset()
         // A tour cut short by the session's end takes its pause with it, and a held pointer move.
         pointerMoveOwed = false
         inputPaused = false
@@ -4099,25 +4107,13 @@ final class StreamClient: ObservableObject {
 
     /// 三指左右滑的切换：Dock 的顺序（图标模式每个应用一项，取它的目标窗口；缩略图模式每个窗口一项），
     /// 连续滑动时沿用上一次的顺序（TrackpadGestures.appSwitchKeepsOrder）。换了就轻震一下，到头不动并给提示震动。
+    /// 本 fork：抬手才判定的三指左右滑（翻页不可用时）和设置面板的手势行走这里；翻页拖动走 `page`。
     private func switchApp(_ gesture: TrackpadGestures.Gesture) -> Bool {
         let now = ProcessInfo.processInfo.systemUptime
-        var thumbnails = UserDefaults.standard.bool(forKey: "Sill.barThumbnails")
-        #if DEBUG
-        if UserDefaults.standard.object(forKey: "SillBarThumbnails") != nil { thumbnails = UserDefaults.standard.bool(forKey: "SillBarThumbnails") }
-        #endif
-        let groups: [[UInt32]] = thumbnails ? orderedWindows.map { [$0.id] } : appGroups.map { [$0.targetID] + $0.windowIDs }
-        let live = Set(groups.flatMap { $0 })
-        var current = appSelection
-        if current == nil, case .window(let id) = active { current = id }
-        // 沿用上次的顺序：时间还没过、而且上次那些窗口都还在。
-        if now - appSwitchAt > TrackpadGestures.appSwitchKeepsOrder || !appSwitchOrder.allSatisfy({ $0.allSatisfy(live.contains) })
-            || appSwitchOrder.isEmpty {
-            appSwitchOrder = groups
-        }
+        let plan = appSwitchPlan(now: now)
+        appSwitchOrder = plan.order
         appSwitchAt = now
-        let order = appSwitchOrder.compactMap(\.first)
-        let mine = current.flatMap { id in appSwitchOrder.first(where: { $0.contains(id) })?.first }
-        guard let target = TrackpadGestures.appSwitchTarget(order: order, current: mine, gesture: gesture) else {
+        guard let target = appSwitchTarget(gesture, in: plan) else {
             UINotificationFeedbackGenerator().notificationOccurred(.warning)
             #if DEBUG
             print("app switch: \(gesture.rawValue): nothing further that way")
@@ -4126,11 +4122,106 @@ final class StreamClient: ObservableObject {
         }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         #if DEBUG
+        let order = plan.order.compactMap(\.first)
         print("app switch: \(gesture.rawValue) → window \(target) (\(order.firstIndex(of: target).map { $0 + 1 } ?? 0) of \(order.count))")
         #endif
         select(.window(target))
         return true
     }
+
+    /// 本 fork：此刻切换用的顺序和当前所在的那一项，只查不改（不刷新 `appSwitchAt`、不存 `appSwitchOrder`）：
+    /// 上次切换之后 `appSwitchKeepsOrder` 之内、而且那些窗口都还在，就沿用上次的顺序，否则按 Dock 现在的。
+    private func appSwitchPlan(now: TimeInterval) -> (order: [[UInt32]], mine: UInt32?) {
+        var thumbnails = UserDefaults.standard.bool(forKey: "Sill.barThumbnails")
+        #if DEBUG
+        if UserDefaults.standard.object(forKey: "SillBarThumbnails") != nil { thumbnails = UserDefaults.standard.bool(forKey: "SillBarThumbnails") }
+        #endif
+        let groups: [[UInt32]] = thumbnails ? orderedWindows.map { [$0.id] } : appGroups.map { [$0.targetID] + $0.windowIDs }
+        let live = Set(groups.flatMap { $0 })
+        var current = appSelection
+        if current == nil, case .window(let id) = active { current = id }
+        var order = appSwitchOrder
+        if now - appSwitchAt > TrackpadGestures.appSwitchKeepsOrder || !order.allSatisfy({ $0.allSatisfy(live.contains) })
+            || order.isEmpty {
+            order = groups
+        }
+        let mine = current.flatMap { id in order.first(where: { $0.contains(id) })?.first }
+        return (order, mine)
+    }
+
+    /// 本 fork：按 `plan` 往 `gesture` 那边切到哪个窗口；到头了是 nil。
+    private func appSwitchTarget(_ gesture: TrackpadGestures.Gesture, in plan: (order: [[UInt32]], mine: UInt32?)) -> UInt32? {
+        TrackpadGestures.appSwitchTarget(order: plan.order.compactMap(\.first), current: plan.mine, gesture: gesture)
+    }
+
+    // MARK: 本 fork：三指翻页拖动
+
+    /// 本 fork：三指翻页拖动此刻可用：就是三指左右滑会切应用的时候（不可用时三指左右滑照旧在抬手时判定）。
+    var pagingEnabled: Bool {
+        TrackpadGestures.switchesApp(.swipeRight, fingers: 3, switchOn: Self.gesturesOn, connected: connected)
+    }
+
+    /// 本 fork：翻页拖动的每一步（StrokeObserver，主线程）。拖动开始时查两边要进来的窗口；松手该翻就**立刻**发出选择
+    /// （不等动画），画面同时滑到位，滑完由占位（PickShade）接上；不翻、到头了、被取消就弹回。开了"减弱动态效果"时
+    /// 画面不动，该切照样切。
+    func page(_ event: StrokeObserver.PageEvent) {
+        let still = UIAccessibility.isReduceMotionEnabled
+        switch event {
+        case .moved(let dx):
+            if pagePlan == nil {
+                let plan = appSwitchPlan(now: ProcessInfo.processInfo.systemUptime)
+                pagePlan = plan
+                // 手指往右（swipeRight，Dock 里的下一个）时画面往右走，目标从左边进来。
+                pager.began(left: appSwitchTarget(.swipeRight, in: plan), right: appSwitchTarget(.swipeLeft, in: plan))
+            }
+            guard !still else { return }
+            let hasTarget = dx > 0 ? pager.targets.left != nil : (dx < 0 ? pager.targets.right != nil : true)
+            pager.drag(to: TrackpadGestures.pageOffset(dx: dx, width: pager.width, hasTarget: hasTarget))
+        case .ended(let dx, let velocity):
+            guard let plan = pagePlan else { return }
+            pagePlan = nil
+            guard let gesture = TrackpadGestures.pageCommit(dx: dx, velocity: velocity, width: pager.width) else {
+                pager.bounce()
+                return
+            }
+            let target = gesture == .swipeRight ? pager.targets.left : pager.targets.right
+            guard let target else {
+                UINotificationFeedbackGenerator().notificationOccurred(.warning)
+                #if DEBUG
+                print("app switch: page \(gesture.rawValue): nothing further that way")
+                #endif
+                pager.bounce()
+                return
+            }
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+            let now = ProcessInfo.processInfo.systemUptime
+            appSwitchOrder = plan.order
+            appSwitchAt = now
+            #if DEBUG
+            let order = plan.order.compactMap(\.first)
+            print("app switch: page \(gesture.rawValue) → window \(target) (\(order.firstIndex(of: target).map { $0 + 1 } ?? 0) of \(order.count))")
+            #endif
+            select(.window(target))
+            pager.commit(toward: gesture == .swipeRight ? 1 : -1, animated: !still)
+        case .cancelled:
+            guard pagePlan != nil else { return }
+            pagePlan = nil
+            pager.bounce()
+        }
+    }
+
+    #if DEBUG
+    /// 本 fork：`-SillPageDrag <dx>`（调试用）：排版 mock 里把翻页固定在这个偏移，两边的目标按 mock 的窗口查，给截图用。
+    /// ZoomedStreamView 知道画面宽度之后调。
+    func debugPageDrag() {
+        guard let text = UserDefaults.standard.string(forKey: "SillPageDrag"), let dx = Double(text), pager.width > 0 else { return }
+        let plan = appSwitchPlan(now: ProcessInfo.processInfo.systemUptime)
+        pager.began(left: appSwitchTarget(.swipeRight, in: plan), right: appSwitchTarget(.swipeLeft, in: plan))
+        let d = CGFloat(dx)
+        let hasTarget = d > 0 ? pager.targets.left != nil : (d < 0 ? pager.targets.right != nil : true)
+        pager.drag(to: TrackpadGestures.pageOffset(dx: d, width: pager.width, hasTarget: hasTarget))
+    }
+    #endif
 
     /// On `queue`.
     private func flushPendingMove() {

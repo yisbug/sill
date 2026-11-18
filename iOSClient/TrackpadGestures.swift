@@ -35,6 +35,9 @@ import CoreGraphics
 /// on a Mac, and a four-finger stroke that iPadOS takes for itself (its touches cancelled) never
 /// reaches the Mac.
 ///
+/// 本 fork：三指左右滑在切应用可用时不等抬手：三指同向横移 `pageStart` 就进入翻页拖动（`drag`），之后每次移动报告
+/// 水平位移，抬手给 `.pageEnded`（位移与速度，翻不翻由 `pageCommit` 定），被取消或落下第四指给 `.pageCancelled`。
+///
 /// Pure: Foundation and CoreGraphics only, checked on its own with swiftc (Tests/checks/gestures).
 /// Deterministic: the same touches give the same outputs. Main thread, as the touches come.
 struct TrackpadGestures {
@@ -62,6 +65,12 @@ struct TrackpadGestures {
         case silenced
         /// The decision, at the first lift of a finger that armed the stroke.
         case gesture(Gesture, fingers: Int)
+        /// 本 fork：翻页拖动中，质心相对武装时刻的水平位移（`drag`）。
+        case paging(dx: CGFloat)
+        /// 本 fork：翻页拖动结束（武装的三指之一抬起）：最后的水平位移和抬手前的水平速度（pt/s，带符号）。
+        case pageEnded(dx: CGFloat, velocity: CGFloat)
+        /// 本 fork：翻页拖动被系统取消，或出现第四根手指：弹回。
+        case pageCancelled
     }
 
     // The tunables, in the surface's points and seconds (Noah's P1 and P3 tune them on glass).
@@ -83,6 +92,8 @@ struct TrackpadGestures {
     var swipeShare: CGFloat = 0.5
     /// The fingers' mean distance from their centroid changed by this fraction: a pinch or a spread.
     var pinchRatio: CGFloat = 0.25
+    /// 本 fork：三指只在屏上、同向横移这么远（且横向占优 `axisRatio`），这一笔就进入翻页拖动（`drag`）。
+    var pageStart: CGFloat = 12
 
     /// From three fingers down (see above) until the next stroke's first touch: the surfaces send
     /// nothing.
@@ -113,6 +124,8 @@ struct TrackpadGestures {
     private var done = false
     /// The armed fingers' centroid over time, from arming, for the flick.
     private var track: [(time: TimeInterval, at: CGPoint)] = []
+    /// 本 fork：这一笔已进入翻页拖动：之后每次移动都报告水平位移，不再产生 `.gesture`。
+    private(set) var paging = false
 
     /// A finger lands. `holding`: a button the surface pressed is held (the trackpad's drag).
     /// Returns `.silenced` once, when this finger makes the stroke silent.
@@ -127,11 +140,17 @@ struct TrackpadGestures {
             others = [:]
             done = false
             track = []
+            paging = false
         }
         fingersDown[id] = Finger(landed: point, landedAt: time, now: point)
         if fingersDown.count >= 5 { done = true }        // a fifth finger: deciding nothing
         if armed {
             others[id] = (point, point)
+            // 本 fork：翻页中又落下一根手指：弹回，这一笔不再判定。
+            if paging, !done {
+                done = true
+                return .pageCancelled
+            }
             return .none
         }
         guard fingersDown.count >= 3, !travelled, !holding else { return .none }
@@ -178,7 +197,13 @@ struct TrackpadGestures {
         var output = Output.none
         if armed, !done, armedBy.contains(id) {
             done = true
-            if let (gesture, fingers) = decide(liftAt: time) { output = .gesture(gesture, fingers: fingers) }
+            if paging {
+                // 本 fork：翻页的笔不判定手势，只交出位移与抬手前的水平速度。
+                let end = centroid(nowOfArmed())
+                output = .pageEnded(dx: end.x - centroid(armedAt).x, velocity: horizontalVelocity(to: end, at: time))
+            } else if let (gesture, fingers) = decide(liftAt: time) {
+                output = .gesture(gesture, fingers: fingers)
+            }
         }
         fingersDown[id] = nil
         return output
@@ -193,10 +218,18 @@ struct TrackpadGestures {
 
     /// The system took a touch (an iPadOS gesture, an alert): nothing is decided for this stroke,
     /// and one that has not armed never will; a silent one stays silent.
-    mutating func cancelled(_ id: Int) {
-        guard fingersDown[id] != nil else { return }
+    /// 本 fork：翻页拖动中被取消时返回 `.pageCancelled`（弹回），其余 `.none`。
+    @discardableResult
+    mutating func cancelled(_ id: Int) -> Output {
+        guard fingersDown[id] != nil else { return .none }
         fingersDown[id] = nil
-        if armed { done = true } else { cancelledEarly = true }
+        guard armed else {
+            cancelledEarly = true
+            return .none
+        }
+        let wasPaging = paging && !done
+        done = true
+        return wasPaging ? .pageCancelled : .none
     }
 
     // MARK: The decision
@@ -233,35 +266,82 @@ struct TrackpadGestures {
     }
 
     /// 本 fork：质心位移 (dx, dy) 是否成立一次滑动（轴向占优、三指同向、其他动过的手指没有逆着滑），成立则给出方向。
-    /// `decide`（抬手时）与 `early`（移动中）共用同一套判断；距离的门槛各自在调用处。
+    /// 抬手时的 `decide` 用它；同向的那一半（`together`）翻页拖动（`drag`）也用。
     private func swipeOf(dx: CGFloat, dy: CGFloat, now: [Int: CGPoint],
                        movers: [Int: (start: CGPoint, now: CGPoint)]) -> Gesture? {
         let major = max(abs(dx), abs(dy)), minor = min(abs(dx), abs(dy))
         if major >= axisRatio * minor {
             let swipe: Gesture = abs(dx) > abs(dy) ? (dx < 0 ? .swipeLeft : .swipeRight) : (dy < 0 ? .swipeUp : .swipeDown)
-            let axis = swipe.direction!
-            let along = dx * axis.dx + dy * axis.dy
-            func share(_ from: CGPoint, _ to: CGPoint) -> CGFloat { (to.x - from.x) * axis.dx + (to.y - from.y) * axis.dy }
-            let together = armedBy.allSatisfy { share(armedAt[$0]!, now[$0]!) >= swipeShare * along }
-                && movers.values.allSatisfy { share($0.start, $0.now) > -swipeShare * along }
-            if together { return swipe }
+            if together(along: swipe, dx: dx, dy: dy, now: now, movers: movers) { return swipe }
         }
         return nil
     }
 
-    /// 本 fork：三指左右滑在移动中越过 `swipeDistance` 的那一刻就判定，不等抬手。一次触摸事件里的移动都记完之后调用，
-    /// 至多返回一次；只在屏幕上正好是武装这一笔的三根手指（没有过别的手指）时才提前，上下滑、捏合、张开、四指仍等抬手，
-    /// 不走 flick。返回后这一笔视为已判定：抬手的 `up` 与再次调用都是 `.none`，silent 照旧保持到下一笔。
-    mutating func early(time: TimeInterval) -> Output {
-        guard armed, !done, others.isEmpty, fingersDown.count == 3 else { return .none }
+    /// 本 fork：三指沿 `swipe` 的方向同向（每指至少 `swipeShare` 的质心位移），其他动过的手指没有逆着它走那么远。
+    private func together(along swipe: Gesture, dx: CGFloat, dy: CGFloat, now: [Int: CGPoint],
+                          movers: [Int: (start: CGPoint, now: CGPoint)]) -> Bool {
+        let axis = swipe.direction!
+        let along = dx * axis.dx + dy * axis.dy
+        func share(_ from: CGPoint, _ to: CGPoint) -> CGFloat { (to.x - from.x) * axis.dx + (to.y - from.y) * axis.dy }
+        let together = armedBy.allSatisfy { share(armedAt[$0]!, now[$0]!) >= swipeShare * along }
+            && movers.values.allSatisfy { share($0.start, $0.now) > -swipeShare * along }
+        return together
+    }
+
+    // MARK: 三指翻页拖动（本 fork）
+
+    /// 本 fork：一次触摸事件里的移动都记完之后调用；`enabled`：翻页此刻可用（三指左右滑会切应用的时候）。
+    /// 进入翻页（返回第一个 `.paging`）要：已武装、未判定，屏上正好是武装的三指（没有过别的手指），质心横移
+    /// `pageStart` 以上且横向占优 `axisRatio`，三指同向，`enabled`。进入后锁定：之后每次都报告质心相对武装时刻的
+    /// 水平位移，不再看轴向；抬手给 `.pageEnded`，不产生 `.gesture`。没进入的笔一切照旧，抬手时由 `decide` 判定。
+    mutating func drag(time: TimeInterval, enabled: Bool) -> Output {
+        guard armed, !done else { return .none }
         let now = nowOfArmed()
         let start = centroid(armedAt), end = centroid(now)
         let dx = end.x - start.x, dy = end.y - start.y
-        guard hypot(dx, dy) >= swipeDistance,
-              let found = swipeOf(dx: dx, dy: dy, now: now, movers: [:]),
-              found == .swipeLeft || found == .swipeRight else { return .none }
-        done = true
-        return .gesture(found, fingers: 3)
+        if paging { return .paging(dx: dx) }
+        // 屏上正好是武装的三指：`others` 为空就是（武装的三指之一抬起或被取消，这一笔已判定，上面就返回了），
+        // 所以不必再数 `fingersDown`。
+        guard enabled, others.isEmpty,
+              abs(dx) >= pageStart, abs(dx) >= axisRatio * abs(dy),
+              together(along: dx < 0 ? .swipeLeft : .swipeRight, dx: dx, dy: dy, now: now, movers: [:]) else { return .none }
+        paging = true
+        return .paging(dx: dx)
+    }
+
+    /// 本 fork：抬手前的水平速度（pt/s，带符号）：与 flick 的 `speed` 同一个起点（`flickWindow` 之前最后的位置），
+    /// 只取水平分量。
+    private func horizontalVelocity(to end: CGPoint, at time: TimeInterval) -> CGFloat {
+        guard let first = track.first else { return 0 }
+        var from = first
+        for sample in track where sample.time <= time - flickWindow { from = sample }
+        let dt = time - from.time
+        guard dt > 0 else { return 0 }
+        return (end.x - from.at.x) / CGFloat(dt)
+    }
+
+    /// 本 fork：松手时位移过了这么远就翻：min(120, 画面宽度 × 0.22)。
+    static func pageCommitDistance(width: CGFloat) -> CGFloat {
+        min(120, width * 0.22)
+    }
+
+    /// 本 fork：抬手时的速度朝位移的反方向到了这么快（pt/s），就不翻，弹回。慢于它的反向速度当作抬手时的抖动，不算。
+    static let pageBackSpeed: CGFloat = 100
+
+    /// 本 fork：松手时翻不翻：位移过了 `pageCommitDistance(width)`，或者以 `flickSpeed` 以上的速度朝位移的方向甩，就翻；
+    /// 速度以 `pageBackSpeed` 以上朝位移的反方向时不翻；零位移不翻。返回 .swipeRight（手指往右）或 .swipeLeft，nil 是弹回。
+    static func pageCommit(dx: CGFloat, velocity: CGFloat, width: CGFloat) -> Gesture? {
+        guard dx != 0 else { return nil }
+        let toward = dx > 0 ? velocity : -velocity          // 速度在位移方向上的分量
+        guard toward > -pageBackSpeed else { return nil }
+        guard abs(dx) >= pageCommitDistance(width: width) || toward >= TrackpadGestures().flickSpeed else { return nil }
+        return dx > 0 ? .swipeRight : .swipeLeft
+    }
+
+    /// 本 fork：画面实际挪多少：那个方向有可切的应用时就是 dx（夹在 ±width 内）；没有时带阻尼，dx × 0.25，最多 ±60。
+    static func pageOffset(dx: CGFloat, width: CGFloat, hasTarget: Bool) -> CGFloat {
+        if hasTarget { return min(max(dx, -width), width) }
+        return min(max(dx * 0.25, -60), 60)
     }
 
     /// The centroid's speed over the last `flickWindow` before `time`: from the last place it was at

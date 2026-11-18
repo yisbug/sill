@@ -205,6 +205,8 @@ struct StreamScreen: View {
     /// It acts only while a window streams (`largerPictureNow`).
     @AppStorage("Sill.barThumbnails") private var storedBarThumbnails = false
     @AppStorage(BarCollapse.key) private var barCollapsed = false
+    /// 本 fork：界面方向是不是 landscapeRight（机身顶部朝左）；还不知道是 nil。iPhone 上灵动岛那一侧留黑边用（PhoneStream.fills）。
+    @State private var landscapeRight: Bool?
     @AppStorage(BarCollapse.handleKey) private var barHandle = BarCollapse.defaultFraction
     /// 拖动中的浮动入口中心，与语音球的避让区域保持同步。
     @State private var barHandleDragging: CGFloat? = nil
@@ -451,6 +453,7 @@ struct StreamScreen: View {
             // A fresh connection starts on the Desktop (the client asks for it as soon as the host
             // reports nothing streaming), so the drawer stays closed until the user opens it.
             sendViewport()
+            readInterfaceOrientation()
             // A link that came in before this connection did waits here now.
             if client.pendingLink != nil { openLinkOverlay() }
             #if DEBUG
@@ -478,7 +481,13 @@ struct StreamScreen: View {
         .onChange(of: keyboardTakers, initial: true) { _, takers in overlay.update(takers: takers) }
         // Rotation animates, and a Mac window resize restarts the stream, so let the size settle.
         .onChange(of: panelSize) { _, _ in sendViewport(after: 0.25) }
-        .onChange(of: screenSize) { _, _ in sendViewport(after: 0.25) }
+        .onChange(of: screenSize) { _, _ in sendViewport(after: 0.25); readInterfaceOrientation() }
+        // 本 fork：横屏转了 180°（灵动岛换到另一侧）尺寸不变，靠设备朝向的通知；转屏动画结束后再读一次。
+        .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
+            readInterfaceOrientation()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { readInterfaceOrientation() }
+        }
+        .environment(\.streamFillEdges, fillEdges)
         // Same wait for Aa: cycling from Off to 0.8× passes three sizes nobody wants the Mac to try.
         .onChange(of: textScale) { _, _ in sendViewport(after: 0.25) }
         // The stream rate follows the panel (`StreamClient.wantedFPS`): re-send when Low Power Mode
@@ -1345,6 +1354,29 @@ struct StreamScreen: View {
                              zoom: zoom)
     }
 
+    /// 本 fork：画面和顶栏底色伸进安全区的那些侧：iPhone 上只有没有灵动岛的那一侧（PhoneStream.fills）。
+    private var fillEdges: Edge.Set {
+        let fills = PhoneStream.fills(phone: DuoLayout.phoneArrangement,
+                                      island: PhoneStream.islandSide(phone: DuoLayout.phoneArrangement, landscapeRight: landscapeRight))
+        var edges: Edge.Set = []
+        if fills.left { edges.insert(.leading) }
+        if fills.right { edges.insert(.trailing) }
+        return edges
+    }
+
+    /// 读当前窗口场景的界面方向（iPhone 上灵动岛在哪一侧）。
+    private func readInterfaceOrientation() {
+        let scenes = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }
+        let scene = scenes.first { $0.activationState == .foregroundActive } ?? scenes.first
+        let now: Bool?
+        switch scene?.effectiveGeometry.interfaceOrientation {
+        case .landscapeRight?: now = true
+        case .landscapeLeft?: now = false
+        default: now = nil
+        }
+        if landscapeRight != now { landscapeRight = now }
+    }
+
     private func contentArea(bar: BarMetrics) -> some View {
         ZStack(alignment: .topLeading) {
             Color.black
@@ -1377,7 +1409,7 @@ struct StreamScreen: View {
             // 本 fork：串流画面横屏下铺满，不再留 8 pt 黑框和圆角，左右伸进安全区（刘海、灵动岛一侧），
             // 顶栏展开与收起都一样；剩下的黑边只来自画面与 Mac 窗口比例不同（Aa 为 Off，或串流桌面）。
             .clipped()
-            .ignoresSafeArea(.container, edges: .horizontal)
+            .ignoresSafeArea(.container, edges: fillEdges)
             .tourTarget(.stream)
 
             // The dim comes after the overlay on purpose: with the drawer open a tap on the dim
@@ -1624,7 +1656,19 @@ private struct BarCollapseHandle: View {
     }
 }
 
+/// 本 fork：串流画面和顶栏底色伸进安全区的那些侧（StreamScreen.fillEdges）；默认两侧。
+private struct StreamFillEdgesKey: EnvironmentKey {
+    static let defaultValue: Edge.Set = .horizontal
+}
+extension EnvironmentValues {
+    var streamFillEdges: Edge.Set {
+        get { self[StreamFillEdgesKey.self] }
+        set { self[StreamFillEdgesKey.self] = newValue }
+    }
+}
+
 private struct TopBar: View {
+    @Environment(\.streamFillEdges) private var fillEdges
     @ObservedObject var client: StreamClient
     let metrics: BarMetrics
     let touches: TouchWatch
@@ -1742,7 +1786,8 @@ private struct TopBar: View {
         .padding(.horizontal, metrics.padding)
         // The bar's colour runs to the screen edge; its contents stay inside the safe area.
         // 顶栏底色铺到屏幕两侧的安全区（横屏刘海、灵动岛一侧），免得顶栏两端露出黑边；按钮仍在安全区内。
-        .background(Palette.bar.ignoresSafeArea(edges: [.top, .horizontal]))
+        // 本 fork：iPhone 上灵动岛那一侧不铺（和画面一样留黑边）。
+        .background(Palette.bar.ignoresSafeArea(edges: Edge.Set.top.union(fillEdges)))
     }
 
     private var iconMenusButton: some View {

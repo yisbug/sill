@@ -35,6 +35,17 @@ MUTANTS = [
     ("W2 缩放写错", 'static func stored(for scale: Double?) -> Double { scale ?? TextScale.off }', 'static func stored(for scale: Double?) -> Double { (scale ?? TextScale.off) + 0.01 }'),
     ("T1 标题错误", 'String(localized: "Text Size"', 'String(localized: "Text size"'),
     ("T2 脚注错误", 'It is the same setting as Aa in the toolbar.', 'It is a separate setting.'),
+    # 灵动岛一侧留黑边。
+    ("I1 灵动岛左右反了", 'return landscapeRight ? .left : .right', 'return landscapeRight ? .right : .left'),
+    ("I2 非 iPhone 也有灵动岛一侧", 'guard phone, let landscapeRight else { return nil }', 'guard let landscapeRight else { return nil }'),
+    ("I3 方向未知当成在左", 'guard phone, let landscapeRight else { return nil }', 'guard phone else { return nil }\n        let landscapeRight = landscapeRight ?? true'),
+    ("I4 灵动岛在左却铺了左侧", 'case .left?: return (false, true)', 'case .left?: return (true, true)'),
+    ("I5 灵动岛在左却没铺右侧", 'case .left?: return (false, true)', 'case .left?: return (false, false)'),
+    ("I6 灵动岛在右却铺了右侧", 'case .right?: return (true, false)', 'case .right?: return (true, true)'),
+    ("I7 灵动岛在右却没铺左侧", 'case .right?: return (true, false)', 'case .right?: return (false, false)'),
+    ("I8 方向未知时两侧都铺", 'case nil: return (false, false)', 'case nil: return (true, true)'),
+    ("I9 非 iPhone 不铺", 'guard phone else { return (true, true) }', 'guard phone else { return (false, false) }'),
+    ("I10 iPhone 也两侧都铺", 'guard phone else { return (true, true) }\n        switch island', 'guard false else { return (true, true) }\n        switch island'),
 ]
 
 caught = 0
