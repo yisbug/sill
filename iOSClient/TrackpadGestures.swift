@@ -284,10 +284,10 @@ struct TrackpadGestures {
 
     // MARK: 三指左右滑切换应用（本 fork）
 
-    /// 三指左右滑在串流窗口时不发给 Mac，而是在顶栏 Dock 里换到相邻的应用（图标模式按应用，缩略图模式按窗口）。
-    /// 串流桌面时照旧是 Mac 的切换桌面空间。只认三指的左右滑；四指与其他方向照旧。
-    static func switchesApp(_ gesture: Gesture, fingers: Int, switchOn: Bool, connected: Bool, windowStreams: Bool) -> Bool {
-        switchOn && connected && windowStreams && fingers == 3 && (gesture == .swipeLeft || gesture == .swipeRight)
+    /// 三指左右滑不发给 Mac（不再切换 Mac 的桌面空间），而是在顶栏 Dock 里换到相邻的应用（图标模式按应用，
+    /// 缩略图模式按窗口）；串流桌面时也一样，从桌面切进 Dock 的第一个或最后一个。只认三指的左右滑；四指与其他方向照旧。
+    static func switchesApp(_ gesture: Gesture, fingers: Int, switchOn: Bool, connected: Bool) -> Bool {
+        switchOn && connected && fingers == 3 && (gesture == .swipeLeft || gesture == .swipeRight)
     }
 
     /// 连续切换时沿用的顺序：上一次切换后这么久之内再滑，用当时的顺序（图标按最近使用排序，切换后会把新应用排到

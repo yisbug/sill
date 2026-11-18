@@ -253,8 +253,9 @@ has Tests/checks/README.md :: | `phone-stream` |
   - 顶栏收起后的浮动入口不透明度调高（底色 0.85、整体 0.92，加阴影）。
   - 语音球空闲时底色略透明（`VoiceInputPolicy.idleFillOpacity` 0.78）；长按弹出系统菜单，紧挨着球：全选并删除、全选、全选并复制、全选并剪切、粘贴、撤销、重做、回车，按键经 `KeyChord.press` 发给 Mac（规则 `VoiceInputPolicy.QuickAction`、`strokes`，检查在 `voice`）。
   - 启动续连：App 打开时为最近连过、还能自动拨的那台 Mac 起一个自动重连（和断线重连同一条路），连接界面之上铺它上次的画面和「正在连接…」与取消；连上进串流，20 s 没连上或重连结束就回连接界面并提示（规则 `ConnectionList.resumeMacID`、`resumeState`，检查在 `connection-list`；状态 `StreamClient.launchResume`，界面 `LaunchResumeView`）。上次的画面在离开前台时（`willResignActive`）也留一张，只在磁贴样式下。
-  - 三指左右滑：串流窗口时不发给 Mac，换到顶栏 Dock 里相邻的应用（图标模式按应用，缩略图模式按窗口；往右下一个、往左上一个，到头不绕回；1.5 s 内连续滑沿用上次顺序），串流桌面时照旧切换 Mac 的桌面空间（规则 `TrackpadGestures.switchesApp`、`appSwitchTarget`，检查在 `gestures`；执行 `StreamClient.switchApp`；设置面板手势说明后加一句 `appSwitchNote`，代做手势的行传 `switchesApps: false`）。
-- 提交：`08401296`，三指切换应用在其后一个提交。
+  - 三指左右滑：不发给 Mac（不再切换 Mac 的桌面空间），换到顶栏 Dock 里相邻的应用（图标模式按应用，缩略图模式按窗口；往右下一个、往左上一个，到头不绕回；1.5 s 内连续滑沿用上次顺序；串流桌面时从桌面切进第一个或最后一个）。四指左右滑照旧发给 Mac。规则 `TrackpadGestures.switchesApp`、`appSwitchTarget`，检查在 `gestures`；执行 `StreamClient.switchApp`；设置面板手势行改成「切换应用」（下一个、上一个应用），说明后加一句 `appSwitchNote`；导览改为「横向轻扫可在应用之间切换」。
+  - 画面尺寸（发给 Mac 的视口）在铺满后的里层量（`contentArea` 里层 ZStack 的 `onGeometryChange`）：在外层 `ignoresSafeArea` 之后量拿到的是安全区内的宽度，Mac 按窄的比例改窗口，iPhone 两侧各留约 62 pt 黑边。
+- 提交：`08401296`、`9c0e6641`，关掉三指切换桌面空间与视口量法在其后的提交。
 - 合并时注意：`contentArea` 里原来的 `.padding(8)`、`clipShape(streamShape)` 与描边已去掉，上游若改这段要保留铺满；`ContentView.app` 的 `onAppear` 多一行 `startLaunchResume()`，ZStack 多一层 `LaunchResumeView`。
 
 ```fork-check
@@ -270,7 +271,7 @@ has iOSClient/StreamClient.swift :: keepPictureForLaunch()
 has iOSClient/ConnectionList.swift :: static func resumeMacID
 has iOSClient/TrackpadGestures.swift :: static func switchesApp
 has iOSClient/StreamClient.swift :: private func switchApp
-has iOSClient/HostSettingsPanel.swift :: switchesApps: false
+has iOSClient/HostSettingsPanel.swift :: "Switch Apps"
 ```
 
 ### F13 文档

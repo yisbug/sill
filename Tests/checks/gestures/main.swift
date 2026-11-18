@@ -861,13 +861,12 @@ check("the random strokes reach every gesture, with three fingers and with four"
       && tallies.keys.contains { $0.hasSuffix("4") })
 
 // 三指左右滑切换应用（本 fork）
-check("app switch: three fingers left or right while a window streams", G.switchesApp(.swipeLeft, fingers: 3, switchOn: true, connected: true, windowStreams: true)
-      && G.switchesApp(.swipeRight, fingers: 3, switchOn: true, connected: true, windowStreams: true))
-check("app switch: not over the Desktop (the Mac's Spaces as before)", !G.switchesApp(.swipeLeft, fingers: 3, switchOn: true, connected: true, windowStreams: false))
-check("app switch: not with four fingers, not up, down, pinch or spread", !G.switchesApp(.swipeLeft, fingers: 4, switchOn: true, connected: true, windowStreams: true)
-      && [G.Gesture.swipeUp, .swipeDown, .pinch, .spread].allSatisfy { !G.switchesApp($0, fingers: 3, switchOn: true, connected: true, windowStreams: true) })
-check("app switch: not with the switch off or no session", !G.switchesApp(.swipeLeft, fingers: 3, switchOn: false, connected: true, windowStreams: true)
-      && !G.switchesApp(.swipeLeft, fingers: 3, switchOn: true, connected: false, windowStreams: true))
+check("app switch: three fingers left or right, never the Mac's Spaces", G.switchesApp(.swipeLeft, fingers: 3, switchOn: true, connected: true)
+      && G.switchesApp(.swipeRight, fingers: 3, switchOn: true, connected: true))
+check("app switch: not with four fingers, not up, down, pinch or spread", !G.switchesApp(.swipeLeft, fingers: 4, switchOn: true, connected: true)
+      && [G.Gesture.swipeUp, .swipeDown, .pinch, .spread].allSatisfy { !G.switchesApp($0, fingers: 3, switchOn: true, connected: true) })
+check("app switch: not with the switch off or no session", !G.switchesApp(.swipeLeft, fingers: 3, switchOn: false, connected: true)
+      && !G.switchesApp(.swipeLeft, fingers: 3, switchOn: true, connected: false))
 let dock: [UInt32] = [10, 20, 30]
 check("app switch: right is the next in the Dock", G.appSwitchTarget(order: dock, current: 10, gesture: .swipeRight) == 20)
 check("app switch: left is the previous", G.appSwitchTarget(order: dock, current: 20, gesture: .swipeLeft) == 10)

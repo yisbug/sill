@@ -1366,6 +1366,10 @@ struct StreamScreen: View {
                              readZoom: { [zoom] in zoom.zoom },
                              writeZoom: { [zoom] in zoom.set($0) })
             }
+            // The panel itself: the size the host fits the Mac window to. 本 fork：在里层量，量到的是伸进两侧安全区之后
+            // 的整块画面；在外层 ignoresSafeArea 之后量，拿到的仍是安全区内的宽度（iPhone 17 Pro 上 750×402，画面却画到
+            // 874 宽），Mac 按窄的比例改窗口，两侧就各留约 62 pt 黑边。
+            .onGeometryChange(for: CGSize.self, of: { $0.size }, action: { panelSize = $0 })
             .background(Palette.panel)
             // A locked Mac: its cover over the picture (LockedMac), under the link's line.
             .overlay { LockedMacShade(client: client) }
@@ -1374,8 +1378,6 @@ struct StreamScreen: View {
             // 顶栏展开与收起都一样；剩下的黑边只来自画面与 Mac 窗口比例不同（Aa 为 Off，或串流桌面）。
             .clipped()
             .ignoresSafeArea(.container, edges: .horizontal)
-            // The panel itself: the size the host fits the Mac window to.
-            .onGeometryChange(for: CGSize.self, of: { $0.size }, action: { panelSize = $0 })
             .tourTarget(.stream)
 
             // The dim comes after the overlay on purpose: with the drawer open a tap on the dim

@@ -1012,7 +1012,7 @@ func texts(_ c: TourCopy) -> [String] { c.rows.map(\.text) }
 // once more, for 0.6"), for Mac mini and an iPad unless said.
 let T1 = "Tap to click.", T2 = "Touch and hold to right-click.", T3 = "Drag to scroll.", T4 = "Apple Pencil works as a mouse."
 let T5 = "New: Pinch to zoom the picture here, up to 5×. Zoomed in, two fingers move it, and one finger still taps, holds and drags on Mac mini."
-let T6 = "New: Swipe with three fingers: up for Mission Control, down for App Exposé, and sideways between Spaces."
+let T6 = "New: Swipe with three fingers: up for Mission Control, down for App Exposé, and sideways between apps."
 let B1 = "Touch and hold a window to close, minimize or go full screen. Keep holding and drag to move it."
 let B1VO = "Each window has actions: close, minimize, full screen, and move left or right. Swipe up or down to hear them."
 let B1Apps = "Apps lists the apps on Mac mini: tap an open one again for its next window."

@@ -3957,13 +3957,11 @@ final class StreamClient: ObservableObject {
     /// still waiting goes before the gesture, as before any input but a move. Nothing else: no
     /// pointer, no scroll, and a latched modifier stays latched. Main thread. True when it went.
     @discardableResult
-    /// `switchesApps`：本 fork 的三指左右滑切换应用；设置面板里代做手势的行（VoiceOver 用）传 false，照旧发给 Mac。
-    func sendGesture(_ gesture: TrackpadGestures.Gesture, fingers: Int, switchesApps: Bool = true) -> Bool {
+    func sendGesture(_ gesture: TrackpadGestures.Gesture, fingers: Int) -> Bool {
         var windowStreams = false
         if case .window = active { windowStreams = true }
-        // 本 fork：串流窗口时三指左右滑换 Dock 里相邻的应用，不发给 Mac（串流桌面时照旧切换桌面空间）。
-        if switchesApps, TrackpadGestures.switchesApp(gesture, fingers: fingers, switchOn: Self.gesturesOn, connected: connected,
-                                        windowStreams: windowStreams) {
+        // 本 fork：三指左右滑换 Dock 里相邻的应用，不发给 Mac（Mac 的切换桌面空间不再用三指）。
+        if TrackpadGestures.switchesApp(gesture, fingers: fingers, switchOn: Self.gesturesOn, connected: connected) {
             return switchApp(gesture)
         }
         let plan = TrackpadGestures.sending(switchOn: Self.gesturesOn, connected: connected, hostGestures: hostGestures,

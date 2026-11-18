@@ -688,18 +688,19 @@ struct HostSettingsPanel: View {
                 ForEach(Self.gestureRows, id: \.gesture) { row in
                     RowDivider()
                     GestureRow(symbol: row.symbol, gesture: row.gesture, action: row.action, does: row.does) {
-                        _ = client.sendGesture($0, fingers: 3, switchesApps: false)
+                        _ = client.sendGesture($0, fingers: 3)
                     }
                 }
             }
         }
-        Footnote(text: gesturesOn && macTakesGestures && !voiceOver
+        Footnote(text: gesturesOn && !voiceOver
                  ? String(localized: "\(gesturesFooter) \(Self.appSwitchNote)", comment: "两句之间的连接；中文译为不带空格")
                  : gesturesFooter)
     }
 
-    /// 本 fork：串流窗口时三指左右滑切换应用（StreamClient.switchApp）。VoiceOver 下手指手势到不了 Sill，不提。
-    static let appSwitchNote = String(localized: "While a window streams, three fingers left or right switch to the next or previous app in the Dock instead.", comment: "主机设置面板：三指左右滑在串流窗口时切换应用的说明")
+    /// 本 fork：三指左右滑切换应用（StreamClient.switchApp），不再切换 Mac 的桌面空间；不经 Mac，所以 Mac 不收手势时也有。
+    /// VoiceOver 下手指手势到不了 Sill，不提（那时设置里的「切换应用」一行代做）。
+    static let appSwitchNote = String(localized: "Three fingers left or right switch to the next or previous app in the Dock.", comment: "主机设置面板：三指左右滑切换应用的说明")
 
     /// Under Send Audio's switch and the Mute row below it (docs/audio-plan.md §7.7): on, that every
     /// device hears it and that Mute silences this one alone; off, what turning it on does, and Mute
@@ -739,13 +740,13 @@ struct HostSettingsPanel: View {
     static let largerPictureFooter = String(localized: "Held upright, a window’s picture takes the place of the window thumbnails and reaches down to where the keyboard comes up. The Desktop keeps the thumbnails. Switch windows with Apps: tap an open app again for its next window. To fill the taller picture with a window, set its text size with Aa. A change applies when you close Settings.", comment: "主机设置面板：更大画面开关的完整说明")
 
     /// What each gesture does on the Mac, and what the row does as an accessibility action: its one
-    /// gesture, or, for the Spaces, one action each way (natural direction: a swipe left brings the
-    /// Space on the right). The pinch opens Launchpad on macOS 14 and 15, from the same key.
+    /// gesture, or, for switching apps (this fork: three fingers sideways switch the Dock's apps, never
+    /// the Mac's Spaces), one action each way. The pinch opens Launchpad on macOS 14 and 15, from the same key.
     private static let gestureRows: [(symbol: String, gesture: String, action: String, does: [GestureRow.Action])] = [
         ("arrow.up", String(localized: "Swipe Up", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "Mission Control", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "Mission Control", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .swipeUp)]),
         ("arrow.down", String(localized: "Swipe Down", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "App Exposé", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "App Exposé", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .swipeDown)]),
-        ("arrow.left.and.right", String(localized: "Swipe Left or Right", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "Spaces", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "Space on the Right", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .swipeLeft),
-                                                                   GestureRow.Action(name: String(localized: "Space on the Left", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .swipeRight)]),
+        ("arrow.left.and.right", String(localized: "Swipe Left or Right", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "Switch Apps", comment: "主机设置面板：三指左右滑的操作（本 fork：切换 Dock 里的应用）"), [GestureRow.Action(name: String(localized: "Next App", comment: "主机设置面板：三指右滑，切到 Dock 里的下一个应用"), gesture: .swipeRight),
+                                                                   GestureRow.Action(name: String(localized: "Previous App", comment: "主机设置面板：三指左滑，切到 Dock 里的上一个应用"), gesture: .swipeLeft)]),
         ("arrow.down.right.and.arrow.up.left", String(localized: "Pinch", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "Apps", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "Apps", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .pinch)]),
         ("arrow.up.left.and.arrow.down.right", String(localized: "Spread", comment: "主机设置面板：三指手势名称或对应操作"), String(localized: "Show Desktop", comment: "主机设置面板：三指手势名称或对应操作"), [GestureRow.Action(name: String(localized: "Show Desktop", comment: "主机设置面板：三指手势名称或对应操作"), gesture: .spread)]),
     ]

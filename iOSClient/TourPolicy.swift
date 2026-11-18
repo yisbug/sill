@@ -595,7 +595,7 @@ enum TourPolicy {
             // device's switch is on and the Mac takes them. The pinch and the spread are the Settings
             // panel's rows.
             if features.gestures {
-                rows.append(row("hand.raised.fingers.spread", spans(String(localized: "**Swipe with three fingers**: up for Mission Control, down for App Exposé, and sideways between Spaces.", comment: "串流导览文案；双星号标出强调文字")), new: true))
+                rows.append(row("hand.raised.fingers.spread", spans(String(localized: "**Swipe with three fingers**: up for Mission Control, down for App Exposé, and sideways between apps.", comment: "串流导览文案；双星号标出强调文字")), new: true))
             }
             let hint: String
             switch layout {
