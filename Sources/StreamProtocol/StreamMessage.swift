@@ -91,6 +91,14 @@ public enum StreamMessageKind: UInt8 {
                              // From the device once per interruption while its keyframe is due, again when it
                              // has not come in 4 s (or four round trips), 2 s apart at least (KeyframeRecovery);
                              // at most one a second per connection on the host
+    // The Desktop's displays (DesktopDisplays.swift, issue #91), after 45 and 46, which open pull requests
+    // hold (the microphone and the pen; the camera). Older hosts map it to `.unknown` and skip it.
+    case nextDisplay = 47    // device → host, empty payload: the Desktop button tapped while the Desktop
+                             // streams, so the Desktop moves to the Mac's next stop (DesktopDisplays: the
+                             // main display first, then each display to its right, wrapping). Only to a host
+                             // whose window list says `desktopDisplays` 2 or more; ignored unless the Desktop
+                             // streams, refused while the Mac is locked. A person at the device (DisplayWake).
+                             // `{"number": n}` is kept for PR #296's list
     // 语音输入（Voice.swift，docs/voice-and-immersive-plan.md 第 2 节）：本 fork 的 100–102，避开上游已用或预留
     // 到 45 的段。老版本读成 `.unknown` 并跳过；设备只向窗口列表 `voice` 为 1 的主机发 100 和 102。
     case voiceClip = 100     // 设备 → Mac，二进制 VoiceClip：片段号、格式、音频（至多 4 MiB）。Mac 交给本机的

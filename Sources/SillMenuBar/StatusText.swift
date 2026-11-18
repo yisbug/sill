@@ -224,9 +224,10 @@ enum StatusText {
         let count = s.devices.count
         if count > 0 {
             let who = count == 1 ? (s.devices[0].name.map(shortName) ?? "a Device") : "\(count) Devices"
-            if s.stream != nil { return ("Streaming to \(who)", nil) }
+            // The off-console view (docs/off-console-plan.md): what the devices see is not this Mac's screen.
+            if s.stream != nil { return ("Streaming to \(who)", s.offConsoleView ? offConsoleViewLogSubtitle : nil) }
             let connected = count == 1 ? (s.devices[0].name.map(shortName) ?? "Device") : "\(count) Devices"
-            return ("\(connected) Connected", "Pick a window on the device to start streaming.")
+            return ("\(connected) Connected", s.offConsoleView ? offConsoleViewLogSubtitle : "Pick a window on the device to start streaming.")
         }
         if case .advertising(let name) = s.network {
             return ("Waiting for a Device", "Open Sill on your iPhone or iPad. This Mac appears as “\(name)”.")
@@ -277,7 +278,8 @@ enum StatusText {
                 } else {
                     header = String(localized: "Streaming to \(count.formatted(.number.grouping(.never))) Devices", comment: "状态卡串流标题，插值为设备数量")
                 }
-                return (header, nil)
+                // The off-console view (docs/off-console-plan.md): what the devices see is not this Mac's screen.
+                return (header, s.offConsoleView ? offConsoleViewSubtitle : nil)
             }
             if count == 1, let name = s.devices[0].name {
                 header = String(localized: "\(shortName(name)) Connected", comment: "状态卡连接标题，插值为设备简称")
@@ -286,13 +288,21 @@ enum StatusText {
             } else {
                 header = String(localized: "\(count.formatted(.number.grouping(.never))) Devices Connected", comment: "状态卡连接标题，插值为设备数量")
             }
-            return (header, String(localized: "Pick a window on the device to start streaming.", comment: "状态卡已连接设备说明"))
+            return (header, s.offConsoleView ? offConsoleViewSubtitle
+                                             : String(localized: "Pick a window on the device to start streaming.", comment: "状态卡已连接设备说明"))
         }
         if case .advertising(let name) = s.network {
             return (String(localized: "Waiting for a Device", comment: "状态卡标题，等待设备"), String(localized: "Open Sill on your iPhone or iPad. This Mac appears as “\(name)”.", comment: "状态卡等待设备说明，插值为此 Mac 的名称"))
         }
         return (String(localized: "Waiting for a Device", comment: "状态卡标题，等待设备"), String(localized: "Registering on the local network…", comment: "状态卡说明，正在注册本地网络"))
     }
+
+    /// Under the header while the off-console view applies (HostStatusSnapshot.offConsoleView).
+    static var offConsoleViewSubtitle: String {
+        String(localized: "Another user is on this Mac’s screen. Devices see this account, and can’t click or type in it.", comment: "状态卡副标题，另一位用户正在使用屏幕时设备只能查看本账户")
+    }
+    /// 日志专用英文原文，不读取界面本地化结果。
+    private static let offConsoleViewLogSubtitle = "Another user is on this Mac’s screen. Devices see this account, and can’t click or type in it."
 
     private static func isFailed(_ n: HostStatusSnapshot.Network) -> Bool {
         if case .failed = n { return true }

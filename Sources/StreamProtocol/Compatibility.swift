@@ -117,12 +117,17 @@ public struct Hello: Codable, Sendable, Equatable {
     public var audio: [String]?
     /// 设备首选语言；只发送前五项，旧设备不发送时沿用 Mac 的语言。
     public var languages: [String]?
+    /// 1 from a device that shows a Mac's off-console view (`WindowList.offConsoleView`, LockedMac.viewGeneration;
+    /// docs/off-console-plan.md): a host sends it the view's list. Nil from every device before: a host sends
+    /// it the locked list without windows, as Sill for Mac 0.6.0 does.
+    public var offConsoleView: Int?
 
     public init(appVersion: String? = nil, build: String? = nil, protocol: Int? = nil, device: String? = nil,
-                audio: [String]? = nil, languages: [String]? = nil) {
+                audio: [String]? = nil, languages: [String]? = nil, offConsoleView: Int? = nil) {
         self.appVersion = appVersion; self.build = build; self.protocol = `protocol`; self.device = device
         self.audio = audio
         self.languages = languages
+        self.offConsoleView = offConsoleView
     }
 }
 
