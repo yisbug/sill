@@ -52,7 +52,7 @@ M = [
     ("连不上回 serviceError", V, "        case NSURLErrorCannotConnectToHost, NSURLErrorCannotFindHost, NSURLErrorNetworkConnectionLost,",
      "        case NSURLErrorCannotFindHost, NSURLErrorNetworkConnectionLost,"),
     # 结果
-    ("锁屏回 nothingStreams", V, "        case .locked: return failed(clip: clip, .locked)", "        case .locked: return failed(clip: clip, .nothingStreams)"),
+    ("锁屏回 nothingStreams", V, "        case .locked: return failed(clip: clip, .locked, locale: locale)", "        case .locked: return failed(clip: clip, .nothingStreams, locale: locale)"),
     ("成功不截预览", V, "        VoiceResult(clip: clip, ok: true, text: preview(text))", "        VoiceResult(clip: clip, ok: true, text: text)"),
     ("预览多一个字符", V, "        return String(text.prefix(limit - 1)) + \"…\"", "        return String(text.prefix(limit)) + \"…\""),
     ("预览按 UTF-16 截", V, "        guard text.count > limit else { return text }", "        guard text.utf16.count > limit else { return text }"),
@@ -99,7 +99,7 @@ M = [
     ("避让挪远处", P, ".min { abs($0 - y) < abs($1 - y) }", ".max { abs($0 - y) < abs($1 - y) }"),
     ("避让可挪出区域", P, ".filter { range.contains($0) && free($0) }", ".filter { free($0) }"),
     # 文字
-    ("时长不补零", P, 'String(format: "%d:%02d", s / 60, s % 60)', 'String(format: "%d:%d", s / 60, s % 60)'),
+    ("时长不补零", P, '.minuteSecond(padMinuteToLength: 1)', '.minuteSecond(padMinuteToLength: 2)'),
     ("音量从 -60 dB 起", P, "return Double(min(max((power + 50) / 50, 0), 1))", "return Double(min(max((power + 60) / 60, 0), 1))"),
     ("VoiceOver 标签写错", P, 'String(localized: "Voice input", comment: "语音悬浮球：无障碍标签")', 'String(localized: "Dictation", comment: "语音悬浮球：无障碍标签")'),
 ]
