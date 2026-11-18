@@ -320,7 +320,7 @@ struct StreamScreen: View {
                 // Paste button and Dismiss take their touches over the stream's UIKit input view, and
                 // nothing else does (the frame around it is empty). Near the bar, off the link's line,
                 // inside the stream panel's corner; never while something is open over the stream.
-                if clipboardChipAllowed, client.clipboardChip || client.clipboardNote != nil, let panel = safePanel(geo.size) {
+                if clipboardChipAllowed, client.clipboardChip || client.clipboardNote != nil, let panel = tourTargets[.stream] {
                     let corner = ClipboardPolicy.chipCorner(landscape: layout == .landscape, linkLineShown: chipAvoidsTop)
                     ClipboardChip(client: client)
                         .frame(maxWidth: max(0, panel.width - 16), alignment: .trailing)
@@ -332,7 +332,7 @@ struct StreamScreen: View {
                 }
                 // 语音悬浮球（VoiceInputButton）：布局之上，导览与配对覆盖层之下；只在串流画面之内（不盖顶栏和键盘行），
                 // 避开剪贴板芯片与链路提示；设置面板、抽屉、导览、配对覆盖层打开时藏起。
-                if let panel = safePanel(geo.size) {
+                if let panel = tourTargets[.stream] {
                     let chip = clipboardChipAllowed && (client.clipboardChip || client.clipboardNote != nil)
                     VoiceInputLayer(client: client, area: panel,
                                     avoiding: VoiceInputLayer.avoiding(panel: panel,
@@ -1275,14 +1275,6 @@ struct StreamScreen: View {
         reduceMotion ? .opacity : .scale(scale: 0.94, anchor: anchor).combined(with: .opacity)
     }
 
-    /// 串流画面落在安全区里的部分（画面横屏下伸进两侧安全区，芯片、语音球只放在这部分，不进刘海、灵动岛底下）。
-    /// 屏幕坐标空间 `TourSpace` 的原点就是安全区左上角，所以安全区是 (0, 0, size)。
-    private func safePanel(_ size: CGSize) -> CGRect? {
-        guard let panel = tourTargets[.stream] else { return nil }
-        let safe = panel.intersection(CGRect(origin: .zero, size: size))
-        return safe.isNull || safe.isEmpty ? panel : safe
-    }
-
     /// 这块屏幕实际画哪种布局：iPhone 的竖屏尺寸（含旋转途中）按横屏的画，其余照 `DuoLayout.of`。
     private static func drawnLayout(_ size: CGSize) -> DuoLayout {
         let duo = DuoLayout.of(size)
@@ -1345,6 +1337,8 @@ struct StreamScreen: View {
                              zoom: zoom)
     }
 
+    private var streamShape: RoundedRectangle { RoundedRectangle(cornerRadius: 12, style: .continuous) }
+
     private func contentArea(bar: BarMetrics) -> some View {
         ZStack(alignment: .topLeading) {
             Color.black
@@ -1370,13 +1364,12 @@ struct StreamScreen: View {
             // A locked Mac: its cover over the picture (LockedMac), under the link's line.
             .overlay { LockedMacShade(client: client) }
             .overlay(alignment: .top) { LinkLineView(text: shownLinkLine) }
-            // 本 fork：串流画面横屏下铺满，不再留 8 pt 黑框和圆角，左右伸进安全区（刘海、灵动岛一侧），
-            // 顶栏展开与收起都一样；剩下的黑边只来自画面与 Mac 窗口比例不同（Aa 为 Off，或串流桌面）。
-            .clipped()
-            .ignoresSafeArea(.container, edges: .horizontal)
-            // The panel itself: the size the host fits the Mac window to.
+            .clipShape(streamShape)
+            .overlay(streamShape.strokeBorder(Color.white.opacity(0.09), lineWidth: 1))
+            // The panel itself, inside the padding: the size the host fits the Mac window to.
             .onGeometryChange(for: CGSize.self, of: { $0.size }, action: { panelSize = $0 })
             .tourTarget(.stream)
+            .padding(8)
 
             // The dim comes after the overlay on purpose: with the drawer open a tap on the dim
             // closes the drawer instead of clicking the Mac.
@@ -1587,21 +1580,20 @@ private struct BarCollapseHandle: View {
 
     var body: some View {
         UnevenRoundedRectangle(bottomLeadingRadius: 13, bottomTrailingRadius: 13)
-            .fill(Palette.bar.opacity(0.85))
+            .fill(Palette.bar.opacity(0.35))
             .overlay {
                 UnevenRoundedRectangle(bottomLeadingRadius: 13, bottomTrailingRadius: 13)
-                    .stroke(Color.white.opacity(0.28), lineWidth: 1)
+                    .stroke(Color.white.opacity(0.12), lineWidth: 1)
             }
             .overlay {
                 Image(systemName: "chevron.down")
                     .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Palette.text)
+                    .foregroundStyle(Palette.text.opacity(0.75))
             }
             .frame(width: BarCollapse.handleSize.width, height: BarCollapse.handleSize.height)
             .frame(height: BarCollapse.touchHeight, alignment: .top)
             .contentShape(Rectangle())
-            .shadow(color: .black.opacity(0.4), radius: 4, y: 1)
-            .opacity(dragging == nil ? 0.92 : 1)
+            .opacity(dragging == nil ? 0.65 : 0.9)
             .onTapGesture(perform: show)
             .gesture(
                 DragGesture(minimumDistance: 10, coordinateSpace: .named(TourSpace.name))
@@ -1739,8 +1731,7 @@ private struct TopBar: View {
         .frame(height: metrics.height)
         .padding(.horizontal, metrics.padding)
         // The bar's colour runs to the screen edge; its contents stay inside the safe area.
-        // 顶栏底色铺到屏幕两侧的安全区（横屏刘海、灵动岛一侧），免得顶栏两端露出黑边；按钮仍在安全区内。
-        .background(Palette.bar.ignoresSafeArea(edges: [.top, .horizontal]))
+        .background(Palette.bar.ignoresSafeArea(edges: .top))
     }
 
     private var iconMenusButton: some View {
