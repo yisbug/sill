@@ -304,6 +304,7 @@ has iOSClient/ContentView.swift :: TrafficStatsView(client: client
   - 选择排队（设备端，规则 `PickFlow`，检查 `pick-flow`）：Mac 正切到另一个源时收到的选择会被它丢掉（`StreamCoordinator.handlePick`，上游行为，没有改）。设备同一时刻只让一次选择在路上，它有结果（窗口列表说 Mac 在串流它了，或换成了别的源）之前，新的选择只记最新的一个，结果到了再发；8 s 没结果就不等了。Dock 高亮（`appSelection`）留在最后选的那个上。`StreamClient.select` 经它发；设备自己的请求（回到桌面、移动连接后重选）不经它。
   - 占位画面（`PickShade`，挂在 `ZoomedStreamView` 上）：选了另一个源、画面还没到时，盖上目标窗口的缩略图和转圈（桌面没有缩略图，只压暗）；Mac 说在串流它了并且发出后收到过关键帧就撤（`StreamClient.pickPending`），最多 9 s。
   - 三指左右滑是跟手的翻页（用户 2026-11-18：滑动时能拖拽整个屏幕、带动画）：屏上正好是武装这一笔的三指、质心水平位移 ≥ 12 pt、三指同向时这一笔进入翻页（`TrackpadGestures.drag`，输出 `.paging`、`.pageEnded`、`.pageCancelled`），串流画面跟着手指横移，旁边带出目标应用的缩略图页（`PagerStage`、`PagerModel`，在 `PickFlow.swift`）；松手时位移过了 `pageCommitDistance`（min(120, 宽 × 0.22)）或朝位移方向甩得够快就翻（`pageCommit`）：立刻发出选择，画面同时滑到位，滑完由占位接上；否则弹回。那一边没有可切的应用时只有带阻尼的小幅位移（`pageOffset`）。开了减弱动态效果时画面不动，该切照样切。翻页不可用（手势开关关着、没连接）时三指左右滑照旧在抬手时判定。执行在 `StreamClient.page`；`StrokeObserver` 的 `onPage`、`pagingEnabled` 按窗口找会话（`PageReceivers`）。上下滑、捏合、张开、四指照旧在抬手时判定。检查在 `gestures`。
+  - 回到 App 后选回上次看的窗口（规则 `LastWatched`，在 `PickFlow.swift`，检查在 `pick-flow`）：App 退到后台几秒后连接就断了，回来是新连接，而设备在新连接的第一份列表上总是自己要桌面。现在记下每台 Mac 上最后看的源（`Sill.lastWatched`，存盘），新连接上什么都没在串流时，上次看的窗口（或它那个应用的窗口）还在就要它，不在才要桌面；每次连接只试一次（`StreamClient.askForLastWatchedByItself`、`rememberWatched`）。上次看的是桌面、或还有别的设备在看时不变。
   - 切换计时：Mac 端每次切换或重启在日志里写两行（`SwitchTiming`：停旧采集、摆好新源、起编码器和采集各多久；首帧发出时刻）；设备端 Debug 控制台写一行从选到画面的耗时（`PickFlow.Done.line`）。调试参数 `-SillPickScript '<t> desktop|none|window:ID; …'` 在模拟器里替人做选择（只对回环上的合成测试主机生效）；`-SillPickShade desktop|<窗口 ID>` 让占位一直显示、`-SillPageDrag <dx>` 把翻页固定在这个偏移，给排版 mock 拍照用。
 - 提交：`git log --oneline -- iOSClient/PickFlow.swift Sources/SillHost/SwitchTiming.swift`。
 - 合并时注意：`StreamCoordinator.select` 与 `startPipeline` 里各多几行 `timing`（上游常改这两个函数，冲突时把这几行挪到对应位置：停完旧采集后 `timing.stopped()`、`startPipeline` 前 `timing.placed()`、成功后 `print(timing.started(describe))`、`onEncoded` 里 `timing?.firstFrame()`）。`StreamClient` 里窗口列表处理多一行 `pickFlowListed()`、收帧处多一段关键帧通知、`active` 的 `didSet` 多一行、`tearDown` 多两行。上游若让 Mac 自己排队切换中到来的选择，`PickFlow` 的排队可以撤，占位和计时仍可留。
@@ -315,6 +316,8 @@ file Tests/checks/pick-flow/main.swift
 has iOSClient/Sill.xcodeproj/project.pbxproj :: PickFlow.swift
 has iOSClient/StreamClient.swift :: if pickFlow.pick(source, active: active
 has iOSClient/StreamClient.swift :: self.pickFlowListed()
+has iOSClient/StreamClient.swift :: self.askForLastWatchedByItself()
+has iOSClient/PickFlow.swift :: enum LastWatched
 has iOSClient/StreamClient.swift :: self.pickFlowKeyframe(at)
 has iOSClient/HEVCDisplayView.swift :: PagerStage(pager: client.pager
 has iOSClient/PickFlow.swift :: PickShade(client: client)

@@ -61,6 +61,21 @@ MUTANTS = [
     ("D6 毫秒没取整", 'Int((seconds * 1000).rounded())', 'Int(seconds * 1000)'),
     ("R1 重置留着关键帧", '        wanted = nil\n        lastKeyframeAt = nil\n', '        wanted = nil\n'),
     ("R2 重置留着排队的", '        flight = nil\n        queued = nil\n        wanted = nil\n        lastKeyframeAt', '        flight = nil\n        wanted = nil\n        lastKeyframeAt'),
+    # LastWatched：新连接上选回上次看的窗口。
+    ("W1 上次是桌面也选窗口", 'guard case .window(let w)? = last else { return nil }', 'guard case .window(let w)? = last else { return windows.first?.id }'),
+    ("W2 只认编号不认应用", 'if let exact = windows.first(where: { $0.id == w.id && sameApp($0) }) { return exact.id }', 'if let exact = windows.first(where: { $0.id == w.id }) { return exact.id }'),
+    ("W3 不先找原来的窗口", 'if let exact = windows.first(where: { $0.id == w.id && sameApp($0) }) { return exact.id }\n', ''),
+    ("W4 窗口不在了就放弃", 'return windows.first(where: sameApp)?.id', 'return nil'),
+    ("W5 没有包名时认成任意没有包名的", '(other.bundleID.isEmpty && other.appName == w.appName)', 'other.bundleID.isEmpty'),
+    ("W6 没有包名时只看名字", '(other.bundleID.isEmpty && other.appName == w.appName)', '(other.appName == w.appName)'),
+    ("W7 有包名时还要名字一样", ': other.bundleID == w.bundleID', ': (other.bundleID == w.bundleID && other.appName == w.appName)'),
+    ("W8 键错了", 'static let key = "Sill.lastWatched"', 'static let key = "Sill.lastSource"'),
+    ("W9 上限变了", 'static let cap = 16', 'static let cap = 8'),
+    ("W10 没名字的 Mac 也记", 'guard !mac.isEmpty else { return all }', 'guard true else { return all }'),
+    ("W11 不记", '        next[mac] = source\n', ''),
+    ("W12 不设上限", 'while next.count > cap, let drop', 'while false, let drop'),
+    ("W13 超出时丢掉刚记的", 'next.keys.sorted().first(where: { $0 != mac })', 'next.keys.sorted().last'),
+    ("W14 坏数据不读成空", '?? [:]\n    }', '?? ["?": .desktop]\n    }'),
 ]
 
 caught = 0

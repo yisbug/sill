@@ -187,6 +187,58 @@ extension PickFlow.Done {
     }
 }
 
+/// 本 fork：这台设备在每台 Mac 上最后看的源，和重新连上之后该不该选回它。纯逻辑，`Tests/checks/pick-flow` 检查。
+///
+/// 起因（用户 2026-11-18）：App 退到后台再回来，串流的不是之前选的那个应用了。App 在后台几秒后连接就断了
+/// （Mac 4 秒收不到读取就踢掉设备，最后一台设备走了它就停止串流），回来是一次新连接，而设备在新连接的第一份
+/// 窗口列表上总是自己要"整个桌面"（DiscoveryPolicy.autoDesktop）。现在第一份列表说什么都没在串流时，
+/// 先看上次看的是不是一个还在的窗口，是就要它；不是才要桌面。
+enum LastWatched {
+    /// 上次看的窗口：它的编号，和它属于哪个应用（编号对不上时按应用找）。
+    struct Window: Equatable, Codable {
+        let id: UInt32
+        let bundleID: String
+        let appName: String
+    }
+
+    enum Source: Equatable, Codable {
+        case desktop
+        case window(Window)
+    }
+
+    /// 新连接上该选回的窗口；nil 是照旧要桌面。`windows` 是 Mac 现在列出的（编号、包名、应用名）。
+    /// 上次看的是桌面，或者没有上次：nil。上次的窗口还在（编号和应用都对得上）：它。它不在了、但那个应用还有窗口
+    /// （Mac 重启过窗口编号会变，或者那个窗口关了）：那个应用在列表里的第一个窗口。应用也不在了：nil。
+    static func resume(_ last: Source?, windows: [(id: UInt32, bundleID: String, appName: String)]) -> UInt32? {
+        guard case .window(let w)? = last else { return nil }
+        func sameApp(_ other: (id: UInt32, bundleID: String, appName: String)) -> Bool {
+            w.bundleID.isEmpty ? (other.bundleID.isEmpty && other.appName == w.appName) : other.bundleID == w.bundleID
+        }
+        if let exact = windows.first(where: { $0.id == w.id && sameApp($0) }) { return exact.id }
+        return windows.first(where: sameApp)?.id
+    }
+
+    /// 存盘的键：一个字典，Mac 的名字 → 上次看的源（JSON）。
+    static let key = "Sill.lastWatched"
+    /// 最多记这么多台 Mac。
+    static let cap = 16
+
+    static func decode(_ data: Data?) -> [String: Source] {
+        data.flatMap { try? JSONDecoder().decode([String: Source].self, from: $0) } ?? [:]
+    }
+
+    static func encode(_ all: [String: Source]) -> Data? { try? JSONEncoder().encode(all) }
+
+    /// 记下 `mac` 上看的源；超过 `cap` 台时丢掉别的（任意一台，按名字排序后最前的，结果确定）。
+    static func remember(_ all: [String: Source], mac: String, source: Source) -> [String: Source] {
+        guard !mac.isEmpty else { return all }
+        var next = all
+        next[mac] = source
+        while next.count > cap, let drop = next.keys.sorted().first(where: { $0 != mac }) { next[drop] = nil }
+        return next
+    }
+}
+
 #if canImport(UIKit)
 import SwiftUI
 import StreamProtocol

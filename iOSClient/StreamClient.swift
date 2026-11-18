@@ -270,6 +270,10 @@ final class StreamClient: ObservableObject {
     /// 同一时刻只让一次选择在路上，其余只留最新的一个排队（Mac 正切换时到的选择会被它丢掉）。主线程。
     private var pickFlow = PickFlow<StreamSource>()
     private var pickTimer: DispatchWorkItem?
+    /// 本 fork（LastWatched）：每台 Mac 上最后看的源，存盘；新连接上什么都没在串流时选回它，而不是总回到桌面。
+    private var lastWatched = LastWatched.decode(UserDefaults.standard.data(forKey: LastWatched.key))
+    /// 这次连接已经试过选回上次的窗口：它起不来时不反复试，交给照旧的"要桌面"。
+    private var resumedLastWatched = false
     /// 本 fork：三指翻页拖动的界面状态（偏移、两边要进来的窗口）。每帧都变，所以不在这个对象的 @Published 里：
     /// 只有画面上的翻页视图看它（ZoomedStreamView）。主线程。
     private(set) lazy var pager = PagerModel(client: self)
@@ -308,6 +312,7 @@ final class StreamClient: ObservableObject {
             if case .window(let id)? = pickFlow.wanted?.source, active != .window(id) { appSelection = id }
             if active != oldValue { recencyActive = nil }
             recordActiveAppUse()
+            rememberWatched()       // 本 fork（LastWatched）
             // The pointer sprite shows nothing while nothing streams.
             let streaming = active != .none
             if presence.streaming != streaming {
@@ -3697,6 +3702,7 @@ final class StreamClient: ObservableObject {
         slowLink = false
         resetPointer()
         // 本 fork（PickFlow）：这次会话的选择不带到下一次。
+        resumedLastWatched = false      // 下一次连接可以再选回上次看的窗口（LastWatched）
         pickFlow.reset()
         pickFlowChanged()
         // 本 fork：翻页拖动也不带到下一次。
@@ -3938,6 +3944,38 @@ final class StreamClient: ObservableObject {
         AppRecency.recordUse(window: AppRecency.Window(id: id, bundleID: window.bundleID, appName: window.appName),
                              record: &appRecency, at: Date().timeIntervalSince1970)
         AppRecency.save(appRecency, to: .standard, mac: macName)
+    }
+
+    /// 本 fork（LastWatched）：Mac 正在串流的源记成这台 Mac 上最后看的；什么都没串流时不动（断线前后都会经过那里）。
+    private func rememberWatched() {
+        let source: LastWatched.Source
+        switch active {
+        case .none: return
+        case .desktop: source = .desktop
+        case .window(let id):
+            guard let w = windows.first(where: { $0.id == id }) else { return }
+            source = .window(LastWatched.Window(id: id, bundleID: w.bundleID, appName: w.appName))
+        }
+        guard !macName.isEmpty, lastWatched[macName] != source else { return }
+        lastWatched = LastWatched.remember(lastWatched, mac: macName, source: source)
+        UserDefaults.standard.set(LastWatched.encode(lastWatched), forKey: LastWatched.key)
+    }
+
+    /// 本 fork（LastWatched）：新连接的第一份列表说什么都没在串流：上次在这台 Mac 上看的窗口（或它那个应用的窗口）
+    /// 还在就要它，返回 true；否则 false，照旧要桌面。每次连接只试一次。和设备自己要桌面一样算一次自动请求。
+    private func askForLastWatchedByItself() -> Bool {
+        guard !resumedLastWatched else { return false }
+        resumedLastWatched = true
+        guard let id = LastWatched.resume(lastWatched[macName], windows: windows.map { ($0.id, $0.bundleID, $0.appName) }) else { return false }
+        #if DEBUG
+        print("session: nothing streams on this connection; picking window \(id) again, the one watched last on \(macName)")
+        #endif
+        desktopRecheck?.cancel()
+        desktopRecheck = nil
+        lastAutoDesktop = Date()
+        request(.window(id))
+        choicesAtLastAuto = choicesSent
+        return true
     }
 
     private func recordActiveAppUse() {
@@ -4643,6 +4681,8 @@ final class StreamClient: ObservableObject {
                         #if DEBUG
                         if watched == .desktop { print("session: the Mac stopped the Desktop; asking for it again") }
                         #endif
+                        // 本 fork（LastWatched）：这次连接上还什么都没看过：先选回上次看的窗口，不在了才要桌面。
+                        if watched == .nothing, self.askForLastWatchedByItself() { break }
                         self.askForDesktopByItself()
                     case .askIn(let wait):
                         self.recheckDesktop(in: wait)

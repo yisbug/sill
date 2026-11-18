@@ -296,5 +296,42 @@ check("随机 3,000 场：安静下来后什么都不等", withFlow.busy == 0)
 check("随机 3,000 场：排着队时要的就是排着的那个", withFlow.broken == 0)
 check("随机 3,000 场：不经 PickFlow 直接发会丢选择、停在错的源上（原问题）", direct.wrong > 300 && direct.drops > 300)
 
+// LastWatched：每台 Mac 上最后看的源，和新连接上该不该选回它。
+typealias LW = LastWatched
+do {
+    let chrome = LW.Window(id: 70, bundleID: "com.google.Chrome", appName: "Google Chrome")
+    let list: [(id: UInt32, bundleID: String, appName: String)] = [
+        (10, "com.apple.finder", "Finder"), (70, "com.google.Chrome", "Google Chrome"), (71, "com.google.Chrome", "Google Chrome"),
+        (90, "", "Loose"), (91, "", "Other"),
+    ]
+    check("没有上次：照旧要桌面", LW.resume(nil, windows: list) == nil)
+    check("上次看的是桌面：照旧要桌面", LW.resume(.desktop, windows: list) == nil)
+    check("上次的窗口还在：选回它", LW.resume(.window(chrome), windows: list) == 70)
+    check("它不在了，那个应用还有窗口：选那个应用在列表里的第一个", LW.resume(.window(LW.Window(id: 999, bundleID: "com.google.Chrome", appName: "Google Chrome")), windows: list) == 70
+          && LW.resume(.window(LW.Window(id: 71, bundleID: "com.google.Chrome", appName: "Google Chrome")), windows: list.filter { $0.id != 71 }) == 70)
+    check("第二个窗口还在：选的是它自己，不是应用的第一个", LW.resume(.window(LW.Window(id: 71, bundleID: "com.google.Chrome", appName: "Google Chrome")), windows: list) == 71)
+    check("编号被别的应用的窗口占了（Mac 重启过）：不选它，按应用找", LW.resume(.window(LW.Window(id: 10, bundleID: "com.google.Chrome", appName: "Google Chrome")), windows: list) == 70)
+    check("应用也不在了：照旧要桌面", LW.resume(.window(LW.Window(id: 5, bundleID: "com.example.gone", appName: "Gone")), windows: list) == nil
+          && LW.resume(.window(chrome), windows: []) == nil)
+    check("没有包名的应用按名字认", LW.resume(.window(LW.Window(id: 500, bundleID: "", appName: "Other")), windows: list) == 91
+          && LW.resume(.window(LW.Window(id: 90, bundleID: "", appName: "Loose")), windows: list) == 90)
+    check("没有包名时不会认成有包名的同名应用", LW.resume(.window(LW.Window(id: 500, bundleID: "", appName: "Finder")), windows: list) == nil)
+    check("有包名时不看名字", LW.resume(.window(LW.Window(id: 500, bundleID: "com.apple.finder", appName: "访达")), windows: list) == 10)
+
+    check("存盘的键", LW.key == "Sill.lastWatched" && LW.cap == 16)
+    var all = LW.remember([:], mac: "Studio", source: .window(chrome))
+    check("记下一台", all == ["Studio": .window(chrome)])
+    all = LW.remember(all, mac: "Mini", source: .desktop)
+    all = LW.remember(all, mac: "Studio", source: .desktop)
+    check("各记各的，新的盖旧的", all == ["Studio": .desktop, "Mini": .desktop])
+    check("没有名字的 Mac 不记", LW.remember(all, mac: "", source: .window(chrome)) == all)
+    check("存了读回来一样", LW.decode(LW.encode(LW.remember(all, mac: "Air", source: .window(chrome)))) == ["Studio": .desktop, "Mini": .desktop, "Air": .window(chrome)])
+    check("没存过、坏数据读成空", LW.decode(nil).isEmpty && LW.decode(Data([1, 2, 3])).isEmpty)
+    var many: [String: LW.Source] = [:]
+    for i in 0..<20 { many = LW.remember(many, mac: String(format: "Mac %02d", i), source: .desktop) }
+    check("最多 16 台，最新记的那台一定在", many.count == 16 && many["Mac 19"] != nil && many["Mac 00"] == nil)
+    check("只有一台超出也不丢它自己", LW.remember(many, mac: "Mac 00", source: .desktop)["Mac 00"] != nil)
+}
+
 print("\(passes) 项通过，\(fails) 项失败")
 exit(fails == 0 ? 0 : 1)
