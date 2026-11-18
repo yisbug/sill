@@ -20,7 +20,9 @@
 4. 按输出处理（见下一节），改完再跑，直到标记和译文两部分通过、"可能丢失的行"逐条看过。
 5. 上游新增的用户可见文案补上译文：`Scripts/l10n-sync.sh`，再 `Scripts/l10n-check.py`（要零缺失）。
 6. 验收：`swift build -c release`；`Tests/checks/run-all.sh`；iOS 用 Xcode 26 构建
-   （`xcodebuild -project iOSClient/Sill.xcodeproj -scheme Sill -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 CODE_SIGN_IDENTITY=- build`）。
+   （`xcodebuild -project iOSClient/Sill.xcodeproj -scheme Sill -configuration Debug -destination 'generic/platform=iOS Simulator' ARCHS=arm64 CODE_SIGN_IDENTITY=- build`）；
+   Debug 通过不代表 Release 通过（`#if DEBUG` 里的代码不同），Release 配置另跑一次
+   `xcodebuild -project iOSClient/Sill.xcodeproj -scheme Sill -configuration Release -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build`。
 7. 更新本文件：同步点；上游已经自己做了的项删掉；合并时不得不改写的项改标记。
 
 ## 检查脚本说什么、怎么补
@@ -39,8 +41,8 @@
 
 ### F01 用 Xcode 26 编译：去掉 iOS 27.1 的折叠屏接口
 
-- 是什么：本机只有 Xcode 26.6（没有 iOS 27.1 SDK），所以去掉了 iPhone Duo 的 `onHingeChange`、`DeviceHingeContext`、`reservedRegions(kind:)`；真机上姿态恒为 unknown。`DuoPosture` 的纯规则和调试 stand-in 保留。另外两处为 Xcode 26 让路：`grammarCheckingType` 只在 Swift 6.4 以上编译；`StreamScreen.body` 的修饰链拆成 `screen` 与 `body` 两段，避免类型检查超时。
-- 提交：`4e0f8bc`、`16b3268`（audio-playout 检查拆长闭包）。
+- 是什么：本机只有 Xcode 26.6（没有 iOS 27.1 SDK），所以去掉了 iPhone Duo 的 `onHingeChange`、`DeviceHingeContext`、`reservedRegions(kind:)`；真机上姿态恒为 unknown。`DuoPosture` 的纯规则和调试 stand-in 保留。另外两处为 Xcode 26 让路：`grammarCheckingType` 只在 Swift 6.4 以上编译；`StreamScreen.body` 的修饰链拆成 `screen` 与 `body` 两段，避免类型检查超时。Release 配置下 `StreamScreen` 另有一个显式的 `init(client:)`：`scannerOverride` 是带默认值的私有 `var`，合成的初始化器是私有的，Xcode 26 的编译器因此报 `'StreamScreen' initializer is inaccessible`（Debug 有自己的初始化器，不受影响）。
+- 提交：`4e0f8bc`、`16b3268`（audio-playout 检查拆长闭包）、Release 初始化器见 `git log -S'init(client: StreamClient) { self.client = client }' -- iOSClient/StreamScreen.swift`。
 - 合并时注意：上游的 Duo 工作还在继续，几乎每次都会重新带回这些接口，或者新增别的 iOS 27.1 接口。标记只认得已知的三个名字，**最终以 Xcode 26 能否编译为准**。上游新写的长修饰链或长闭包也可能再次超时，拆开即可。等本机升到 Xcode 27.1，这一整项可以撤销。
 
 ```fork-check
@@ -49,6 +51,7 @@ lacks iOSClient/*.swift :: DeviceHingeContext)
 lacks iOSClient/*.swift :: geo.reservedRegions(
 has iOSClient/InputOverlay.swift :: #if compiler(>=6.4)
 has iOSClient/StreamScreen.swift :: private var screen: some View
+has iOSClient/StreamScreen.swift :: init(client: StreamClient) { self.client = client }
 ```
 
 ### F02 简体中文本地化的基础设施

@@ -229,6 +229,10 @@ struct StreamScreen: View {
         _pairingOverlay = State(initialValue: pairingOverlay)
         self.scannerOverride = scannerOverride
     }
+    #else
+    /// Release 配置下显式写出初始化器。`scannerOverride` 是带默认值的私有 `var`，合成的逐成员
+    /// 初始化器因此是私有的，Xcode 26 的编译器不让 ContentView 写 `StreamScreen(client:)`。
+    init(client: StreamClient) { self.client = client }
     #endif
 
     private var screen: some View {
