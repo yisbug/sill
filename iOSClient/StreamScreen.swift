@@ -400,6 +400,10 @@ struct StreamScreen: View {
             // 串流界面一律隐藏状态栏（沉浸式全屏）：顶栏贴着屏幕顶边，不再排在时间、电量那一条下面。
             // 放在背景里，显示与隐藏不会重建界面；连接界面等其他界面照常显示状态栏。
             .background { Color.clear.statusBarHidden(true) }
+            // 本 fork：屏幕上沿的系统手势（下拉通知中心、右上角的控制中心）延后：第一下只露出小横条，再下拉才出来。
+            // 不延后的话，iOS 会先把贴着上沿的触摸扣住一会儿判断是不是系统手势；iPhone 的顶栏只有 44 pt 高、贴着上沿，
+            // 最右边的收起按钮正在右上角，点下去要等一下才有反应（用户 2026-11-18；iPad 的顶栏更高，没有这个问题）。
+            .defersSystemGestures(on: .top)
             .environment(\.largerPictureOffered, offersLarger)
             #if DEBUG
             // The console's line for the gates: what Larger Picture's rule made of the switch and of

@@ -868,15 +868,19 @@ check("app switch: not with four fingers, not up, down, pinch or spread", !G.swi
 check("app switch: not with the switch off or no session", !G.switchesApp(.swipeLeft, fingers: 3, switchOn: false, connected: true)
       && !G.switchesApp(.swipeLeft, fingers: 3, switchOn: true, connected: false))
 let dock: [UInt32] = [10, 20, 30]
-check("app switch: right is the next in the Dock", G.appSwitchTarget(order: dock, current: 10, gesture: .swipeRight) == 20)
-check("app switch: left is the previous", G.appSwitchTarget(order: dock, current: 20, gesture: .swipeLeft) == 10)
-check("app switch: no wrap at either end", G.appSwitchTarget(order: dock, current: 30, gesture: .swipeRight) == nil
-      && G.appSwitchTarget(order: dock, current: 10, gesture: .swipeLeft) == nil)
-check("app switch: current gone, right the first and left the last", G.appSwitchTarget(order: dock, current: 99, gesture: .swipeRight) == 10
-      && G.appSwitchTarget(order: dock, current: nil, gesture: .swipeLeft) == 30)
-check("app switch: nothing to switch to", G.appSwitchTarget(order: [], current: nil, gesture: .swipeRight) == nil
-      && G.appSwitchTarget(order: [10], current: 10, gesture: .swipeRight) == nil)
-check("app switch: up and down pick nothing", G.appSwitchTarget(order: dock, current: 10, gesture: .swipeUp) == nil)
+check("app switch: left is the next in the Dock", G.appSwitchTarget(order: dock, current: 10, gesture: .swipeLeft) == 20
+      && G.appSwitchTarget(order: dock, current: 20, gesture: .swipeLeft) == 30)
+check("app switch: right is the previous", G.appSwitchTarget(order: dock, current: 20, gesture: .swipeRight) == 10
+      && G.appSwitchTarget(order: dock, current: 30, gesture: .swipeRight) == 20)
+check("app switch: no wrap at either end", G.appSwitchTarget(order: dock, current: 30, gesture: .swipeLeft) == nil
+      && G.appSwitchTarget(order: dock, current: 10, gesture: .swipeRight) == nil)
+check("app switch: current gone, left the first and right the last", G.appSwitchTarget(order: dock, current: 99, gesture: .swipeLeft) == 10
+      && G.appSwitchTarget(order: dock, current: nil, gesture: .swipeRight) == 30)
+check("app switch: nothing to switch to", G.appSwitchTarget(order: [], current: nil, gesture: .swipeLeft) == nil
+      && G.appSwitchTarget(order: [10], current: 10, gesture: .swipeLeft) == nil && G.appSwitchTarget(order: [10], current: 10, gesture: .swipeRight) == nil)
+check("app switch: up, down, pinch and spread pick nothing, wherever it is", [G.Gesture.swipeUp, .swipeDown, .pinch, .spread].allSatisfy { g in
+    [10, 20, 30, 99].allSatisfy { G.appSwitchTarget(order: dock, current: $0, gesture: g) == nil } && G.appSwitchTarget(order: dock, current: nil, gesture: g) == nil
+})
 check("app switch: the order is kept a short while", G.appSwitchKeepsOrder > 0.5 && G.appSwitchKeepsOrder <= 3)
 
 // 本 fork：三指翻页拖动（drag / pageEnded / pageCancelled）与松手的纯函数

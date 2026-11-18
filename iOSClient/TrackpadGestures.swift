@@ -394,14 +394,15 @@ struct TrackpadGestures {
     }
 
     /// 连续切换时沿用的顺序：上一次切换后这么久之内再滑，用当时的顺序（图标按最近使用排序，切换后会把新应用排到
-    /// 最前；沿用旧顺序，连续往右滑才能一路往后走，和 iPhone 底部横条的左右滑一样）。
+    /// 最前；沿用旧顺序，连续往一个方向滑才能一路往后走）。
     static let appSwitchKeepsOrder = 1.5
 
-    /// 切换的目标：在 `order`（Dock 从左到右）里，`current` 往右滑是下一个、往左滑是上一个，到头不绕回；
-    /// `current` 不在列表里（刚关掉）时往右是第一个、往左是最后一个。没有别的可切就是 nil。
+    /// 切换的目标：在 `order`（Dock 从左到右）里，`current` 往左滑是下一个（Dock 里右边那个，画面往左走、它从右边进来）、
+    /// 往右滑是上一个，到头不绕回（用户 2026-11-18：方向调反，和拖动画面的方向一致）；
+    /// `current` 不在列表里（刚关掉、或在串流桌面）时往左是第一个、往右是最后一个。没有别的可切就是 nil。
     static func appSwitchTarget(order: [UInt32], current: UInt32?, gesture: Gesture) -> UInt32? {
         guard !order.isEmpty, gesture == .swipeLeft || gesture == .swipeRight else { return nil }
-        let forward = gesture == .swipeRight
+        let forward = gesture == .swipeLeft
         guard let current, let i = order.firstIndex(of: current) else {
             return forward ? order.first : order.last
         }

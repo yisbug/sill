@@ -276,7 +276,7 @@ struct PickShade: View {
 /// 所以单独一个对象，只有 `PagerStage` 看它；StreamClient 的 @Published 不变，串流画面以外的界面不跟着重算。
 /// StreamClient 持有一个（`pager`），并在这里登记，让触摸面按窗口找到它（PageReceivers）。主线程。
 final class PagerModel: ObservableObject {
-    /// 两边要进来的窗口：`left` 是手指往右滑时从左边进来的（Dock 里的下一个），`right` 是往左滑时从右边进来的。
+    /// 两边要进来的窗口：`left` 是手指往右滑时从左边进来的（Dock 里的上一个），`right` 是往左滑时从右边进来的。
     struct Targets: Equatable {
         var left: UInt32?
         var right: UInt32?

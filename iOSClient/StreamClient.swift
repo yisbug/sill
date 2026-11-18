@@ -4171,7 +4171,7 @@ final class StreamClient: ObservableObject {
             if pagePlan == nil {
                 let plan = appSwitchPlan(now: ProcessInfo.processInfo.systemUptime)
                 pagePlan = plan
-                // 手指往右（swipeRight，Dock 里的下一个）时画面往右走，目标从左边进来。
+                // 手指往右（swipeRight，Dock 里的上一个）时画面往右走，目标从左边进来；往左是下一个，从右边进来。
                 pager.began(left: appSwitchTarget(.swipeRight, in: plan), right: appSwitchTarget(.swipeLeft, in: plan))
             }
             guard !still else { return }
@@ -4220,6 +4220,7 @@ final class StreamClient: ObservableObject {
         let d = CGFloat(dx)
         let hasTarget = d > 0 ? pager.targets.left != nil : (d < 0 ? pager.targets.right != nil : true)
         pager.drag(to: TrackpadGestures.pageOffset(dx: d, width: pager.width, hasTarget: hasTarget))
+        print("app switch: page drag \(Int(d)) pt: order \(plan.order.compactMap(\.first)), now \(plan.mine.map(String.init) ?? "none"); from the left \(pager.targets.left.map(String.init) ?? "none"), from the right \(pager.targets.right.map(String.init) ?? "none"); offset \(Int(pager.offset)) of \(Int(pager.width))")
     }
     #endif
 

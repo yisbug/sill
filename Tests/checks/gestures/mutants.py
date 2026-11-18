@@ -109,6 +109,12 @@ MUTANTS = {
     "P38 offset: the damping changed": ("return min(max(dx * 0.25, -60), 60)", "return min(max(dx * 0.5, -60), 60)"),
     "P39 offset: no cap without a target": ("return min(max(dx * 0.25, -60), 60)", "return dx * 0.25"),
     "P40 the start changed": ("var pageStart: CGFloat = 12", "var pageStart: CGFloat = 10"),
+    # 本 fork：三指左右滑切到 Dock 里的哪一个（往左下一个、往右上一个）。
+    "A1 app switch: the direction the other way": ("let forward = gesture == .swipeLeft", "let forward = gesture == .swipeRight"),
+    "A2 app switch: current gone picks the wrong end": ("return forward ? order.first : order.last", "return forward ? order.last : order.first"),
+    "A3 app switch: wraps at the ends": ("return order.indices.contains(j) ? order[j] : nil", "return order[(j + order.count) % order.count]"),
+    "A4 app switch: up and down switch too": ("guard !order.isEmpty, gesture == .swipeLeft || gesture == .swipeRight else { return nil }", "guard !order.isEmpty else { return nil }"),
+    "A5 app switch: four fingers switch too": ("switchOn && connected && fingers == 3 && (gesture == .swipeLeft || gesture == .swipeRight)", "switchOn && connected && (gesture == .swipeLeft || gesture == .swipeRight)"),
 }
 # M33: silence only once the stroke arms, as before the review (the review's F1): the silence moves into the
 # arming branch, so three fingers placed slowly, or beside a resting thumb, are not silent.

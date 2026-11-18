@@ -212,7 +212,7 @@ has Sources/SillHost/VirtualStage.swift :: vd.refusedAgain
 
 ### F12 检查与 CI
 
-- 是什么：新增七组纯检查 `app-recency`、`voice`、`bar-collapse`、`phone-stream`、`traffic-stats`、`pick-flow`、`viewport-owner`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
+- 是什么：新增八组纯检查 `app-recency`、`voice`、`bar-collapse`、`phone-stream`、`traffic-stats`、`pick-flow`、`viewport-owner`、`stage-home`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
 - 提交：`9d4ac02`、`39c0d25`、`4f80231`、`a632a5c`。
 - 合并时注意：`ci.yml` 的矩阵是一整行，上游每加一个检查这一行就冲突，合并后三个名字都要在；README 表格同理。
 
@@ -252,10 +252,11 @@ has Tests/checks/README.md :: | `phone-stream` |
 
 - 是什么：
   - 横屏串流画面去掉 8 pt 黑框和圆角，伸进两侧安全区，顶栏底色也铺过去；**iPhone 上灵动岛（刘海）那一侧例外，留黑边**（用户 2026-11-18：灵动岛区域还是用黑边），只铺另一侧：规则 `PhoneStream.islandSide`、`fills`（检查在 `phone-stream`），`StreamScreen.fillEdges` 按界面方向取，经环境值 `streamFillEdges` 给顶栏；剪贴板芯片和语音球只放在画面落在安全区里的部分（`StreamScreen.safePanel`）。剩下的黑边只来自画面与 Mac 窗口比例不同（Aa 为 Off，或串流桌面）。
+  - 串流界面把屏幕上沿的系统手势延后（`.defersSystemGestures(on: .top)`）：iPhone 的顶栏只有 44 pt 高、贴着上沿，不延后时点最右边的收起按钮要等一下才有反应。
   - 顶栏收起后的浮动入口不透明度调高（底色 0.85、整体 0.92，加阴影）。
   - 语音球空闲时底色略透明（`VoiceInputPolicy.idleFillOpacity` 0.78）；长按弹出系统菜单，紧挨着球：全选并删除、全选、全选并复制、全选并剪切、粘贴、撤销、重做、回车，按键经 `KeyChord.press` 发给 Mac（规则 `VoiceInputPolicy.QuickAction`、`strokes`，检查在 `voice`）。
   - 启动续连：App 打开时为最近连过、还能自动拨的那台 Mac 起一个自动重连（和断线重连同一条路），连接界面之上铺它上次的画面和「正在连接…」与取消；连上进串流，20 s 没连上或重连结束就回连接界面并提示（规则 `ConnectionList.resumeMacID`、`resumeState`，检查在 `connection-list`；状态 `StreamClient.launchResume`，界面 `LaunchResumeView`）。上次的画面在离开前台时（`willResignActive`）也留一张，只在磁贴样式下。
-  - 三指左右滑：不发给 Mac（不再切换 Mac 的桌面空间），换到顶栏 Dock 里相邻的应用（图标模式按应用，缩略图模式按窗口；往右下一个、往左上一个，到头不绕回；1.5 s 内连续滑沿用上次顺序；串流桌面时从桌面切进第一个或最后一个）。四指左右滑照旧发给 Mac。规则 `TrackpadGestures.switchesApp`、`appSwitchTarget`，检查在 `gestures`；执行 `StreamClient.switchApp`；设置面板手势行改成「切换应用」（下一个、上一个应用），说明后加一句 `appSwitchNote`；导览改为「横向轻扫可在应用之间切换」。
+  - 三指左右滑：不发给 Mac（不再切换 Mac 的桌面空间），换到顶栏 Dock 里相邻的应用（图标模式按应用，缩略图模式按窗口；往左下一个、往右上一个（用户 2026-11-18 调反，和拖动画面的方向一致），到头不绕回；1.5 s 内连续滑沿用上次顺序；串流桌面时从桌面切进第一个或最后一个）。四指左右滑照旧发给 Mac。规则 `TrackpadGestures.switchesApp`、`appSwitchTarget`，检查在 `gestures`；执行 `StreamClient.switchApp`；设置面板手势行改成「切换应用」（下一个、上一个应用），说明后加一句 `appSwitchNote`；导览改为「横向轻扫可在应用之间切换」。
   - 画面尺寸（发给 Mac 的视口）在铺满后的里层量（`contentArea` 里层 ZStack 的 `onGeometryChange`）：在外层 `ignoresSafeArea` 之后量拿到的是安全区内的宽度，Mac 按窄的比例改窗口，iPhone 两侧各留约 62 pt 黑边。
 - 提交：`08401296`、`9c0e6641`，关掉三指切换桌面空间与视口量法在其后的提交。
 - 合并时注意：`contentArea` 里原来的 `.padding(8)`、`clipShape(streamShape)` 与描边已去掉，上游若改这段要保留铺满；`ContentView.app` 的 `onAppear` 多一行 `startLaunchResume()`，ZStack 多一层 `LaunchResumeView`。
@@ -274,6 +275,7 @@ has iOSClient/ConnectionList.swift :: static func resumeMacID
 has iOSClient/TrackpadGestures.swift :: static func switchesApp
 has iOSClient/PhoneStream.swift :: static func islandSide
 has iOSClient/StreamScreen.swift :: .ignoresSafeArea(.container, edges: fillEdges)
+has iOSClient/StreamScreen.swift :: .defersSystemGestures(on: .top)
 has iOSClient/StreamClient.swift :: private func switchApp
 has iOSClient/HostSettingsPanel.swift :: "Switch Apps"
 ```
@@ -340,6 +342,21 @@ has Sources/SillHost/StreamCoordinator.swift :: { viewportUsed(by: connection) }
 has Sources/SillHost/StreamCoordinator.swift :: self.viewportLeft(connection)
 has .github/workflows/ci.yml :: , viewport-owner,
 has Tests/checks/README.md :: | `viewport-owner` |
+```
+
+### F19 窗口送回原位之后确认它真的回去了
+
+- 是什么：虚拟显示器上的窗口送回原位时，上游只写一次位置和大小、不回读。Chrome、Tabbit 这类 Chromium 窗口随后会把大小改回它在虚拟显示器上的那个（左下角不动，位置也跟着偏），下次再上虚拟显示器时这个框又被当成新的原位，越切越偏（2026-11-18 的日志：Tabbit 原位 (776,31,2395×997)，送回后停在 (776,276,1824×752)）。现在送回后在 0.15、0.4、0.9、1.6、2.5 秒回读：又是舞台上的大小就再写一次原位（先大小后位置，`WindowSizer.resizeFirst`），日志写 `… went back to the virtual display's size … asking again`；是别的大小或位置（人动过）就不再管。另外记住每个窗口的原位和它在舞台上的大小，它带着舞台上的大小再次上来时原位用记下的那个（日志 `… still wore the virtual display's size …; its home stays …`）。规则 `StageHome`（检查 `stage-home`），执行在 `VirtualStage.watchHome`、`prepare`。退出 Sill 时来不及回读。
+- 提交：`git log --oneline -- Sources/SillHost/StageHome.swift`。
+- 合并时注意：`VirtualStage.releaseWindow` 里 `sizer.restore(p)` 前后各多一行；`prepare` 里取 `fresh` 的那个分支多了几行。与 F11（上台时窗口拒绝改大小的重试）是同一类问题的另一头。
+
+```fork-check
+file Sources/SillHost/StageHome.swift
+file Tests/checks/stage-home/main.swift
+has Sources/SillHost/VirtualStage.swift :: watchHome(p, staged: staged)
+has Sources/SillHost/VirtualStage.swift :: StageHome.home(found: fresh.originalFrame
+has .github/workflows/ci.yml :: , stage-home,
+has Tests/checks/README.md :: | `stage-home` |
 ```
 
 ### F13 文档

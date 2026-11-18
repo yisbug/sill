@@ -143,6 +143,10 @@ final class VirtualStage {
     /// the display, found no AX window at that frame and warned about a window already on its way
     /// home (System Settings, twice, 2026-09-23), so `evictForeignWindows` asks this element instead.
     private var lastReleased: (windowID: CGWindowID, element: AXUIElement)?
+    /// 本 fork（StageHome）：每个送回过的窗口的原位和它在舞台上的大小；它带着舞台上的大小再上来时，原位用这里记的。
+    private var homeMemory: [CGWindowID: StageHome.Memory] = [:]
+    /// 本 fork（StageHome）：送回原位之后的回读，每个窗口一个；它再上舞台时取消。
+    private var homeChecks: [CGWindowID: Task<Void, Never>] = [:]
     /// The window server tore the display down on its own (sleep, display arbitration). Main actor.
     var onLost: (() -> Void)?
     /// Called just before the stage warps the cursor home (`releaseWindow`): that motion is Sill's,
@@ -323,7 +327,15 @@ final class VirtualStage {
         if let current = placement, current.windowID == window.windowID {
             p = current                                       // same window: keep its original frame
         } else if let fresh = sizer.placement(for: window) {
-            p = home.map { fresh.homed(at: $0) } ?? fresh
+            // 本 fork（StageHome）：上次送回之后它又变回了舞台上的大小（Chromium），现在的框不是它的原位。
+            homeChecks[window.windowID]?.cancel()
+            homeChecks[window.windowID] = nil
+            let remembered = StageHome.home(found: fresh.originalFrame, remembered: homeMemory[window.windowID])
+            if home == nil, remembered != fresh.originalFrame {
+                print("\(fresh.appName) — \(fresh.title) still wore the virtual display's size at \(Self.fmt(fresh.originalFrame)); its home stays \(Self.fmt(remembered))")
+                Stats.shared.bump("vd.homeKept")
+            }
+            p = home.map { fresh.homed(at: $0) } ?? fresh.homed(at: remembered)
         } else {
             throw Failure.axWindowNotFound
         }
@@ -702,7 +714,10 @@ final class VirtualStage {
     /// Puts the staged window back where it was and forgets it. The display stays.
     func releaseWindow() {
         if let p = placement {
+            // 本 fork（StageHome）：它在舞台上的大小，送回之后回读用。
+            let staged = WindowSizer.frame(of: p.element)?.size
             let ok = sizer.restore(p)
+            if ok, let staged { watchHome(p, staged: staged) }
             print(ok ? "Restored \(p.appName) — \(p.title) to \(Self.fmt(p.originalFrame))"
                      : "Could not restore \(p.appName) — \(p.title) to \(Self.fmt(p.originalFrame)); it is on a real display but not where it was")
             Stats.shared.bump("vd.restored")
@@ -724,6 +739,48 @@ final class VirtualStage {
         captureRect = .zero
         catalog.stagedWindowID = nil
         EmergencySnapshot.set(nil)
+    }
+
+    /// 本 fork（StageHome）：送回原位之后回读几次；应用把大小改回了舞台上的那个（Chromium）就再写一次原位，
+    /// 先大小后位置。窗口在这期间又上了舞台、被人动了、关了，就不再管。退出 Sill 时来不及做（进程没了）。
+    private func watchHome(_ p: WindowSizer.Placement, staged: CGSize) {
+        homeChecks[p.windowID]?.cancel()
+        homeChecks[p.windowID] = nil
+        homeMemory[p.windowID] = StageHome.Memory(home: p.originalFrame, staged: staged)
+        if homeMemory.count > 64 { homeMemory = homeMemory.filter { $0.key == p.windowID || catalog.window(id: $0.key) != nil } }
+        guard !StageHome.same(staged, p.originalFrame.size) else { return }
+        homeChecks[p.windowID] = Task { @MainActor [weak self] in
+            var last: TimeInterval = 0
+            var homes = 0, asked = 0
+            for (look, at) in StageHome.looks.enumerated() {
+                try? await Task.sleep(for: .seconds(at - last))
+                last = at
+                guard let self, !Task.isCancelled, self.placement?.windowID != p.windowID,
+                      let now = WindowSizer.frame(of: p.element) else { return }
+                switch StageHome.verdict(now: now, home: p.originalFrame, staged: staged) {
+                case .home:
+                    homes += 1
+                    if StageHome.settled(homesInARow: homes, look: look) {
+                        if asked > 0 { print("\(p.appName) — \(p.title) is back at \(Self.fmt(p.originalFrame)) after \(asked) more \(asked == 1 ? "ask" : "asks")") }
+                        return
+                    }
+                case .wearsStage:
+                    homes = 0
+                    asked += 1
+                    if asked == 1 {
+                        print("\(p.appName) — \(p.title) went back to the virtual display's size at \(Self.fmt(now)) after it was restored; asking again, size first")
+                    }
+                    Stats.shared.bump("vd.homeAgain")
+                    self.sizer.resizeFirst(p, to: p.originalFrame)
+                case .elsewhere:
+                    return
+                }
+            }
+            guard let self, self.placement?.windowID != p.windowID, asked > 0, let now = WindowSizer.frame(of: p.element) else { return }
+            let back = StageHome.verdict(now: now, home: p.originalFrame, staged: staged) == .home
+            print(back ? "\(p.appName) — \(p.title) is back at \(Self.fmt(p.originalFrame)) after \(asked) more \(asked == 1 ? "ask" : "asks")"
+                       : "\(p.appName) — \(p.title) would not go back to \(Self.fmt(p.originalFrame)): it is at \(Self.fmt(now))")
+        }
     }
 
     /// Removes the display. Call `releaseWindow()` first while both displays exist, so the window
