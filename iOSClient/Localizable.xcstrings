@@ -1976,6 +1976,28 @@
         }
       }
     },
+    "By Day" : {
+      "comment" : "流量统计：按天（近 7 天）",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按天"
+          }
+        }
+      }
+    },
+    "By Hour" : {
+      "comment" : "流量统计：按小时（近 24 小时）",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按小时"
+          }
+        }
+      }
+    },
     "Camera. Point it at the code on %@." : {
       "comment" : "连接页或配对提示；插值为Mac 名称",
       "localizations" : {
@@ -2371,6 +2393,17 @@
         }
       }
     },
+    "Counts the data Sill exchanges with your Macs on this device: what it receives (the picture, sound, window lists) and what it sends (input, pings). Network overhead isn’t included, so your carrier may count a few percent more. Kept on this device only." : {
+      "comment" : "流量统计：说明统计口径",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "统计这台设备上 Sill 与 Mac 之间收发的数据：收到的（画面、声音、窗口列表）和发出的（输入、心跳）。不含网络协议开销，运营商计的可能多几个百分点。只保存在这台设备上。"
+          }
+        }
+      }
+    },
     "Custom — %@ Mbps" : {
       "comment" : "自定义画质选项标题，插值为每秒兆比特数",
       "extractionState" : "stale",
@@ -2379,6 +2412,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "自定义 — %@ Mbps"
+          }
+        }
+      }
+    },
+    "Data" : {
+      "comment" : "流量统计：图表纵轴",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "数据量"
+          }
+        }
+      }
+    },
+    "Data Usage" : {
+      "comment" : "流量统计界面标题",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "流量统计"
           }
         }
       }
@@ -2879,6 +2934,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "更大画面"
+          }
+        }
+      }
+    },
+    "Last 24 Hours" : {
+      "comment" : "流量统计：图表标题，近 24 小时",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "近 24 小时"
+          }
+        }
+      }
+    },
+    "Last 7 Days" : {
+      "comment" : "流量统计：近 7 天",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "近 7 天"
           }
         }
       }
@@ -3840,6 +3917,17 @@
         }
       }
     },
+    "Range" : {
+      "comment" : "流量统计：按小时或按天的选择器",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "范围"
+          }
+        }
+      }
+    },
     "Recognizing" : {
       "comment" : "语音悬浮球：识别中的无障碍值",
       "localizations" : {
@@ -3944,6 +4032,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "请移除 % 后面的部分：该部分仅适用于当前网络。"
+          }
+        }
+      }
+    },
+    "Reset Statistics" : {
+      "comment" : "流量统计：清零按钮",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置统计"
+          }
+        }
+      }
+    },
+    "Reset all data usage statistics?" : {
+      "comment" : "流量统计：清零确认",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要清零全部流量统计吗？"
           }
         }
       }
@@ -4325,6 +4435,17 @@
         }
       }
     },
+    "Shows how much data Sill used, by hour and by day." : {
+      "comment" : "设置面板：流量统计入口的无障碍提示",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按小时、按天查看 Sill 用了多少流量。"
+          }
+        }
+      }
+    },
     "Shows how to use Sill on this %@." : {
       "comment" : "串流导览文案；插值为设备类型",
       "localizations" : {
@@ -4364,6 +4485,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "这些设置会保留到 SillHost 退出为止。"
+          }
+        }
+      }
+    },
+    "Since %@" : {
+      "comment" : "流量统计：累计从何时开始，插值为日期时间",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自 %@ 起"
           }
         }
       }
@@ -4425,6 +4557,7 @@
     },
     "Space on the Left" : {
       "comment" : "主机设置面板：三指手势名称或对应操作",
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4436,6 +4569,7 @@
     },
     "Space on the Right" : {
       "comment" : "主机设置面板：三指手势名称或对应操作",
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -4447,6 +4581,7 @@
     },
     "Spaces" : {
       "comment" : "主机设置面板：三指手势名称或对应操作",
+      "extractionState" : "stale",
       "localizations" : {
         "zh-Hans" : {
           "stringUnit" : {
@@ -5334,6 +5469,17 @@
         }
       }
     },
+    "Time" : {
+      "comment" : "流量统计：图表横轴",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "时间"
+          }
+        }
+      }
+    },
     "To find your Mac, allow Local Network for Sill in Settings." : {
       "comment" : "连接页搜索或本地网络访问权限提示",
       "localizations" : {
@@ -5379,6 +5525,17 @@
         }
       }
     },
+    "Today" : {
+      "comment" : "流量统计：今天",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天"
+          }
+        }
+      }
+    },
     "Too long to send: %@ takes up to %lld KB of text." : {
       "comment" : "剪贴板文字过长提示，插值为 Mac 名称和容量上限（KB）",
       "extractionState" : "stale",
@@ -5393,6 +5550,17 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "文字过长，无法发送：%@ 最多可接收 %lld KB 的文字。"
+          }
+        }
+      }
+    },
+    "Total" : {
+      "comment" : "流量统计：累计",
+      "localizations" : {
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "累计"
           }
         }
       }
@@ -6337,6 +6505,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "“%@”"
+          }
+        }
+      }
+    },
+    "↓ %@  ↑ %@" : {
+      "comment" : "流量统计：收到与发出的数据量，插值为数据量",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "↓ %1$@  ↑ %2$@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "↓ %1$@  ↑ %2$@"
           }
         }
       }

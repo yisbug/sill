@@ -893,6 +893,12 @@ final class StreamClient: ObservableObject {
         let startedAt: Double
     }
     @Published var launchResume: LaunchResume?
+    /// 流量统计（本 fork，TrafficStats）：存在本机，按小时、按天、累计。收发在网络队列上先记进
+    /// `trafficPending`（锁保护），每 5 秒、离开前台和打开统计界面时并进来并存盘（`flushTraffic`）。
+    @Published private(set) var traffic = TrafficStats.decode(UserDefaults.standard.data(forKey: TrafficStats.key))
+    private let trafficLock = NSLock()
+    private var trafficPending = (received: 0, sent: 0)
+    private var trafficTimer: Timer?
     /// 启动续连每秒一次的检查。
     var launchResumeTimer: Timer?
     /// The key the last session at home under each Bonjour name saw on an open door (`p=0`), in
@@ -1123,7 +1129,11 @@ final class StreamClient: ObservableObject {
         // （模拟器上实测：后台里解码的那张一直没写出来）。
         NotificationCenter.default.addObserver(forName: UIApplication.willResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
             self?.keepPictureForLaunch()
+            self?.flushTraffic()
         }
+        let trafficTimer = Timer(timeInterval: 5, repeats: true) { [weak self] _ in self?.flushTraffic() }
+        RunLoop.main.add(trafficTimer, forMode: .common)
+        self.trafficTimer = trafficTimer
         // The clipboard's chip looks when Sill becomes active (StreamClient+Clipboard).
         observeClipboardActivation()
         sound.setMuted(soundMuted)
@@ -3467,6 +3477,38 @@ final class StreamClient: ObservableObject {
         finishDisconnect()
     }
 
+    // MARK: - 流量统计（本 fork）
+
+    /// 记一笔收发的字节数。任何线程。
+    func countTraffic(received: Int = 0, sent: Int = 0) {
+        trafficLock.lock()
+        trafficPending.received += received
+        trafficPending.sent += sent
+        trafficLock.unlock()
+    }
+
+    /// 把攒下的字节并进统计并存盘。主线程。
+    func flushTraffic() {
+        trafficLock.lock()
+        let pending = trafficPending
+        trafficPending = (0, 0)
+        trafficLock.unlock()
+        guard pending.received > 0 || pending.sent > 0 else { return }
+        var next = traffic
+        next.add(received: pending.received, sent: pending.sent, at: Date(), calendar: .current)
+        traffic = next
+        UserDefaults.standard.set(next.encoded(), forKey: TrafficStats.key)
+    }
+
+    /// 清零（统计界面里的「重置统计」）。
+    func resetTraffic() {
+        trafficLock.lock()
+        trafficPending = (0, 0)
+        trafficLock.unlock()
+        traffic = TrafficStats()
+        UserDefaults.standard.removeObject(forKey: TrafficStats.key)
+    }
+
     /// 本 fork（启动续连）：离开前台时也留一张当前画面，下次打开 App 续连时先显示它（App 在后台被系统或用户结束时
     /// 不会走 `tearDown`，原来就只有断开时才留）。规则同 tearDown 的：只在磁贴样式下、这台 Mac 存着时。
     private func keepPictureForLaunch() {
@@ -3880,7 +3922,9 @@ final class StreamClient: ObservableObject {
     /// Any client → host message. Extensions (viewport, client stats) use this; frames never go this way.
     func send(_ kind: StreamMessageKind, payload: Data) {
         let message = StreamMessage(kind: kind, timestamp: Date().timeIntervalSince1970, isKeyframe: false, payload: payload)
-        link.send(message.serialized())
+        let bytes = message.serialized()
+        countTraffic(sent: bytes.count)
+        link.send(bytes)
     }
 
     func sendInput(_ event: InputEvent) {
@@ -4024,7 +4068,9 @@ final class StreamClient: ObservableObject {
     private func send(_ kind: StreamMessageKind, _ payload: Data) {
         let message = StreamMessage(kind: kind, timestamp: Date().timeIntervalSince1970,
                                     isKeyframe: false, payload: payload)
-        link.send(message.serialized())
+        let bytes = message.serialized()
+        countTraffic(sent: bytes.count)
+        link.send(bytes)
     }
 
     /// A pick, a launch, a window's button or a menu item, behind the input already on its way
@@ -4249,7 +4295,10 @@ final class StreamClient: ObservableObject {
     private func startReading(_ c: NWConnection) {
         MessageReader(connection: c,
                       stillReads: { [weak self] in self?.link.reads(c) ?? false },
-                      onBytes: { [weak self] _ in self?.lastReceivedAt = CACurrentMediaTime() },
+                      onBytes: { [weak self] n in
+                          self?.lastReceivedAt = CACurrentMediaTime()
+                          self?.countTraffic(received: n)
+                      },
                       onMessage: { [weak self] header, data in self?.deliver(header, data, from: c) },
                       onEnd: { [weak self] end in self?.readingEnded(c, end) }).start()
     }

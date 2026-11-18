@@ -212,7 +212,7 @@ has Sources/SillHost/VirtualStage.swift :: vd.refusedAgain
 
 ### F12 检查与 CI
 
-- 是什么：新增四组纯检查 `app-recency`、`voice`、`bar-collapse`、`phone-stream`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
+- 是什么：新增五组纯检查 `app-recency`、`voice`、`bar-collapse`、`phone-stream`、`traffic-stats`（各有 `run.sh`、`main.swift`、`mutants.py`），登记在 `Tests/checks/README.md` 的表格和 `ci.yml` 的 mutants 矩阵里；`tour`、`compatibility`、`display-wake`、`pointer-control`、`protocol` 几个检查跟着功能改了。
 - 提交：`9d4ac02`、`39c0d25`、`4f80231`、`a632a5c`。
 - 合并时注意：`ci.yml` 的矩阵是一整行，上游每加一个检查这一行就冲突，合并后三个名字都要在；README 表格同理。
 
@@ -227,6 +227,8 @@ has Tests/checks/README.md :: | `app-recency` |
 has Tests/checks/README.md :: | `bar-collapse` |
 has Tests/checks/README.md :: | `phone-stream` |
 has Tests/checks/README.md :: | `voice` |
+has .github/workflows/ci.yml :: , traffic-stats,
+has Tests/checks/README.md :: | `traffic-stats` |
 ```
 
 ### F14 iPhone 串流界面：强制横屏、图标 Dock 栏、可调的默认缩放
@@ -272,6 +274,24 @@ has iOSClient/ConnectionList.swift :: static func resumeMacID
 has iOSClient/TrackpadGestures.swift :: static func switchesApp
 has iOSClient/StreamClient.swift :: private func switchApp
 has iOSClient/HostSettingsPanel.swift :: "Switch Apps"
+```
+
+### F16 流量统计
+
+- 是什么：记下这台设备和 Mac 之间收发的数据量（Sill 自己的消息字节数，不含 TLS、TCP/IP 包头），按小时（留 8 天）、按天（留 400 天）和累计存在本机 `Sill.trafficStats`，不发给 Mac（规则 `TrafficStats`，检查 `traffic-stats`）。收到的在 `startReading` 的 `onBytes`、发出的在 `StreamClient` 的两个 `send` 里记进 `trafficPending`，每 5 秒、离开前台和打开界面时并进来存盘（`flushTraffic`）。单独的界面 `TrafficStatsView`：累计、近 7 天、今天（收、发分开），按小时（近 24 小时）或按天（近 7 天）的柱状图和明细，重置统计；从设置面板最后一组的「流量统计」行（显示近 7 天合计）和连接界面标题旁的图表按钮打开。
+- 提交：待填。
+- 合并时注意：`startReading` 的 `onBytes` 闭包、两个 `send` 多了 `countTraffic`；连接界面标题旁的按钮叠层里多了一个按钮（`HStack`）。
+
+```fork-check
+file iOSClient/TrafficStats.swift
+file iOSClient/TrafficStatsView.swift
+file Tests/checks/traffic-stats/main.swift
+has iOSClient/Sill.xcodeproj/project.pbxproj :: TrafficStats.swift
+has iOSClient/Sill.xcodeproj/project.pbxproj :: TrafficStatsView.swift
+has iOSClient/StreamClient.swift :: self?.countTraffic(received: n)
+has iOSClient/StreamClient.swift :: func flushTraffic()
+has iOSClient/HostSettingsPanel.swift :: TrafficStatsView(client: client
+has iOSClient/ContentView.swift :: TrafficStatsView(client: client
 ```
 
 ### F13 文档

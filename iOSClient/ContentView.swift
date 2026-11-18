@@ -1137,6 +1137,8 @@ struct ConnectScreen: View {
     /// The DEBUG harness's stand-in for the camera (the simulator has none); nil on a device.
     let scannerOverride: CodeScanner.Mode?
     @AccessibilityFocusState private var titleFocused: Bool
+    /// 本 fork：流量统计界面开着。
+    @State private var showTraffic = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.dynamicTypeSize) private var typeSize
     /// The Duo's hinge (iOS 27.1): with the fold, where the column goes (ConnectLayout).
@@ -1294,6 +1296,9 @@ struct ConnectScreen: View {
             #endif
         }
         .onChange(of: client.status) { _, line in announce(line) }
+        .sheet(isPresented: $showTraffic) {
+            TrafficStatsView(client: client, close: { showTraffic = false })
+        }
     }
 
     /// Not the idle "Looking for Macs…" lines, which change as the search does.
@@ -1351,6 +1356,17 @@ struct ConnectScreen: View {
                 // back.
                 .overlay(alignment: .trailing) {
                     if !carded, client.pendingLink == nil {
+                      HStack(spacing: 0) {
+                        // 本 fork：流量统计界面（TrafficStatsView）。
+                        Button { showTraffic = true } label: {
+                            Image(systemName: "chart.bar")
+                                .font(.system(size: 15, weight: .medium))
+                                .foregroundStyle(Palette.accent)
+                                .frame(width: 44, height: 44)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(String(localized: "Data Usage", comment: "流量统计界面标题"))
                         Button {
                             toggleStyle()
                         } label: {
@@ -1362,6 +1378,7 @@ struct ConnectScreen: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityLabel(style == .tiles ? String(localized: "Show as list", comment: "连接页：切换到列表的无障碍标签") : String(localized: "Show as tiles", comment: "连接页：切换到卡片的无障碍标签"))
+                      }
                     }
                 }
 

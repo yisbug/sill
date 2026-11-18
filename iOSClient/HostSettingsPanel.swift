@@ -94,6 +94,8 @@ struct HostSettingsPanel: View {
     /// VoiceOver is on: it keeps three-finger swipes and taps for itself, so the This iPad group says
     /// its rows do the gestures instead.
     @State private var voiceOver = HostSettingsPanel.voiceOverRunning
+    /// 本 fork：流量统计界面开着。
+    @State private var showTraffic = false
 
     private var mac: String { client.macName.isEmpty ? String(localized: "the Mac", comment: "主机设置面板：Mac 名称缺失时的称呼") : client.macName }
     private static let shape = RoundedRectangle(cornerRadius: 20, style: .continuous)
@@ -196,6 +198,9 @@ struct HostSettingsPanel: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: UIAccessibility.voiceOverStatusDidChangeNotification).receive(on: RunLoop.main)) { _ in
             voiceOver = Self.voiceOverRunning
+        }
+        .sheet(isPresented: $showTraffic) {
+            TrafficStatsView(client: client, close: { showTraffic = false })
         }
     }
 
@@ -456,6 +461,22 @@ struct HostSettingsPanel: View {
     /// it even while the Mac's settings load.
     @ViewBuilder private var tour: some View {
         Rows {
+            // 本 fork：流量统计界面（TrafficStatsView）。
+            Button { showTraffic = true } label: {
+                HStack {
+                    Text(String(localized: "Data Usage", comment: "流量统计界面标题"))
+                        .foregroundStyle(Palette.accent)
+                    Spacer()
+                    Text(TrafficStatsView.bytes(client.traffic.lastSevenDays(now: Date(), calendar: .current).total))
+                        .foregroundStyle(Palette.muted)
+                        .monospacedDigit()
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(String(localized: "Shows how much data Sill used, by hour and by day.", comment: "设置面板：流量统计入口的无障碍提示"))
+            .rowFrame()
             Button(action: takeTour) {
                 Text(TourPolicy.takeTourTitle)
                     .foregroundStyle(Palette.accent)
