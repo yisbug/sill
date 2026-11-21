@@ -198,6 +198,31 @@ enum VoicePolicy {
         }
     }
 
+    // MARK: 多行文字：粘贴，不逐字打
+
+    /// 识别出的文字含换行时不逐字打而是粘贴：逐字打会把换行打成回车键（InputInjector.type），聊天类输入框
+    /// 里回车就是发送，第一行一到就发出去，后面几行落到空输入框或别处，整段没能完整录入。粘贴的换行只是
+    /// 文字里的换行，哪个应用都不当作发送（终端的括号粘贴也不执行）。单行照旧逐字打。与 meeppo-voice
+    /// 自己回填的做法一致：存下剪贴板、写入文字、⌘V、稍后恢复（HostClipboard.stageVoicePaste）。
+    static func pastes(_ text: String) -> Bool {
+        text.unicodeScalars.contains { CharacterSet.newlines.contains($0) }
+    }
+
+    /// 粘贴：⌘V，和设备的"立即粘贴"一样按键盘的按法，⌘ 自己的键在 V 的外面（KeyStrokes 据此定每个事件的标志，
+    /// V 抬起后 HID 状态表里不留 ⌘）。V 是 HID 用法 0x19（ClipboardPolicy.pasteKey），⌘ 是 0xE3，标志 1 << 20。
+    static let pasteKeys: [InputEvent] = [
+        .key(hidUsage: commandKey, down: true, modifiers: commandFlag),
+        .key(hidUsage: ClipboardPolicy.pasteKey, down: true, modifiers: commandFlag),
+        .key(hidUsage: ClipboardPolicy.pasteKey, down: false, modifiers: commandFlag),
+        .key(hidUsage: commandKey, down: false, modifiers: 0),
+    ]
+    private static let commandKey: UInt16 = 0xE3
+    private static let commandFlag: UInt64 = 1 << 20
+
+    /// 粘贴后多久把剪贴板恢复成原来的内容：⌘V 可能要等应用到前台（协调器最多扣住输入 0.6 s），应用读剪贴板
+    /// 也要一点时间，所以留足 1.5 s。期间有人复制了别的东西就不恢复（HostClipboard）。
+    static let clipboardRestoreDelay: TimeInterval = 1.5
+
     /// 预览：最多 200 个字符（Character），超出时截断并以省略号结尾（省略号算在 200 之内）。
     static func preview(_ text: String) -> String {
         let limit = VoiceResult.maxPreviewCharacters

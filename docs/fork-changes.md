@@ -119,8 +119,8 @@ has Sources/StreamProtocol/Switcher.swift :: public var voice: Int?
 
 ### F06 语音输入：Mac 端 VoiceBridge
 
-- 是什么：Mac 把语音片段交给本机的 meeppo-voice 识别（发现文件 `local-api.json`，默认 TypefreeDemo 目录，`voiceDataDirectory` / `--voice-dir` / `SILL_TEST_VOICE_DIR`），文字走 kind 8 文字的同一入口注入；Settings › General 有一行状态；测试替身 `Scripts/voice-standin.py`，`sillclient.py` 的 `--voice`、`--voice-cancel`。
-- 提交：`c963aeb`。
+- 是什么：Mac 把语音片段交给本机的 meeppo-voice 识别（发现文件 `local-api.json`，默认 TypefreeDemo 目录，`voiceDataDirectory` / `--voice-dir` / `SILL_TEST_VOICE_DIR`），单行文字走 kind 8 文字的同一入口注入，含换行的多行文字改为借剪贴板粘贴（`VoicePolicy.pastes`：存下剪贴板、写入文字、⌘V 走设备按键的同一入口、1.5 s 后剪贴板没被别人改过就恢复，`HostClipboard.stageVoicePaste`；逐字打时换行是回车键，聊天输入框里一回车就发出去，整段录不全）；Settings › General 有一行状态；测试替身 `Scripts/voice-standin.py`，`sillclient.py` 的 `--voice`、`--voice-cancel`。
+- 提交：`c963aeb`；多行粘贴见 `git log -S'stageVoicePaste'`。
 - 合并时注意：`StreamCoordinator`、`StreamServer`、`HostConfig`、`InputInjector`、`TestHooks` 是上游改动最密的文件，语音的接线点（收 kind 100/102、发 101、窗口列表里的 `voice`）容易在冲突里丢。
 
 ```fork-check
@@ -132,6 +132,9 @@ has Sources/SillHostCLI/main.swift :: --voice-dir
 has Sources/SillHost/StreamCoordinator.swift :: VoiceBridge
 has Sources/SillHost/StreamServer.swift :: voiceClip
 has Scripts/sillclient.py :: --voice-cancel
+has Sources/SillHost/VoicePolicy.swift :: static func pastes(
+has Sources/SillHost/StreamCoordinator.swift :: clipboard.stageVoicePaste(
+has Sources/SillHost/HostClipboard.swift :: func stageVoicePaste(
 ```
 
 ### F07 语音输入：iOS 悬浮球

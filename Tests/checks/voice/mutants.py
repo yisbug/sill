@@ -102,5 +102,11 @@ M = [
     ("时长不补零", P, '.minuteSecond(padMinuteToLength: 1)', '.minuteSecond(padMinuteToLength: 2)'),
     ("音量从 -60 dB 起", P, "return Double(min(max((power + 50) / 50, 0), 1))", "return Double(min(max((power + 60) / 60, 0), 1))"),
     ("VoiceOver 标签写错", P, 'String(localized: "Voice input", comment: "语音悬浮球：无障碍标签")', 'String(localized: "Dictation", comment: "语音悬浮球：无障碍标签")'),
+    # 多行文字粘贴
+    ("只认 \\n 一种换行", V, "        text.unicodeScalars.contains { CharacterSet.newlines.contains($0) }", '        text.contains("\\n")'),
+    ("从不粘贴", V, "        text.unicodeScalars.contains { CharacterSet.newlines.contains($0) }", "        false"),
+    ("V 不带 ⌘", V, "        .key(hidUsage: ClipboardPolicy.pasteKey, down: true, modifiers: commandFlag),", "        .key(hidUsage: ClipboardPolicy.pasteKey, down: true, modifiers: 0),"),
+    ("⌘ 抬起仍带 ⌘", V, "        .key(hidUsage: commandKey, down: false, modifiers: 0),", "        .key(hidUsage: commandKey, down: false, modifiers: commandFlag),"),
+    ("恢复剪贴板太早", V, "static let clipboardRestoreDelay: TimeInterval = 1.5", "static let clipboardRestoreDelay: TimeInterval = 0.2"),
 ]
 sys.exit(0 if module.mutate("voice", M, sys.argv[1]) else 1)

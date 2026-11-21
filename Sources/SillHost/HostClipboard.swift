@@ -206,6 +206,27 @@ final class HostClipboard {
         if subscribers.isEmpty { stopLooking() }
     }
 
+    // MARK: 语音的多行文字（VoicePolicy.pastes）
+
+    /// 粘贴前：存下剪贴板现有的内容，写入要粘贴的文字（只给这台 Mac，看的时候不发给设备），之后安排在
+    /// `VoicePolicy.clipboardRestoreDelay` 后恢复。写完才返回，所以随后的 ⌘V 一定贴到这段文字。返回原内容是否
+    /// 存下了（macOS 不让读剪贴板时存不了，文字就留在剪贴板上）。与"共享剪贴板"开关无关：这是这台 Mac 自己的粘贴。
+    func stageVoicePaste(_ text: String) async -> Bool {
+        let saved = await board.stagePaste(text)
+        if testLog { print("Test clipboard: voice text staged for a paste, \(text.utf8.count) bytes; the clipboard \(saved ? "saved" : "not saved (macOS does not allow reads)").") }
+        restoreTask?.cancel()
+        restoreTask = Task { [weak self, board] in
+            try? await Task.sleep(nanoseconds: UInt64(VoicePolicy.clipboardRestoreDelay * 1_000_000_000))
+            guard !Task.isCancelled else { return }
+            let restored = await board.restorePaste()
+            if self?.testLog == true { print("Test clipboard: after the voice paste, the clipboard \(restored ? "restored" : "left as it is").") }
+        }
+        return saved
+    }
+
+    /// 语音粘贴之后的恢复，等着的那一个：再来一段时取消它（沿用第一次存下的原内容）。
+    private var restoreTask: Task<Void, Never>?
+
     private func subscribe(_ connection: NWConnection, who: String) {
         let id = ObjectIdentifier(connection)
         guard subscribers[id] == nil else { return }
@@ -344,6 +365,53 @@ final class HostClipboard {
             return Look(access: access, change: (count, decision))
         }
 
+        /// 语音的多行文字借剪贴板粘贴（VoicePolicy.pastes）：把现在剪贴板上每一项的每种数据存下（只在 macOS
+        /// 允许读时：否则一读就弹它的粘贴提示，就不存，粘贴后文字留在剪贴板上，返回 false），再像设备的文字
+        /// 一样写入（只给这台 Mac、带本次启动的标记，所以"看"永远不会把它发给设备）。上一次的还没恢复时沿用
+        /// 那次存下的（原来的内容），不把上一段语音当原内容存。在自己的队列上，读一个应用承诺的数据慢也不卡主线程。
+        func stagePaste(_ text: String) async -> Bool {
+            await withCheckedContinuation { done in
+                queue.async {
+                    if self.pendingRestore == nil {
+                        let canRead = ClipboardPolicy.hostLooks(self.access())
+                        self.pendingRestore = (canRead ? self.board.pasteboardItems.map(Self.copies) ?? [] : nil, 0)
+                    }
+                    self.writeNow(text)
+                    self.pendingRestore?.count = self.ownChangeCount ?? 0
+                    done.resume(returning: self.pendingRestore?.items != nil)
+                }
+            }
+        }
+
+        /// 粘贴过后：剪贴板还是那次写入的（没人又复制别的）就换回存下的内容，同样只给这台 Mac，且这次改动当作
+        /// 已看过，不发给设备（它本来就在剪贴板上）。返回是否恢复了。
+        func restorePaste() async -> Bool {
+            await withCheckedContinuation { done in
+                queue.async {
+                    guard let pending = self.pendingRestore else { return done.resume(returning: false) }
+                    self.pendingRestore = nil
+                    guard let items = pending.items, self.board.changeCount == pending.count else { return done.resume(returning: false) }
+                    _ = self.board.prepareForNewContents(with: .currentHostOnly)
+                    if !items.isEmpty { self.board.writeObjects(items) }
+                    self.ownChangeCount = self.board.changeCount
+                    self.seen = self.board.changeCount
+                    done.resume(returning: true)
+                }
+            }
+        }
+
+        /// 粘贴前存下的剪贴板（nil：macOS 不让读，没存）与写入语音文字后的变更计数。只在 `queue` 上读写。
+        private var pendingRestore: (items: [NSPasteboardItem]?, count: Int)?
+
+        /// 一项的每种数据复制成新的一项（原来那项属于剪贴板，不能再写回去）；读不出的类型跳过。
+        private static func copies(_ items: [NSPasteboardItem]) -> [NSPasteboardItem] {
+            items.map { item in
+                let copy = NSPasteboardItem()
+                for type in item.types { if let data = item.data(forType: type) { copy.setData(data, forType: type) } }
+                return copy
+            }
+        }
+
         /// A device's text, for this Mac only, marked as this launch's, its change count kept. Written
         /// whatever macOS says of reads: writing needs no leave. Synchronous (the review of #242): the
         /// main actor, which handles each device's messages in order, returns from `received` only once
@@ -355,18 +423,21 @@ final class HostClipboard {
         /// came 50 to 66 ms after. The cost: the write (about a millisecond) and a look the queue is in
         /// the middle of. Nothing on this queue ever waits for the main actor, so it cannot deadlock.
         func write(_ text: String) {
-            queue.sync {
-                let prepared = self.board.prepareForNewContents(with: .currentHostOnly)
-                let item = NSPasteboardItem()
-                item.setString(text, forType: .string)
-                item.setString(self.launchID, forType: NSPasteboard.PasteboardType(ClipboardPolicy.ownType))
-                self.board.writeObjects([item])
-                // The count after it: read back while macOS allows reads, as the looks do; else the one
-                // the write began with, which the write itself does not move.
-                let count = self.lastAccess.map(ClipboardPolicy.hostLooks) == false ? prepared : self.board.changeCount
-                self.ownChangeCount = count
-                self.seen = count
-            }
+            queue.sync { self.writeNow(text) }
+        }
+
+        /// `write` 的本体，在 `queue` 上。
+        private func writeNow(_ text: String) {
+            let prepared = self.board.prepareForNewContents(with: .currentHostOnly)
+            let item = NSPasteboardItem()
+            item.setString(text, forType: .string)
+            item.setString(self.launchID, forType: NSPasteboard.PasteboardType(ClipboardPolicy.ownType))
+            self.board.writeObjects([item])
+            // The count after it: read back while macOS allows reads, as the looks do; else the one
+            // the write began with, which the write itself does not move.
+            let count = self.lastAccess.map(ClipboardPolicy.hostLooks) == false ? prepared : self.board.changeCount
+            self.ownChangeCount = count
+            self.seen = count
         }
     }
 

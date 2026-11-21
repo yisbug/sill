@@ -1418,7 +1418,18 @@ package final class StreamCoordinator {
                                     payload: Wire.encode(event))
         guard case .take = lockDecision(message, input: event, from: id, reading: lockReading) else { return .locked }
         guard currentSourceRect() != nil else { return .nothingStreams }
-        await handle(message, from: connection, arrived: lockReading)
+        // 多行文字粘贴，不逐字打：逐字打的换行是回车键，聊天输入框里一回车就发出去了（VoicePolicy.pastes）。
+        // 文字先写进剪贴板（写完才往下走），⌘V 再走设备按键的同一入口（锁屏、到前台、扣住的输入照旧），剪贴板稍后恢复。
+        guard VoicePolicy.pastes(text) else {
+            await handle(message, from: connection, arrived: lockReading)
+            return .typed
+        }
+        _ = await clipboard.stageVoicePaste(text)
+        for key in VoicePolicy.pasteKeys {
+            let keyMessage = StreamMessage(kind: .input, timestamp: Date().timeIntervalSince1970, isKeyframe: false,
+                                           payload: Wire.encode(key))
+            await handle(keyMessage, from: connection, arrived: lockReading)
+        }
         return .typed
     }
 

@@ -326,5 +326,18 @@ check("录音中、识别中不给菜单", !P.offersQuickActions(.recording(clip
 check("每项都有文字和图标", P.QuickAction.allCases.allSatisfy { !P.title($0).isEmpty && !P.symbol($0).isEmpty })
 check("空闲底色略透明", P.idleFillOpacity > 0.5 && P.idleFillOpacity < 0.92)
 
+// MARK: - 多行文字借剪贴板粘贴（逐字打时换行会成回车键，聊天输入框里回车即发送）
+
+check("单行逐字打", !V.pastes("你好，世界") && !V.pastes("") && !V.pastes("a\tb"))
+check("含 \\n 的粘贴", V.pastes("第一行\n第二行") && V.pastes("末尾换行\n"))
+check("含 \\r\\n、\\r 的粘贴", V.pastes("a\r\nb") && V.pastes("a\rb"))
+check("Unicode 行、段分隔符也粘贴", V.pastes("a\u{2028}b") && V.pastes("a\u{2029}b") && V.pastes("a\u{85}b"))
+check("粘贴键恰好是 ⌘V：⌘ 下、V 下、V 上、⌘ 上", V.pasteKeys == [
+    .key(hidUsage: 0xE3, down: true, modifiers: 1 << 20),
+    .key(hidUsage: 0x19, down: true, modifiers: 1 << 20),
+    .key(hidUsage: 0x19, down: false, modifiers: 1 << 20),
+    .key(hidUsage: 0xE3, down: false, modifiers: 0)])
+check("恢复剪贴板在设备输入最长的等待（0.6 s）之后", V.clipboardRestoreDelay > 0.6 && V.clipboardRestoreDelay <= 2)
+
 print("\(passes) checks, \(fails) failed")
 exit(fails == 0 ? 0 : 1)
